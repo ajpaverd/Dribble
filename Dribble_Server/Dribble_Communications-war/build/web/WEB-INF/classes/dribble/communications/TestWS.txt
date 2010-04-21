@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<drib>
+    <text>Hello</text>
+    <latitude>1</latitude>
+    <longitude>1</longitude>
+    <messageID>2</messageID>
+    <time></time>
+
+    <topic>
+        <name>Fire</name>
+        <latitude>1</latitude>
+        <longitude>1</longitude>
+        <topicID></topicID>
+        <numViews></numViews>
+        <numPosts></numPosts>
+        <time></time>
+        <popularity></popularity>
+    </topic>
+
+    <like_count>0</like_count>
+    <popularity>100</popularity>
+</drib>
