@@ -13,4 +13,7 @@
   <module>
     <ejb>Dribble_Processing-ejb.jar</ejb>
   </module>
+  <module>
+    <ejb>Dribble_Dataset.jar</ejb>
+  </module>
 </application>

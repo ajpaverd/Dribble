@@ -1,46 +1,51 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dribble.communications;
 
-//import dribble.common.Drib;
-import java.util.ArrayList;
-import java.util.List;
-
-//import dribble.common.DribTopic;
-//import javax.naming.InitialContext;
-
+import javax.naming.NamingException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
-//import javax.ws.rs.PathParam;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.GET;
 import javax.ws.rs.Produces;
 
-import javax.naming.NamingException;
 import java.util.logging.Logger;
 
-import java.util.Calendar;
 
 import dribble.common.*;
-import javax.naming.*;
-import javax.jms.*;
+import javax.annotation.Resource;
+import javax.jms.Connection;
+import javax.jms.ConnectionFactory;
+import javax.jms.JMSException;
+import javax.jms.Message;
+import javax.jms.MessageProducer;
+import javax.jms.ObjectMessage;
+import javax.jms.Queue;
+
+import javax.jms.QueueConnection;
+import javax.jms.QueueConnectionFactory;
+import javax.jms.QueueReceiver;
+import javax.jms.QueueRequestor;
+import javax.jms.QueueSender;
+import javax.jms.QueueSession;
+import javax.jms.Session;
+import javax.jms.TemporaryQueue;
+import javax.jms.TextMessage;
+import javax.naming.InitialContext;
 import javax.ws.rs.core.MultivaluedMap;
 
 /**
  * REST Web Service
  *
- * @author andrew
+ * @author Dribble
  */
-@Path("GetDribs")
-public class GetDribsResource {
+@Path("GetDribSubjects")
+public class GetDribSubjectsResource {
 
     @Context
     private UriInfo context;
-    static final Logger logger = Logger.getLogger("GetDribsResource");
+    static final Logger logger = Logger.getLogger("GetDribSubjectsResource");
     private InitialContext jndiContext;
     private QueueConnectionFactory queueConnectionFactory;
     private QueueConnection queueConnection;
@@ -49,10 +54,10 @@ public class GetDribsResource {
     private QueueSender queueSender;
 
 
-    /** Creates a new instance of GetDribsResource */
-    public GetDribsResource() {
+    /** Creates a new instance of PutDribResource */
+    public GetDribSubjectsResource() {
 
-        logger.info("GetDribsResource Constructor");
+        logger.info("GetDribSubjectsResource Constructor");
 
         try {
             jndiContext = new InitialContext();
@@ -60,9 +65,9 @@ public class GetDribsResource {
             //Connection factory and queue
 
             logger.info("Looking up queue");
-            queue = (Queue)jndiContext.lookup("jms/getDribsQueue");
+            queue = (Queue)jndiContext.lookup("jms/getDribSubjectsQueue");
             logger.info("lookup queue connection factory");
-            queueConnectionFactory = (QueueConnectionFactory) jndiContext.lookup("jms/getDribsQueueFactoryPool");
+            queueConnectionFactory = (QueueConnectionFactory) jndiContext.lookup("jms/getDribSubjectsQueueFactoryPool");
             logger.info("Lookup context complete");
         } catch (NamingException e) {
             logger.info("JNDI API lookup failed: "
@@ -85,15 +90,13 @@ public class GetDribsResource {
         }
     }
 
-
     /**
-     * Retrieves representation of an instance of dribble.communications.GetDribsResource
-     * @return an instance of java.util.ArrayList
+     * Retrieves representation of an instance of dribble.communications.GetDribSubjectsResource
+     * @return an instance of dribble.common.DribSubject
      */
     @GET
     @Produces("application/xml")
-    public ArrayList<Drib> getXml(@Context UriInfo ui) {
-
+    public DribSubject getXml(@Context UriInfo ui) {
         logger.info("Get Request");
 
         MultivaluedMap<String,String> queryParams = ui.getQueryParameters();
@@ -101,12 +104,10 @@ public class GetDribsResource {
         String latitudeString = queryParams.getFirst("latitude");
         String longitudeString = queryParams.getFirst("longitude");
         String resultsString = queryParams.getFirst("results");
-        String subjectIDString = queryParams.getFirst("subjectID");
 
         double latitude = Double.parseDouble(latitudeString);
         double longitude = Double.parseDouble(longitudeString);
         int results = Integer.parseInt(resultsString);
-        int subjectID = Integer.parseInt(subjectIDString);
 
         try {
 
@@ -114,7 +115,6 @@ public class GetDribsResource {
             msg.setDoubleProperty("latitude", latitude);
             msg.setDoubleProperty("longitude", longitude);
             msg.setIntProperty("results", results);
-            msg.setIntProperty("subjectID", subjectID);
 
             logger.info("Message created");
 
@@ -134,7 +134,7 @@ public class GetDribsResource {
 
             queueSender.send(msg);
 
-            logger.info("Sent msg");
+            logger.info("Sent omsg");
 
             Message response = receiver.receive(10000);
 
@@ -147,28 +147,25 @@ public class GetDribsResource {
 
             logger.info("Object message created");
 
-            ArrayList<Drib> dribList = (ArrayList<Drib>) oresponse.getObject();
+            DribSubject ds = (DribSubject)oresponse.getObject();
 
-            return dribList;
+            return ds;
 
 
         } catch (JMSException jmse2) {
             logger.info("Error...");
             return null;
         }
-
     }
 
-
-
     /**
-     * PUT method for updating or creating an instance of GetDribsResource
+     * PUT method for updating or creating an instance of GetDribSubjectsResource
      * @param content representation for the resource
      * @return an HTTP response with content of the updated or created resource.
      */
     @PUT
     @Consumes("application/xml")
-    public void putXml(ArrayList content) {
+    public void putXml(DribSubject content) {
         throw new UnsupportedOperationException();
     }
 }

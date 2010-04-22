@@ -36,6 +36,7 @@ public class putDribBean implements MessageListener {
         {
             ObjectMessage objMessage = (ObjectMessage) message;
             Drib drib = (Drib) objMessage.getObject();
+            logger.info(drib.getText());
         }
 
         /*try {
