@@ -166,24 +166,6 @@ exists or setup the property manually. For example like this:
                 <isset property="build.deploy.on.save"/>
             </not>
         </condition>
-        <ant antfile="${project.Dribble_Dataset}/build.xml" inheritall="false" target="dist-ear">
-            <property location="${build.dir}" name="dist.ear.dir"/>
-            <property name="deploy.on.save" value="${build.deploy.on.save}"/>
-        </ant>
-        <condition property="build.deploy.on.save" value="false">
-            <not>
-                <isset property="build.deploy.on.save"/>
-            </not>
-        </condition>
-        <ant antfile="${project.Dribble_Processing}/build.xml" inheritall="false" target="dist-ear">
-            <property location="${build.dir}" name="dist.ear.dir"/>
-            <property name="deploy.on.save" value="${build.deploy.on.save}"/>
-        </ant>
-        <condition property="build.deploy.on.save" value="false">
-            <not>
-                <isset property="build.deploy.on.save"/>
-            </not>
-        </condition>
         <ant antfile="${project.Dribble_Processing-ejb}/build.xml" inheritall="false" target="dist-ear">
             <property location="${build.dir}" name="dist.ear.dir"/>
             <property name="deploy.on.save" value="${build.deploy.on.save}"/>
@@ -201,12 +183,7 @@ exists or setup the property manually. For example like this:
     </target>
     <target depends="init,deps-jar,pre-pre-compile,pre-compile" name="-do-compile-deps">
         <copyfiles files="${reference.Dribble_Communications-war.dist-ear}" todir="${build.dir}//"/>
-        <copyfiles files="${reference.Dribble_Processing.dist-ear}" todir="${build.dir}//"/>
-        <copyfiles files="${reference.Dribble_Processing.dist-ear}" todir="${build.dir}//"/>
-        <copyfiles files="${reference.Dribble_Processing.dist-ear}" todir="${build.dir}//"/>
-        <copyfiles files="${reference.Dribble_Processing.dist-ear}" todir="${build.dir}//"/>
         <copyfiles files="${reference.Dribble_Processing-ejb.dist-ear}" todir="${build.dir}//"/>
-        <copyfiles files="${reference.Dribble_Dataset.dist-ear}" todir="${build.dir}//"/>
     </target>
     <target name="post-compile">
         <!-- Empty placeholder for easier customization. -->
@@ -284,8 +261,6 @@ exists or setup the property manually. For example like this:
     <target name="-run-deploy-am" unless="no.deps">
         <!-- Task to deploy to the Access Manager runtime. -->
         <ant antfile="${project.Dribble_Communications-war}/build.xml" inheritall="false" target="-run-deploy-am"/>
-        <ant antfile="${project.Dribble_Dataset}/build.xml" inheritall="false" target="-run-deploy-am"/>
-        <ant antfile="${project.Dribble_Processing}/build.xml" inheritall="false" target="-run-deploy-am"/>
         <ant antfile="${project.Dribble_Processing-ejb}/build.xml" inheritall="false" target="-run-deploy-am"/>
     </target>
     <target depends="-init-cos,dist-directory-deploy,pre-run-deploy,-pre-nbmodule-run-deploy,-run-deploy-nb,-init-deploy-ant,-deploy-ant,-run-deploy-am,-post-nbmodule-run-deploy,post-run-deploy" name="run-deploy"/>
@@ -472,24 +447,6 @@ exists or setup the property manually. For example like this:
             </not>
         </condition>
         <ant antfile="${project.Dribble_Communications-war}/build.xml" inheritall="false" target="clean-ear">
-            <property location="${build.dir}" name="dist.ear.dir"/>
-            <property name="deploy.on.save" value="${build.deploy.on.save}"/>
-        </ant>
-        <condition property="build.deploy.on.save" value="false">
-            <not>
-                <isset property="build.deploy.on.save"/>
-            </not>
-        </condition>
-        <ant antfile="${project.Dribble_Dataset}/build.xml" inheritall="false" target="clean-ear">
-            <property location="${build.dir}" name="dist.ear.dir"/>
-            <property name="deploy.on.save" value="${build.deploy.on.save}"/>
-        </ant>
-        <condition property="build.deploy.on.save" value="false">
-            <not>
-                <isset property="build.deploy.on.save"/>
-            </not>
-        </condition>
-        <ant antfile="${project.Dribble_Processing}/build.xml" inheritall="false" target="clean-ear">
             <property location="${build.dir}" name="dist.ear.dir"/>
             <property name="deploy.on.save" value="${build.deploy.on.save}"/>
         </ant>

@@ -12,27 +12,7 @@
                     <path-in-war>/</path-in-war>
                 </library>
                 <library>
-                    <file>${reference.Dribble_Processing.dist-ear}</file>
-                    <path-in-war>/</path-in-war>
-                </library>
-                <library>
-                    <file>${reference.Dribble_Processing.dist-ear}</file>
-                    <path-in-war>/</path-in-war>
-                </library>
-                <library>
-                    <file>${reference.Dribble_Processing.dist-ear}</file>
-                    <path-in-war>/</path-in-war>
-                </library>
-                <library>
-                    <file>${reference.Dribble_Processing.dist-ear}</file>
-                    <path-in-war>/</path-in-war>
-                </library>
-                <library>
                     <file>${reference.Dribble_Processing-ejb.dist-ear}</file>
-                    <path-in-war>/</path-in-war>
-                </library>
-                <library>
-                    <file>${reference.Dribble_Dataset.dist-ear}</file>
                     <path-in-war>/</path-in-war>
                 </library>
             </web-module-additional-libraries>
@@ -40,22 +20,6 @@
         <references xmlns="http://www.netbeans.org/ns/ant-project-references/1">
             <reference>
                 <foreign-project>Dribble_Communications-war</foreign-project>
-                <artifact-type>j2ee_ear_archive</artifact-type>
-                <script>build.xml</script>
-                <target>dist-ear</target>
-                <clean-target>clean-ear</clean-target>
-                <id>dist-ear</id>
-            </reference>
-            <reference>
-                <foreign-project>Dribble_Dataset</foreign-project>
-                <artifact-type>j2ee_ear_archive</artifact-type>
-                <script>build.xml</script>
-                <target>dist-ear</target>
-                <clean-target>clean-ear</clean-target>
-                <id>dist-ear</id>
-            </reference>
-            <reference>
-                <foreign-project>Dribble_Processing</foreign-project>
                 <artifact-type>j2ee_ear_archive</artifact-type>
                 <script>build.xml</script>
                 <target>dist-ear</target>
