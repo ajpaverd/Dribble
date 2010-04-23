@@ -99,6 +99,10 @@ public class GetDribSubjectsResource {
     public DribSubject getXml(@Context UriInfo ui) {
         logger.info("Get Request");
 
+        /*if(ui==null)
+        {
+            return null;
+        }
         MultivaluedMap<String,String> queryParams = ui.getQueryParameters();
 
         String latitudeString = queryParams.getFirst("latitude");
@@ -107,14 +111,17 @@ public class GetDribSubjectsResource {
 
         double latitude = Double.parseDouble(latitudeString);
         double longitude = Double.parseDouble(longitudeString);
-        int results = Integer.parseInt(resultsString);
+        int results = Integer.parseInt(resultsString);*/
+
+        double latitude = 0.3232;
+        double longitude = 0.43438;
 
         try {
 
             Message msg = queueSession.createMessage();
-            msg.setDoubleProperty("latitude", latitude);
-            msg.setDoubleProperty("longitude", longitude);
-            msg.setIntProperty("results", results);
+            //msg.setDoubleProperty("latitude", latitude);
+            //msg.setDoubleProperty("longitude", longitude);
+            //msg.setIntProperty("results", results);
 
             logger.info("Message created");
 

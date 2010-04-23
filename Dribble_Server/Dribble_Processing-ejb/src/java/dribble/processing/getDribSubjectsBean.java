@@ -96,9 +96,9 @@ public class getDribSubjectsBean implements MessageListener {
 
         logger.info("Reply created");
 
-        ObjectMessage omsg = (ObjectMessage)message;
-        String msg = (String)omsg.getObject();
-        logger.info("Bean: "+msg);
+        //ObjectMessage omsg = (ObjectMessage)message;
+       // String msg = (String)omsg.getObject();
+        //logger.info("Bean: "+msg);
 
         logger.info("creating reply");
 

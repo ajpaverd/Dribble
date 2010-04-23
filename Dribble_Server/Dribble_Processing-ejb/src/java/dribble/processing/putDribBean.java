@@ -6,6 +6,8 @@
 package dribble.processing;
 
 import dribble.common.*;
+import dribble.dataset.Dataset;
+import dribble.dataset.SQLCommunicator;
 import java.util.logging.Level;
 import javax.ejb.ActivationConfigProperty;
 import javax.ejb.MessageDriven;
@@ -36,7 +38,9 @@ public class putDribBean implements MessageListener {
         {
             ObjectMessage objMessage = (ObjectMessage) message;
             Drib drib = (Drib) objMessage.getObject();
-            logger.info(drib.getText());
+            logger.info("Drib deserialised and now adding to database");
+            processDrib(drib);
+            logger.info("Drib has been inserted in database");
         }
 
         /*try {
@@ -53,6 +57,14 @@ public class putDribBean implements MessageListener {
         } catch (JMSException ex) {
             logger.info("Problem");
         }
+    }
+
+    public void processDrib(Drib drib)
+    {
+        Dataset dataset = new SQLCommunicator();
+        logger.info("Adding to database");
+        dataset.addDrib(drib);
+
     }
     
 }

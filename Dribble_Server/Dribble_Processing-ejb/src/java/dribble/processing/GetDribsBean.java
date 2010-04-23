@@ -97,13 +97,25 @@ public class GetDribsBean implements MessageListener {
         ArrayList<Drib> resp = new ArrayList<Drib>();
 
         Drib a = new Drib();
-        a.setText("Topic A");
+        a.setText("There is a fire in the hole");
         a.setPopularity(10000);
-
+        a.setLatitude(0.4343434);
+        a.setLongitude(0.436746);
+        a.setLikeCount(5);
+        //a.setTime(System.currentTimeMillis());
+        DribSubject dribsubject = new DribSubject();
+        a.setSubject(dribsubject);
+        a.getSubject().setName("Fire");
+        a.getSubject().setLatitude(0.4343443432);
+        a.getSubject().setLongitude(0.3232);
+        //a.getSubject().setNumPosts(0);
+        a.getSubject().setSubjectID(25);
+        //a.getSubject().s
 
         Drib b = new Drib();
         b.setText("Topic B");
         b.setPopularity(10);
+
 
 
         Drib c = new Drib();
@@ -116,12 +128,12 @@ public class GetDribsBean implements MessageListener {
 
         logger.info("Reply created");
 
-        double lat = message.getDoubleProperty("latitude");
-        double lon = message.getDoubleProperty("longitude");
-        int num = message.getIntProperty("num_messages");
-        logger.info("Lat: " + lat);
-        logger.info("Lon: " + lon);
-        logger.info("Num: " + num);
+        //double lat = message.getDoubleProperty("latitude");
+        //double lon = message.getDoubleProperty("longitude");
+        //int num = message.getIntProperty("num_messages");
+        //logger.info("Lat: " + lat);
+        //logger.info("Lon: " + lon);
+        //logger.info("Num: " + num);
 
 
         Message reply = queueSession.createObjectMessage(resp);
