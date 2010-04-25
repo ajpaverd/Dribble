@@ -11,7 +11,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author Dribble
  */
 
-@XmlRootElement
+@XmlRootElement(name="dribble.common.Drib")
 public class Drib implements Serializable{
 
 

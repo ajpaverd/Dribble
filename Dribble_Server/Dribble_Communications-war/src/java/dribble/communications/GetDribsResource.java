@@ -1,39 +1,38 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dribble.communications;
 
-//import dribble.common.Drib;
-import java.util.ArrayList;
-import java.util.List;
+import dribble.common.*;
 
-//import dribble.common.DribTopic;
-//import javax.naming.InitialContext;
+import java.util.ArrayList;
+import java.util.logging.Logger;
+
+import javax.jms.JMSException;
+import javax.jms.Message;
+import javax.jms.ObjectMessage;
+import javax.jms.Queue;
+import javax.jms.QueueConnection;
+import javax.jms.QueueConnectionFactory;
+import javax.jms.QueueReceiver;
+import javax.jms.QueueSender;
+import javax.jms.QueueSession;
+import javax.jms.Session;
+import javax.jms.TemporaryQueue;
+
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriInfo;
-//import javax.ws.rs.PathParam;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.GET;
 import javax.ws.rs.Produces;
 
-import javax.naming.NamingException;
-import java.util.logging.Logger;
-
-import java.util.Calendar;
-
-import dribble.common.*;
-import javax.naming.*;
-import javax.jms.*;
-import javax.ws.rs.core.MultivaluedMap;
-
 /**
  * REST Web Service
  *
- * @author andrew
+ * @author Dribble
  */
 @Path("GetDribs")
 public class GetDribsResource {
@@ -48,7 +47,6 @@ public class GetDribsResource {
     private Queue queue;
     private QueueSender queueSender;
 
-
     /** Creates a new instance of GetDribsResource */
     public GetDribsResource() {
 
@@ -57,34 +55,27 @@ public class GetDribsResource {
         try {
             jndiContext = new InitialContext();
             logger.info("JNDI Context Initialised");
-            //Connection factory and queue
 
             logger.info("Looking up queue");
-            queue = (Queue)jndiContext.lookup("jms/getDribsQueue");
+            queue = (Queue) jndiContext.lookup("jms/getDribsQueue");
             logger.info("lookup queue connection factory");
             queueConnectionFactory = (QueueConnectionFactory) jndiContext.lookup("jms/getDribsQueueFactoryPool");
             logger.info("Lookup context complete");
-        } catch (NamingException e) {
-            logger.info("JNDI API lookup failed: "
-                    + e.toString());
-        }
-        //Create a queue connection, a session and a sender object to send the message
-        try {
+
+            //Create a queue connection, a session and a sender object to send the message
             logger.info("create queue connection");
             queueConnection = queueConnectionFactory.createQueueConnection();
             logger.info("created, now create queue session");
             queueSession = queueConnection.createQueueSession(false, Session.AUTO_ACKNOWLEDGE);
             logger.info("created, now create queue requestor");
             queueSender = queueSession.createSender(queue);
-            //queueRequestor = new QueueRequestor(queueSession, queue);
-            logger.info("queue requestor created");
-
+            logger.info("queue sender created");
+        } catch (NamingException e) {
+            logger.severe("JNDI API lookup failed: " + e.toString());
         } catch (JMSException e) {
-            System.out.println("Exception occurred: "
-                    + e.toString());
+            logger.severe("Exception occurred: " + e.toString());
         }
     }
-
 
     /**
      * Retrieves representation of an instance of dribble.communications.GetDribsResource
@@ -96,19 +87,19 @@ public class GetDribsResource {
 
         logger.info("Get Request");
 
-        MultivaluedMap<String,String> queryParams = ui.getQueryParameters();
-
-        String latitudeString = queryParams.getFirst("latitude");
-        String longitudeString = queryParams.getFirst("longitude");
-        String resultsString = queryParams.getFirst("results");
-        String subjectIDString = queryParams.getFirst("subjectID");
-
-        double latitude = Double.parseDouble(latitudeString);
-        double longitude = Double.parseDouble(longitudeString);
-        int results = Integer.parseInt(resultsString);
-        int subjectID = Integer.parseInt(subjectIDString);
+        MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
 
         try {
+
+            String latitudeString = queryParams.getFirst("latitude");
+            String longitudeString = queryParams.getFirst("longitude");
+            String resultsString = queryParams.getFirst("results");
+            String subjectIDString = queryParams.getFirst("subjectID");
+
+            double latitude = Double.parseDouble(latitudeString);
+            double longitude = Double.parseDouble(longitudeString);
+            int results = Integer.parseInt(resultsString);
+            int subjectID = Integer.parseInt(subjectIDString);
 
             Message msg = queueSession.createMessage();
             msg.setDoubleProperty("latitude", latitude);
@@ -136,35 +127,36 @@ public class GetDribsResource {
 
             logger.info("Sent msg");
 
-            Message response = receiver.receive(10000);
+            ObjectMessage response = (ObjectMessage)receiver.receive(10000);
 
             logger.info("Message received");
-            if(response == null) {
+            if (response == null) {
                 logger.info("Timeout");
             }
 
-            ObjectMessage oresponse = (ObjectMessage)response;
+            logger.info("Object message received");
 
-            logger.info("Object message created");
-
-            ArrayList<Drib> dribList = (ArrayList<Drib>) oresponse.getObject();
+            ArrayList<Drib> dribList = (ArrayList<Drib>) response.getObject();
 
             return dribList;
 
 
-        } catch (JMSException jmse2) {
-            logger.info("Error...");
+        } catch (JMSException jmse) {
+            logger.severe("JMS exception: " + jmse.getMessage());
+            return null;
+        } catch (NumberFormatException nfe) {
+            logger.severe("Number format exception: " + nfe.getMessage());
+            return null;
+        } catch (NullPointerException npe) {
+            logger.severe("Null pointer exception: " + npe.getMessage());
             return null;
         }
 
     }
 
-
-
     /**
-     * PUT method for updating or creating an instance of GetDribsResource
-     * @param content representation for the resource
-     * @return an HTTP response with content of the updated or created resource.
+     * PUT method unused in this webservice
+     * @return UnsupportedOperationException
      */
     @PUT
     @Consumes("application/xml")

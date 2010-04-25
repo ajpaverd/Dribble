@@ -356,7 +356,7 @@ exists or setup the property manually. For example like this:
         <copy flatten="true" todir="${dist.dir}/Dribble_ServerClient">
             <fileset dir="${wa.copy.client.jar.from}/Dribble_Server" includes="**/*.*ar"/>
         </copy>
-        <copy flatten="false" todir="${dist.dir}/Dribble_ServerClient">
+        <copy failonerror="false" flatten="false" todir="${dist.dir}/Dribble_ServerClient">
             <fileset dir="${dist.dir}/gfdeploy/Dribble_Server" includes="**/*.jar"/>
         </copy>
     </target>

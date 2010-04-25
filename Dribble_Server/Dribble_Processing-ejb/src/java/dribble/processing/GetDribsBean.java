@@ -1,35 +1,24 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package dribble.processing;
 
-
 import dribble.common.*;
+import dribble.dataset.*;
+
 import java.util.ArrayList;
-import java.util.List;
-
-
 import java.util.logging.Logger;
 
 import javax.ejb.ActivationConfigProperty;
 import javax.ejb.MessageDriven;
-import javax.jms.InvalidDestinationException;
 
 import javax.jms.Queue;
 import javax.jms.JMSException;
 import javax.jms.Message;
-import javax.jms.MessageFormatException;
 import javax.jms.MessageListener;
-import javax.jms.MessageProducer;
-import javax.jms.ObjectMessage;
 import javax.jms.QueueConnection;
 import javax.jms.QueueConnectionFactory;
-import javax.jms.QueueRequestor;
 import javax.jms.QueueSender;
 import javax.jms.QueueSession;
 import javax.jms.Session;
+
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
@@ -37,18 +26,18 @@ import javax.naming.NamingException;
  *
  * @author Dribble
  */
-@MessageDriven(mappedName = "jms/getDribsQueue", activationConfig =  {
-        @ActivationConfigProperty(propertyName = "acknowledgeMode", propertyValue = "Auto-acknowledge"),
-        @ActivationConfigProperty(propertyName = "destinationType", propertyValue = "javax.jms.Queue")
-    })
+@MessageDriven(mappedName = "jms/getDribsQueue", activationConfig = {
+    @ActivationConfigProperty(propertyName = "acknowledgeMode", propertyValue = "Auto-acknowledge"),
+    @ActivationConfigProperty(propertyName = "destinationType", propertyValue = "javax.jms.Queue")
+})
 public class GetDribsBean implements MessageListener {
 
     static final Logger logger = Logger.getLogger("GetDribsBean");
-
     private InitialContext jndiContext;
     private QueueConnectionFactory queueConnectionFactory;
     private QueueConnection queueConnection;
     private QueueSession queueSession;
+    private Dataset dataset;
 
     public GetDribsBean() {
         try {
@@ -56,24 +45,24 @@ public class GetDribsBean implements MessageListener {
             logger.info("JNDI Context Initialised");
 
             logger.info("lookup queue connection factory");
-            queueConnectionFactory = (QueueConnectionFactory)jndiContext.lookup("jms/getDribsQueueFactoryPool");
+            queueConnectionFactory = (QueueConnectionFactory) jndiContext.lookup("jms/getDribsQueueFactoryPool");
             logger.info("Lookup context complete");
-        } catch (NamingException e) {
-            logger.info("JNDI API lookup failed: "
-                    + e.toString());
-        }
-        //Create a queue connection, a session and a sender object to send the message
-        try {
+
+            //Create a queue connection, a session and a sender object to send the message
             logger.info("create queue connection");
             queueConnection = queueConnectionFactory.createQueueConnection();
             logger.info("created, now create queue session");
             queueSession = queueConnection.createQueueSession(true, Session.AUTO_ACKNOWLEDGE);
 
+            dataset = new SQLCommunicator();
 
-        } catch (JMSException e) {
-            System.out.println("Exception occurred: "
-                    + e.toString());
+        } catch (NamingException ne) {
+            logger.severe("JNDI API lookup failed: " + ne.getMessage());
+
+        } catch (JMSException jmse) {
+            logger.severe("JMS exception occurred: " + jmse.getMessage());
         }
+
     }
 
     public void onMessage(Message message) {
@@ -82,32 +71,56 @@ public class GetDribsBean implements MessageListener {
 
         try {
 
-        //get the destination instance where the ping reply is to be sent.
-        Queue dest = (Queue)message.getJMSReplyTo();
+            Queue dest = (Queue) message.getJMSReplyTo();
 
-        if(dest == null) {
-            logger.info("Dest is null");
+            if (dest != null) {
+
+                logger.info("Reply queue: " + dest.toString());
+
+                //create a producer instance
+                QueueSender sender = queueSession.createSender(dest);
+
+                double latitude = message.getDoubleProperty("latitude");
+                double longitude = message.getDoubleProperty("longitude");
+                int results = message.getIntProperty("results");
+                int subjectID = message.getIntProperty("subjectID");
+
+                ArrayList<Drib> dribList = getDribs(latitude, longitude, results, subjectID);
+
+                Message reply = queueSession.createObjectMessage(dribList);
+
+                logger.info("sending reply");
+                sender.send(reply);
+                logger.info("sent reply");
+            }
+
+        } catch (JMSException jmse) {
+            logger.info("JMS exception: " + jmse.getMessage());
         }
 
-        logger.info("Got destination queue: " + dest.toString());
+    }
 
-        //create a producer instance
-        QueueSender sender = queueSession.createSender(dest);
+    public ArrayList<Drib> getDribs(double latitude, double longitude, int results, int subjectID) {
+
+        logger.info("Latitude: " + latitude);
+        logger.info("Longitude: " + longitude);
+        logger.info("Results: " + results);
+        logger.info("SubjectID: " + subjectID);
 
         ArrayList<Drib> resp = new ArrayList<Drib>();
 
         Drib a = new Drib();
-        a.setText("Topic A");
+        a.setText("Drib A");
         a.setPopularity(10000);
 
 
         Drib b = new Drib();
-        b.setText("Topic B");
+        b.setText("Drib B");
         b.setPopularity(10);
 
 
         Drib c = new Drib();
-        c.setText("Topic C");
+        c.setText("Drib C");
         c.setPopularity(100);
 
         resp.add(a);
@@ -116,30 +129,6 @@ public class GetDribsBean implements MessageListener {
 
         logger.info("Reply created");
 
-        double lat = message.getDoubleProperty("latitude");
-        double lon = message.getDoubleProperty("longitude");
-        int num = message.getIntProperty("num_messages");
-        logger.info("Lat: " + lat);
-        logger.info("Lon: " + lon);
-        logger.info("Num: " + num);
-
-
-        Message reply = queueSession.createObjectMessage(resp);
-
-        logger.info("sending reply");
-        sender.send(reply);
-        logger.info("sent reply");
-
-
-
-        } catch(JMSException jmse) {
-            logger.info("problem");
-        }
-
-
-
-
-
+        return resp;
     }
-    
 }
