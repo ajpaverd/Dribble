@@ -83,7 +83,7 @@ public class GetDribsResource {
      */
     @GET
     @Produces("application/xml")
-    public ArrayList<Drib> getXml(@Context UriInfo ui) {
+    public DribList getXml(@Context UriInfo ui) {
     //public DribSubjectList getXml(@Context UriInfo ui) {
 
         logger.info("Get Request");
@@ -139,7 +139,11 @@ public class GetDribsResource {
 
                 ArrayList<Drib> dribList = (ArrayList<Drib>) response.getObject();
 
-                return dribList;
+                DribList wrapperList = new DribList();
+
+                wrapperList.list = dribList;
+
+                return wrapperList;
 
             } else {
 

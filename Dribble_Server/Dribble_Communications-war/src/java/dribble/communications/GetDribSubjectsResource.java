@@ -2,7 +2,6 @@ package dribble.communications;
 
 import dribble.common.*;
 import java.util.ArrayList;
-import java.util.List;
 
 import java.util.logging.Logger;
 
@@ -89,8 +88,6 @@ public class GetDribSubjectsResource {
      */
     @GET
     @Produces("application/xml")
-    @XmlElementWrapper(name = "list")
-    //public List<DribSubject> getXml(@Context UriInfo ui) {
     public DribSubjectList getXml(@Context UriInfo ui) {
 
         logger.info("Get Request");

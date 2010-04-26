@@ -103,7 +103,6 @@ public class getDribSubjectsBean implements MessageListener {
 
     }
 
-    @XmlElementWrapper(name = "list")
     public ArrayList<DribSubject> getDribSubjects(double latitude, double longitude, int results) {
 
         logger.info("Latitude: " + latitude);
