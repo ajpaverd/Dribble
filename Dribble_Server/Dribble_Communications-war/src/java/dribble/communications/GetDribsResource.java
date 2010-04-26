@@ -86,10 +86,13 @@ public class GetDribsResource {
     public ArrayList<Drib> getXml(@Context UriInfo ui) {
 
         logger.info("Get Request");
-
-        MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
+        if (ui ==null){
+            return null;
+        }
 
         try {
+
+            MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
 
             String latitudeString = queryParams.getFirst("latitude");
             String longitudeString = queryParams.getFirst("longitude");
@@ -102,10 +105,10 @@ public class GetDribsResource {
             int subjectID = Integer.parseInt(subjectIDString);
 
             Message msg = queueSession.createMessage();
-            msg.setDoubleProperty("latitude", latitude);
-            msg.setDoubleProperty("longitude", longitude);
-            msg.setIntProperty("results", results);
-            msg.setIntProperty("subjectID", subjectID);
+            //msg.setDoubleProperty("latitude", latitude);
+            //msg.setDoubleProperty("longitude", longitude);
+            //msg.setIntProperty("results", results);
+           // msg.setIntProperty("subjectID", subjectID);
 
             logger.info("Message created");
 

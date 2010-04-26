@@ -14,7 +14,7 @@ public interface Dataset {
 
     ArrayList<Drib> getDribs(DribSubject t, double lat, double longitude, double radius);
 
-    //ArrayList<DribSubject> getDribSubjects(double lat, double longitude, double radius);
+    ArrayList<DribSubject> getDribSubjects(double lat, double longitude, double radius);
 
     boolean deleteDrib(Drib m);
 

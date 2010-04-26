@@ -89,7 +89,11 @@ public class GetDribSubjectsResource {
     @GET
     @Produces("application/xml")
     public ArrayList<DribSubject> getXml(@Context UriInfo ui) {
+
         logger.info("Get Request");
+        if (ui ==null){
+            return null;
+        }
 
         try {
 
@@ -98,6 +102,7 @@ public class GetDribSubjectsResource {
             String latitudeString = queryParams.getFirst("latitude");
             String longitudeString = queryParams.getFirst("longitude");
             String resultsString = queryParams.getFirst("results");
+            String subjectIDString = queryParams.getFirst("subjectID");
 
             double latitude = Double.parseDouble(latitudeString);
             double longitude = Double.parseDouble(longitudeString);

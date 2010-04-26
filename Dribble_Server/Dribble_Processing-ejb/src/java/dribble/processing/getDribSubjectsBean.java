@@ -95,6 +95,7 @@ public class getDribSubjectsBean implements MessageListener {
                 logger.info("sent reply");
             }
 
+
         } catch (JMSException jmse) {
             logger.info("JMS exception: " + jmse.getMessage());
         }
