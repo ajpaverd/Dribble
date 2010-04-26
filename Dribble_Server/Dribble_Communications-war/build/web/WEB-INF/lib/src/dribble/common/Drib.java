@@ -19,7 +19,7 @@ public class Drib implements Serializable{
     private double latitude;
     private double longitude;
     private int messageID;
-    private Date time;
+    private long time;
     private DribSubject subject;
     private int likeCount;
     private int popularity;
@@ -77,12 +77,12 @@ public class Drib implements Serializable{
     }
 
     //Set a Time object with current date and time
-    public void setTime(Date time)
+    public void setTime(long time)
     {
         this.time = time;
     }
 
-    public Date getTime()
+    public long getTime()
     {
         return this.time;
     }

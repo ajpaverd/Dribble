@@ -84,10 +84,10 @@ public class GetDribsResource {
     @GET
     @Produces("application/xml")
     public DribList getXml(@Context UriInfo ui) {
-    //public DribSubjectList getXml(@Context UriInfo ui) {
 
         logger.info("Get Request");
         if (ui == null) {
+            logger.severe("URI Info was null");
             return null;
         }
 
@@ -142,6 +142,8 @@ public class GetDribsResource {
                 DribList wrapperList = new DribList();
 
                 wrapperList.list = dribList;
+
+                logger.info("Dribs Sent");
 
                 return wrapperList;
 

@@ -87,15 +87,18 @@ public class PutDribResource {
      */
     @PUT
     @Consumes("application/xml")
-    public void putXml(Drib content) {
+    //@Produces("application/xml")
+    public String putXml(Drib content) {
 
         logger.info("Put Request");
         try {
             ObjectMessage msg = queueSession.createObjectMessage(content);
             queueSender.send(msg);
             logger.info("Object Message Sent");
+            return "success";
         } catch (JMSException jmse) {
             logger.severe("JMS Exception: " + jmse.getMessage());
+            return "failure";
         }
 
     }

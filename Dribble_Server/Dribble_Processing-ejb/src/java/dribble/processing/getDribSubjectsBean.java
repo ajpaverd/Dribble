@@ -21,7 +21,8 @@ import javax.jms.Session;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
-import javax.xml.bind.annotation.XmlElementWrapper;
+
+;
 
 /**
  *
@@ -94,6 +95,8 @@ public class getDribSubjectsBean implements MessageListener {
                 logger.info("sending reply");
                 sender.send(reply);
                 logger.info("sent reply");
+
+                sender.close();
             }
 
 
@@ -132,5 +135,14 @@ public class getDribSubjectsBean implements MessageListener {
         logger.info("Reply created");
 
         return resp;
+    }
+
+    @Override
+    protected void finalize() throws Throwable {
+
+        queueSession.close();
+        queueConnection.close();
+        
+        super.finalize();
     }
 }

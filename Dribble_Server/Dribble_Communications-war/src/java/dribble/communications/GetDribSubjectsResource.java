@@ -141,7 +141,7 @@ public class GetDribSubjectsResource {
 
                 subjectList = (ArrayList<DribSubject>) response.getObject();
 
-                logger.info("Message about to be sent");
+                logger.info("Subjects Sent");
 
                 DribSubjectList wrapperList = new DribSubjectList();
                 wrapperList.list = subjectList;

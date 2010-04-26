@@ -4,6 +4,7 @@ import dribble.common.*;
 import dribble.dataset.*;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.logging.Logger;
 
 import javax.ejb.ActivationConfigProperty;
@@ -38,6 +39,7 @@ public class GetDribsBean implements MessageListener {
     private QueueConnection queueConnection;
     private QueueSession queueSession;
     private Dataset dataset;
+    Date t = new Date();
 
     public GetDribsBean() {
         try {
@@ -92,6 +94,8 @@ public class GetDribsBean implements MessageListener {
                 logger.info("sending reply");
                 sender.send(reply);
                 logger.info("sent reply");
+
+                sender.close();
             }
 
         } catch (JMSException jmse) {
@@ -116,7 +120,7 @@ public class GetDribsBean implements MessageListener {
         a.setLatitude(0.4343434);
         a.setLongitude(0.436746);
         a.setLikeCount(5);
-        //a.setTime(System.currentTimeMillis());
+        a.setTime(t.getTime());
         DribSubject dribsubject = new DribSubject();
         a.setSubject(dribsubject);
         a.getSubject().setName("Fire");
@@ -142,5 +146,14 @@ public class GetDribsBean implements MessageListener {
 
         return resp;
 
+    }
+
+    @Override
+    protected void finalize() throws Throwable {
+
+        queueSession.close();
+        queueConnection.close();
+
+        super.finalize();
     }
 }

@@ -1,14 +1,15 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package dribble.dataset;
 
 import dribble.common.*;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.logging.Logger;
 import java.util.ArrayList;
+import java.util.Date;
 
 /**
  *
@@ -17,16 +18,36 @@ import java.util.ArrayList;
 public class SQLCommunicator implements Dataset {
 
     static final Logger logger = Logger.getLogger("SQLCommunicator");
-
     private String connectionUrl;
     private Connection con;
 
     public SQLCommunicator() {
-logger.info("Inside SQLConstructor");
+        logger.info("Inside SQLConstructor");
         try {
-            
+
             connectionUrl = "jdbc:derby://localhost:1527/DribbleDerbyDB";
             con = DriverManager.getConnection(connectionUrl, "APP", "dribble");
+
+            Statement stmt = con.createStatement();
+            logger.info("Connection Started");
+            ResultSet rs = stmt.executeQuery("SELECT ID "
+                    + "FROM DRIBBLE_SYSTEM_SUBJECTS ");
+
+            if (rs.next() == false) {
+                logger.info("Creating new subject table");
+                stmt.execute("CREATE TABLE \"DRIBBLE_SYSTEM_SUBJECTS\""
+                        + "(DRIB VARCHAR(144),"
+                        + "LAT BIGINT,"
+                        + "LONG BIGINT,"
+                        + "CURRENTIME BIGINT,"
+                        + "DRIBID BIGINT,"
+                        + "DRIBPOPULARITY BIGINT"
+                        + ")");
+
+                logger.info("Subject table created");
+            }
+
+
         } catch (SQLException e) {
             logger.severe("SQLexception: " + e.toString());
         }
@@ -46,32 +67,35 @@ logger.info("Inside SQLConstructor");
             ResultSet rs = stmt.executeQuery("SELECT ID "
                     + "FROM DRIBBLE_SYSTEM_SUBJECTS "
                     + "WHERE ID=" + m.getSubject().getSubjectID());
-            logger.info("If not in queue execute was null");
-            if (rs == null) {
-                logger.info("wasnull executing");
-                stmt.execute("CREATE TABLE " + m.getSubject().getName()
+
+            if (rs.next() == false) {
+                logger.info("Creating new subject table");
+                stmt.execute("CREATE TABLE \"" + m.getSubject().getSubjectID() + "\""
                         + "(DRIB VARCHAR(144),"
-                        + "LAT double,"
-                        + "LONG double,"
-                        + "CURRENTIME time,"
-                        + "DRIBID Integer,"
-                        + "DRIBPOPULARITY integer"
+                        + "LAT BIGINT,"
+                        + "LONG BIGINT,"
+                        + "CURRENTIME BIGINT,"
+                        + "DRIBID BIGINT,"
+                        + "DRIBPOPULARITY BIGINT"
                         + ")");
 
-                logger.info("Message input into database");
-                
-                stmt.execute("INSERT INTO DRIBBLE_SYSTEM_SUBJECTS"  + " (NAME,ID,LATITUDE,LONGITUDE,VIEWS,POSTS,POPULARITY,CURRENTIME)"
-                    + "VALUES (" + "\'"+m.getSubject().getName()+"\'" + "," + m.getSubject().getSubjectID()
-                    + "," + m.getSubject().getLatitude() + "," + m.getSubject().getLongitude()
-                    +"," +m.getSubject().getNumViews()+","+m.getSubject().getNumPosts()
-                    +","+m.getSubject().getPopularity()+","+m.getSubject().getTime()+")");
+                logger.info("Subject table created");
+
+                stmt.execute("INSERT INTO DRIBBLE_SYSTEM_SUBJECTS" + " (NAME,ID,LATITUDE,LONGITUDE,VIEWS,POSTS,POPULARITY,CURRENTIME)"
+                        + "VALUES (" + "\'" + m.getSubject().getName() + "\'," + m.getSubject().getSubjectID()
+                        + "," + m.getSubject().getLatitude() + "," + m.getSubject().getLongitude()
+                        + "," + m.getSubject().getNumViews() + "," + m.getSubject().getNumPosts()
+                        + "," + m.getSubject().getPopularity() + "," + m.getSubject().getTime() + ")");
             }
-            logger.info("Skipped table creation");
+
+            logger.info("Adding Drib to subject table");
+            stmt.execute("INSERT INTO \"" + m.getSubject().getSubjectID() + "\" (DRIB,LAT,LONG,CURRENTIME,DRIBID,DRIBPOPULARITY)"
+                    + "VALUES (" + "\'" + m.getText() + "\'" + "," + m.getLatitude() + "," + m.getLongitude() + "," + m.getTime() + "," + m.getMessageID() + "," + m.getPopularity() + ")");
+
+            logger.info("Drib successfully added to table");
             
-            
-           stmt.execute("INSERT INTO " + m.getSubject().getName() + " (DRIB,LAT,LONG,CURRENTIME,DRIBID,DRIBPOPULARITY)"
-                    + "VALUES (" + "\'"+m.getText()+"\'" + "," + m.getLatitude() + "," + m.getTime() + "," + m.getTime() + "," + m.getMessageID() + "," + m.getPopularity() + ")");
             return true;
+
         } catch (SQLException e) {
             logger.severe("Error adding Drib: " + e.getMessage());
             return false;
@@ -114,13 +138,11 @@ logger.info("Inside SQLConstructor");
         try {
 
             Statement stmt = con.createStatement();
-            ResultSet topics=  stmt.executeQuery("SELECT ID FROM DRIBBLE_SYSTEM_DRIBSUBJECTS");
-            while(topics.next())
-            {
-              if (!(getDribs(getDribSubject(topics.getInt("ID")),lat,longitude,radius).isEmpty()))
-              {
-                  DribList.add(getDribSubject(topics.getInt("ID")));
-              }
+            ResultSet topics = stmt.executeQuery("SELECT ID FROM DRIBBLE_SYSTEM_DRIBSUBJECTS");
+            while (topics.next()) {
+                if (!(getDribs(getDribSubject(topics.getInt("ID")), lat, longitude, radius).isEmpty())) {
+                    DribList.add(getDribSubject(topics.getInt("ID")));
+                }
             }
 
         } catch (SQLException e) {
@@ -151,11 +173,10 @@ logger.info("Inside SQLConstructor");
             stmt.execute("DELETE FROM " + m.getSubject().getSubjectID()
                     + "WHERE DRIBID=" + m.getMessageID());
 
-            if(m.getSubject().getNumPosts()==1)
-            {
+            if (m.getSubject().getNumPosts() == 1) {
                 stmt.execute("DELETE FROM  DRIBBLE_SYSTEM_DRIBSUBJECTS"
-                    + "WHERE ID=" + m.getSubject().getSubjectID()+")");
-                stmt.execute("(DROP TABLE"+ m.getSubject().getSubjectID()+")");
+                        + "WHERE ID=" + m.getSubject().getSubjectID() + ")");
+                stmt.execute("(DROP TABLE" + m.getSubject().getSubjectID() + ")");
             }
 
             logger.info("Drib deleted");
@@ -187,7 +208,7 @@ logger.info("Inside SQLConstructor");
             double longitude = rs.getDouble("LONG");
             m.setLongitude(longitude);
             Date time = rs.getDate("TIME");
-            m.setTime(time);
+            m.setTime(time.getTime());
             int popularity = rs.getInt("DRIBPOPULARITY");
             m.setPopularity(popularity);
 
@@ -203,7 +224,7 @@ logger.info("Inside SQLConstructor");
         return m;
     }
 
-    public DribSubject getDribSubject(int SubjectID){
+    public DribSubject getDribSubject(int SubjectID) {
         logger.info("Getting Subject");
 
         DribSubject s = new DribSubject();
@@ -218,9 +239,9 @@ logger.info("Inside SQLConstructor");
             s.setLatitude(lat);
             double longitude = rs.getDouble("LONG");
             s.setLongitude(longitude);
-            int views=rs.getInt("VIEWS");
+            int views = rs.getInt("VIEWS");
             s.setNumViews(views);
-            int posts=rs.getInt("POSTS");
+            int posts = rs.getInt("POSTS");
             s.setNumViews(posts);
             Date time = rs.getDate("TIME");
             s.setTime(time);
@@ -239,7 +260,7 @@ logger.info("Inside SQLConstructor");
         return s;
     }
 
-    public DribSubject getDribSubject(String SubjectName){
+    public DribSubject getDribSubject(String SubjectName) {
         logger.info("Getting Subject");
 
         DribSubject s = new DribSubject();
@@ -248,7 +269,7 @@ logger.info("Inside SQLConstructor");
             Statement stmt = con.createStatement();
             ResultSet rs = stmt.executeQuery("SELECT ID FROM DRIBBLE_SYSTEM_DRIBSUBJECTS"
                     + "WHERE NAME=" + SubjectName);
-           s=getDribSubject(rs.getInt("ID"));
+            s = getDribSubject(rs.getInt("ID"));
 
         } catch (SQLException e) {
 
@@ -261,5 +282,4 @@ logger.info("Inside SQLConstructor");
 
         return s;
     }
-
 }
