@@ -1,8 +1,8 @@
-
 package dribble.communications;
 
 import dribble.common.*;
 import java.util.ArrayList;
+import java.util.List;
 
 import java.util.logging.Logger;
 
@@ -29,6 +29,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.GET;
 import javax.ws.rs.Produces;
+import javax.xml.bind.annotation.XmlElementWrapper;
 
 /**
  * REST Web Service
@@ -40,15 +41,16 @@ public class GetDribSubjectsResource {
 
     @Context
     private UriInfo context;
-
     static final Logger logger = Logger.getLogger("GetDribSubjectsResource");
-
     private InitialContext jndiContext;
     private QueueConnectionFactory queueConnectionFactory;
     private QueueConnection queueConnection;
     private QueueSession queueSession;
     private Queue queue;
     private QueueSender queueSender;
+
+    @XmlElementWrapper(name = "list")
+    private ArrayList<DribSubject> subjectList;
 
     /** Creates a new instance of PutDribResource */
     public GetDribSubjectsResource() {
@@ -73,8 +75,7 @@ public class GetDribSubjectsResource {
             queueSession = queueConnection.createQueueSession(false, Session.AUTO_ACKNOWLEDGE);
             logger.info("created, now create queue requestor");
             queueSender = queueSession.createSender(queue);
-            //queueRequestor = new QueueRequestor(queueSession, queue);
-            logger.info("queue requestor created");
+            logger.info("queue sender created");
         } catch (NamingException e) {
             logger.severe("JNDI API lookup failed: " + e.toString());
         } catch (JMSException e) {
@@ -88,10 +89,12 @@ public class GetDribSubjectsResource {
      */
     @GET
     @Produces("application/xml")
-    public ArrayList<DribSubject> getXml(@Context UriInfo ui) {
+    @XmlElementWrapper(name = "list")
+    //public List<DribSubject> getXml(@Context UriInfo ui) {
+    public DribSubjectList getXml(@Context UriInfo ui) {
 
         logger.info("Get Request");
-        if (ui ==null){
+        if (ui == null) {
             return null;
         }
 
@@ -102,7 +105,6 @@ public class GetDribSubjectsResource {
             String latitudeString = queryParams.getFirst("latitude");
             String longitudeString = queryParams.getFirst("longitude");
             String resultsString = queryParams.getFirst("results");
-            String subjectIDString = queryParams.getFirst("subjectID");
 
             double latitude = Double.parseDouble(latitudeString);
             double longitude = Double.parseDouble(longitudeString);
@@ -133,18 +135,28 @@ public class GetDribSubjectsResource {
 
             logger.info("Sent msg");
 
-            ObjectMessage response = (ObjectMessage)receiver.receive(10000);
+            ObjectMessage response = (ObjectMessage) receiver.receive(10000);
 
-            logger.info("Message received");
-            if (response == null) {
-                logger.info("Timeout");
+            if (response != null) {
+
+                logger.info("Message received");
+
+
+                subjectList = (ArrayList<DribSubject>) response.getObject();
+
+                logger.info("Message about to be sent");
+
+                DribSubjectList wrapperList = new DribSubjectList();
+                wrapperList.list = subjectList;
+
+                return wrapperList;
+
+            } else {
+
+                logger.severe("Message not received - timeout");
+
+                return null;
             }
-
-            logger.info("Object message received");
-
-            ArrayList<DribSubject> subjectList = (ArrayList<DribSubject>) response.getObject();
-
-            return subjectList;
 
 
         } catch (JMSException jmse) {

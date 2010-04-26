@@ -84,9 +84,10 @@ public class GetDribsResource {
     @GET
     @Produces("application/xml")
     public ArrayList<Drib> getXml(@Context UriInfo ui) {
+    //public DribSubjectList getXml(@Context UriInfo ui) {
 
         logger.info("Get Request");
-        if (ui ==null){
+        if (ui == null) {
             return null;
         }
 
@@ -105,10 +106,10 @@ public class GetDribsResource {
             int subjectID = Integer.parseInt(subjectIDString);
 
             Message msg = queueSession.createMessage();
-            //msg.setDoubleProperty("latitude", latitude);
-            //msg.setDoubleProperty("longitude", longitude);
-            //msg.setIntProperty("results", results);
-           // msg.setIntProperty("subjectID", subjectID);
+            msg.setDoubleProperty("latitude", latitude);
+            msg.setDoubleProperty("longitude", longitude);
+            msg.setIntProperty("results", results);
+            msg.setIntProperty("subjectID", subjectID);
 
             logger.info("Message created");
 
@@ -130,18 +131,23 @@ public class GetDribsResource {
 
             logger.info("Sent msg");
 
-            ObjectMessage response = (ObjectMessage)receiver.receive(10000);
+            ObjectMessage response = (ObjectMessage) receiver.receive(10000);
 
-            logger.info("Message received");
-            if (response == null) {
-                logger.info("Timeout");
+            if (response != null) {
+
+                logger.info("Message received");
+
+                ArrayList<Drib> dribList = (ArrayList<Drib>) response.getObject();
+
+                return dribList;
+
+            } else {
+
+                logger.severe("Message not received - timeout");
+
+                return null;
+                
             }
-
-            logger.info("Object message received");
-
-            ArrayList<Drib> dribList = (ArrayList<Drib>) response.getObject();
-
-            return dribList;
 
 
         } catch (JMSException jmse) {
