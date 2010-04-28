@@ -13,7 +13,7 @@ import java.util.ArrayList;
 
 /**
  *
- * @author Dribble
+ * @author Dr ibble
  */
 public class SQLCommunicator implements Dataset {
 
