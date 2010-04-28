@@ -11,14 +11,14 @@ import java.util.ArrayList;
 public interface Dataset {
 
     boolean addDrib(Drib m);
+    //view of subject
+    ArrayList<Drib> getDribs(int subjectID, long lat, long longitude, long radius);
 
-    ArrayList<Drib> getDribs(DribSubject t, double lat, double longitude, double radius);
-
-    ArrayList<DribSubject> getDribSubjects(double lat, double longitude, double radius);
+    ArrayList<DribSubject> getDribSubjects(long lat, long longitude, long radius);
 
     boolean deleteDrib(Drib m);
 
     boolean updateDrib(Drib m);
 
-    Drib getDrib(DribSubject t, int DribID);
+    Drib getDrib(int subjectID, int DribID);
 }
