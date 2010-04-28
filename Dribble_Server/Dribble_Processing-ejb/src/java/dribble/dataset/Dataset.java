@@ -11,7 +11,7 @@ import java.util.ArrayList;
 public interface Dataset {
 
     boolean addDrib(Drib m);
-    //view of subject
+    //vie w of subject
     ArrayList<Drib> getDribs(int subjectID, long lat, long longitude, long radius);
 
     ArrayList<DribSubject> getDribSubjects(long lat, long longitude, long radius);
