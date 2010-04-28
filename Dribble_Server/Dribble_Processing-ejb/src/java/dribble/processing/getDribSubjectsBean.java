@@ -2,8 +2,8 @@ package dribble.processing;
 
 import dribble.common.*;
 import dribble.dataset.*;
-import java.util.ArrayList;
 
+import java.util.ArrayList;
 import java.util.logging.Logger;
 
 import javax.ejb.ActivationConfigProperty;
@@ -21,8 +21,6 @@ import javax.jms.Session;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
-
-;
 
 /**
  *
@@ -43,20 +41,19 @@ public class getDribSubjectsBean implements MessageListener {
 
     public getDribSubjectsBean() {
         try {
+            logger.info("Constructing GetDribSubjectBean");
+
             jndiContext = new InitialContext();
-            logger.info("JNDI Context Initialised");
-
-            logger.info("lookup queue connection factory");
+            logger.info("Looking up queue connection factory");
             queueConnectionFactory = (QueueConnectionFactory) jndiContext.lookup("jms/getDribSubjectsQueueFactoryPool");
-            logger.info("Lookup context complete");
-
-            //Create a queue connection, a session and a sender object to send the message
-            logger.info("create queue connection");
+            logger.info("Create queue connection");
             queueConnection = queueConnectionFactory.createQueueConnection();
-            logger.info("created, now create queue session");
+            logger.info("Create queue session");
             queueSession = queueConnection.createQueueSession(true, Session.AUTO_ACKNOWLEDGE);
-
+            logger.info("Create Dataset connection");
             dataset = new SQLCommunicator();
+
+            logger.info("GetDribSubjectsBean instance created");
 
         } catch (NamingException ne) {
             logger.severe("JNDI API lookup failed: " + ne.getMessage());
@@ -65,13 +62,11 @@ public class getDribSubjectsBean implements MessageListener {
             logger.severe("JMS exception: " + jmse.getMessage());
         }
 
-
-
     }
 
     public void onMessage(Message message) {
 
-        logger.info("OnMessage");
+        logger.info("Processing request received");
 
         try {
 
@@ -79,22 +74,21 @@ public class getDribSubjectsBean implements MessageListener {
 
             if (dest != null) {
 
-                logger.info("Reply queue: " + dest.toString());
+                logger.info("Reply: " + dest.getQueueName());
 
-                //create a producer instance
                 QueueSender sender = queueSession.createSender(dest);
 
-                double latitude = message.getDoubleProperty("latitude");
-                double longitude = message.getDoubleProperty("longitude");
+                int latitude = message.getIntProperty("latitude");
+                int longitude = message.getIntProperty("longitude");
                 int results = message.getIntProperty("results");
 
                 ArrayList<DribSubject> subjectList = getDribSubjects(latitude, longitude, results);
 
                 Message reply = queueSession.createObjectMessage(subjectList);
 
-                logger.info("sending reply");
+                logger.info("Sending response");
+
                 sender.send(reply);
-                logger.info("sent reply");
 
                 sender.close();
             }
@@ -106,35 +100,67 @@ public class getDribSubjectsBean implements MessageListener {
 
     }
 
-    public ArrayList<DribSubject> getDribSubjects(double latitude, double longitude, int results) {
+    public ArrayList<DribSubject> getDribSubjects(int latitude, int longitude, int results) {
 
-        logger.info("Latitude: " + latitude);
-        logger.info("Longitude: " + longitude);
-        logger.info("Results: " + results);
+        logger.info("Request parameter: latitude = " + latitude);
+        logger.info("Request parameter: longitude = " + longitude);
+        logger.info("Request parameter: results = " + results);
 
-        ArrayList<DribSubject> resp = new ArrayList<DribSubject>();
+        logger.info("Retrieving DribSubjects from dataset");
+        //ArrayList<DribSubject> subjectList = dataset.getDribSubjects(latitude, longitude, 25000);
+        ArrayList<DribSubject> subjectList = testSubjectList();
+
+        logger.info("Calculating popularity scores");
+
+        subjectList = DribblePopularity.rankSubjects(subjectList, latitude, longitude);
+
+        while(subjectList.size() > results) {
+            subjectList.remove(results);
+        }
+        //TODO resize list
+
+        return subjectList;
+    }
+
+    private ArrayList<DribSubject> testSubjectList() {
+
+        ArrayList<DribSubject> testList = new ArrayList<DribSubject>();
 
         DribSubject a = new DribSubject();
         a.setName("DribSubject A");
-        a.setPopularity(10000);
+        a.setNumViews(2);
+        a.setNumPosts(2);
+        a.setLatitude(108000);
+        a.setLongitude(108000);
+        a.setTime(System.currentTimeMillis()-300000);
+        a.setSubjectID(25);
 
 
         DribSubject b = new DribSubject();
         b.setName("DribSubject B");
-        b.setPopularity(10);
+        b.setNumViews(2);
+        b.setNumPosts(2);
+        b.setLatitude(108000);
+        b.setLongitude(108000);
+        b.setTime(System.currentTimeMillis()-60000);
+        b.setSubjectID(26);
 
 
         DribSubject c = new DribSubject();
         c.setName("DribSubject C");
-        c.setPopularity(100);
+        c.setNumViews(2);
+        c.setNumPosts(2);
+        c.setLatitude(108000);
+        c.setLongitude(108000);
+        c.setTime(System.currentTimeMillis()-300000);
+        c.setSubjectID(27);
 
-        resp.add(a);
-        resp.add(b);
-        resp.add(c);
+        testList.add(a);
+        testList.add(b);
+        testList.add(c);
 
-        logger.info("Reply created");
+        return testList;
 
-        return resp;
     }
 
     @Override
@@ -142,7 +168,7 @@ public class getDribSubjectsBean implements MessageListener {
 
         queueSession.close();
         queueConnection.close();
-        
+
         super.finalize();
     }
 }

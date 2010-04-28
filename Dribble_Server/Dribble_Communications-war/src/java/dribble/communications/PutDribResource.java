@@ -16,8 +16,6 @@ import javax.jms.Session;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -32,8 +30,8 @@ import javax.ws.rs.Produces;
 @Path("PutDrib")
 public class PutDribResource {
 
-    @Context
-    private UriInfo context;
+    //@Context
+    //private UriInfo context;
     static final Logger logger = Logger.getLogger("PutDribResource");
     InitialContext jndiContext;
     QueueConnectionFactory queueConnectionFactory;
@@ -48,20 +46,20 @@ public class PutDribResource {
         logger.info("PutDribResource Constructor");
 
         try {
+
             jndiContext = new InitialContext();
             logger.info("Looking up queue");
             queue = (Queue) jndiContext.lookup("jms/putDribQueue");
-            logger.info("lookup queue connection factory");
+            logger.info("Looking up queue connection factory");
             queueConnectionFactory = (QueueConnectionFactory) jndiContext.lookup("jms/putDribQueueFactoryPool");
-            logger.info("Lookup context complete");
-
-            //Create a queue connection, a session and a sender object to send the message
-            logger.info("create queue connection");
+            logger.info("Create queue connection");
             queueConnection = queueConnectionFactory.createQueueConnection();
-            logger.info("created, now create queue session");
+            logger.info("Create queue session");
             queueSession = queueConnection.createQueueSession(true, Session.AUTO_ACKNOWLEDGE);
-            logger.info("created, now create queue sender");
+            logger.info("Create queue sender");
             queueSender = queueSession.createSender(queue);
+
+            logger.info("PutDribResource instance constructed");
 
         } catch (NamingException ne) {
             logger.severe("JNDI API lookup failed: " + ne.toString());
@@ -87,19 +85,27 @@ public class PutDribResource {
      */
     @PUT
     @Consumes("application/xml")
-    //@Produces("application/xml")
     public String putXml(Drib content) {
 
-        logger.info("Put Request");
+        logger.info("Put Request: " + content.getText());
         try {
             ObjectMessage msg = queueSession.createObjectMessage(content);
             queueSender.send(msg);
-            logger.info("Object Message Sent");
+            logger.info("Drib sent to processing bean");
             return "success";
         } catch (JMSException jmse) {
             logger.severe("JMS Exception: " + jmse.getMessage());
             return "failure";
         }
 
+    }
+
+    @Override
+    protected void finalize() throws Throwable {
+
+        queueSession.close();
+        queueConnection.close();
+
+        super.finalize();
     }
 }

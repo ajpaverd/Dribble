@@ -2,7 +2,6 @@ package dribble.common;
 
 
 import java.io.Serializable;
-import java.util.Date;
 import javax.xml.bind.annotation.XmlRootElement;
 
 
@@ -12,12 +11,12 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 
 @XmlRootElement(name="dribble.common.Drib")
-public class Drib implements Serializable{
+public class Drib implements Serializable {
 
 
     private String text;
-    private double latitude;
-    private double longitude;
+    private int latitude;
+    private int longitude;
     private int messageID;
     private long time;
     private DribSubject subject;
@@ -30,7 +29,7 @@ public class Drib implements Serializable{
     }
 
     //Set the message constructor
-    public Drib(DribSubject Message_subject, String text, double latitude, double longitude)
+    public Drib(DribSubject Message_subject, String text, int latitude, int longitude)
     {
         //Set the message subject
         setSubject(Message_subject);
@@ -55,23 +54,23 @@ public class Drib implements Serializable{
     }
 
     //Set and get the latitude coordinates of the message
-    public void setLatitude(double latitude)
+    public void setLatitude(int latitude)
     {
         this.latitude = latitude;
     }
 
-    public double getLatitude()
+    public int getLatitude()
     {
         return latitude;
     }
 
     //Set and get the longitude coordinates of the message
-    public void setLongitude(double longitude)
+    public void setLongitude(int longitude)
     {
         this.longitude = longitude;
     }
 
-    public double getLongitude()
+    public int getLongitude()
     {
         return this.longitude;
     }

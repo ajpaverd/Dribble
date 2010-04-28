@@ -28,8 +28,11 @@ public class putDribBean implements MessageListener {
 
     public putDribBean() {
 
+        logger.info("Constructing PutDribBean");
+
         dataset = new SQLCommunicator();
 
+        logger.info("PutDribBean instance constructed");
     }
 
     public void onMessage(Message message) {
@@ -39,6 +42,8 @@ public class putDribBean implements MessageListener {
                 ObjectMessage objMessage = (ObjectMessage) message;
                 Drib drib = (Drib) objMessage.getObject();
                 putDrib(drib);
+            } else {
+                logger.severe("Invalid JMS message type");
             }
 
         } catch (JMSException jmse) {
@@ -51,6 +56,10 @@ public class putDribBean implements MessageListener {
 
         logger.info("PutDrib: " + drib.getText());
 
+        //Set or update the times of the Drib and Subject
+        drib.setTime(System.currentTimeMillis());
+        drib.getSubject().setTime(System.currentTimeMillis());
+
         //Check if this is a new drib or an update
         if (drib.getMessageID() == 0) {
             addDrib(drib);
@@ -62,13 +71,28 @@ public class putDribBean implements MessageListener {
 
     //Add the new drib directly to the current dataset
     public void addDrib(Drib drib) {
-        logger.info("AddDrib: " + drib.getText());
-        dataset.addDrib(drib);
+        logger.info("New Drib: " + drib.getText());
+
+        //Assign a new message ID
+        drib.setMessageID(DribbleIdentifier.getUniqueID());
+
+        if (drib.getSubject().getSubjectID() == 0) {
+            //Assigin a new subject ID
+            drib.getSubject().setSubjectID(DribbleIdentifier.getUniqueID());
+        }
+
+        //Add to dataset
+        boolean result = dataset.addDrib(drib);
+
+        if (result == true) {
+            logger.info("===== Drib added to dataset =====");
+        }
+
     }
 
     //Update the drib in the current dataset
     public void updateDrib(Drib drib) {
-        logger.info("UpdateDrib: " + drib.getText());
+        logger.info("Update Drib: " + drib.getText());
 
         int dribID = drib.getMessageID();
         DribSubject subject = drib.getSubject();
@@ -83,11 +107,19 @@ public class putDribBean implements MessageListener {
             existingDrib.setLikeCount(likeCount);
 
             //Update the existing drib in the dataset
-            dataset.updateDrib(existingDrib);
+            boolean result = dataset.updateDrib(existingDrib);
+
+            if (result == true) {
+                logger.info("===== Drib updated in dataset =====");
+            }
 
         } else {
-            dataset.addDrib(drib);
+            boolean result = dataset.addDrib(drib);
+
+            if (result == true) {
+                logger.info("===== Drib added to dataset =====");
+            }
+
         }
     }
-    
 }

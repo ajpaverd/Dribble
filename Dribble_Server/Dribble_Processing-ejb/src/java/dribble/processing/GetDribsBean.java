@@ -4,7 +4,6 @@ import dribble.common.*;
 import dribble.dataset.*;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.logging.Logger;
 
 import javax.ejb.ActivationConfigProperty;
@@ -39,24 +38,23 @@ public class GetDribsBean implements MessageListener {
     private QueueConnection queueConnection;
     private QueueSession queueSession;
     private Dataset dataset;
-    Date t = new Date();
 
     public GetDribsBean() {
         try {
+
+            logger.info("Constructing GetDribsBean");
+
             jndiContext = new InitialContext();
-            logger.info("JNDI Context Initialised");
-
-            logger.info("lookup queue connection factory");
+            logger.info("Looking up queue connection factory");
             queueConnectionFactory = (QueueConnectionFactory) jndiContext.lookup("jms/getDribsQueueFactoryPool");
-            logger.info("Lookup context complete");
-
-            //Create a queue connection, a session and a sender object to send the message
-            logger.info("create queue connection");
+            logger.info("Create queue connection");
             queueConnection = queueConnectionFactory.createQueueConnection();
-            logger.info("created, now create queue session");
+            logger.info("Create queue session");
             queueSession = queueConnection.createQueueSession(true, Session.AUTO_ACKNOWLEDGE);
-
+            logger.info("Create Dataset connection");
             dataset = new SQLCommunicator();
+
+            logger.info("GetDribsBean instance created");
 
         } catch (NamingException ne) {
             logger.severe("JNDI API lookup failed: " + ne.getMessage());
@@ -69,7 +67,7 @@ public class GetDribsBean implements MessageListener {
 
     public void onMessage(Message message) {
 
-        logger.info("OnMessage");
+        logger.info("Processing request received");
 
         try {
 
@@ -77,13 +75,12 @@ public class GetDribsBean implements MessageListener {
 
             if (dest != null) {
 
-                logger.info("Reply queue: " + dest.toString());
+                logger.info("Reply: " + dest.getQueueName());
 
-                //create a producer instance
                 QueueSender sender = queueSession.createSender(dest);
 
-                double latitude = message.getDoubleProperty("latitude");
-                double longitude = message.getDoubleProperty("longitude");
+                int latitude = message.getIntProperty("latitude");
+                int longitude = message.getIntProperty("longitude");
                 int results = message.getIntProperty("results");
                 int subjectID = message.getIntProperty("subjectID");
 
@@ -91,9 +88,9 @@ public class GetDribsBean implements MessageListener {
 
                 Message reply = queueSession.createObjectMessage(dribList);
 
-                logger.info("sending reply");
+                logger.info("Sending response");
+
                 sender.send(reply);
-                logger.info("sent reply");
 
                 sender.close();
             }
@@ -104,47 +101,120 @@ public class GetDribsBean implements MessageListener {
 
     }
 
-    public ArrayList<Drib> getDribs(double latitude, double longitude, int results, int subjectID) {
+    public ArrayList<Drib> getDribs(int latitude, int longitude, int results, int subjectID) {
 
-        logger.info("Latitude: " + latitude);
-        logger.info("Longitude: " + longitude);
-        logger.info("Results: " + results);
-        logger.info("SubjectID: " + subjectID);
+        logger.info("Request parameter: latitude = " + latitude);
+        logger.info("Request parameter: longitude = " + longitude);
+        logger.info("Request parameter: results = " + results);
+        logger.info("Request parameter: subjectID = " + subjectID);
 
-        ArrayList<Drib> resp = new ArrayList<Drib>();
+        logger.info("Retrieving DribSubjects from dataset");
+        //ArrayList<Drib> dribList = dataset.getDribs(subjectID, latitude, longitude, 25000);
+        ArrayList<Drib> dribList = testDribList();
+
+        logger.info("Calculating popularity scores");
+
+        dribList = DribblePopularity.rankDribs(dribList, latitude, longitude);
+
+        while(dribList.size() > results) {
+            dribList.remove(results);
+        }
+
+        return dribList;
+
+    }
+
+    public ArrayList<Drib> testDribList() {
+
+        ArrayList<Drib> testList = new ArrayList<Drib>();
 
         Drib a = new Drib();
-
-        a.setText("There is a fire in the hole");
-        a.setPopularity(10000);
-        a.setLatitude(0.4343434);
-        a.setLongitude(0.436746);
+        a.setText("All the fires are out");
+        a.setLatitude(108000);
+        a.setLongitude(108000);
         a.setLikeCount(5);
-        a.setTime(t.getTime());
-        DribSubject dribsubject = new DribSubject();
-        a.setSubject(dribsubject);
-        a.getSubject().setName("Fire");
-        a.getSubject().setLatitude(0.4343443432);
-        a.getSubject().setLongitude(0.3232);
-        //a.getSubject().setNumPosts(0);
+        a.setTime(System.currentTimeMillis() - 300000);
+        a.setMessageID(30);
+        a.setSubject(new DribSubject());
+        a.getSubject().setName("No Fire");
+        a.getSubject().setLatitude(108000);
+        a.getSubject().setLongitude(108000);
+        a.getSubject().setNumPosts(3);
         a.getSubject().setSubjectID(25);
-        //a.getSubject().s
+        a.getSubject().setPopularity(100);
+        a.getSubject().setTime(System.currentTimeMillis()-300000);
 
         Drib b = new Drib();
-        b.setText("Drib B");
-        b.setPopularity(10);
+        b.setText("Its cold now");
+        b.setLatitude(108000);
+        b.setLongitude(108000);
+        b.setLikeCount(5);
+        b.setTime(System.currentTimeMillis());
+        b.setMessageID(40);
+        b.setSubject(new DribSubject());
+        b.getSubject().setName("No Fire");
+        b.getSubject().setLatitude(108000);
+        b.getSubject().setLongitude(108000);
+        b.getSubject().setNumPosts(3);
+        b.getSubject().setSubjectID(25);
+        b.getSubject().setPopularity(100);
+        b.getSubject().setTime(System.currentTimeMillis());
 
         Drib c = new Drib();
-        c.setText("Drib C");
-        c.setPopularity(100);
+        c.setText("Hi Chad");
+        c.setLatitude(108000);
+        c.setLongitude(108000);
+        c.setLikeCount(5);
+        c.setTime(System.currentTimeMillis() - 150000);
+        c.setMessageID(50);
+        c.setSubject(new DribSubject());
+        c.getSubject().setName("No Fire");
+        c.getSubject().setLatitude(108000);
+        c.getSubject().setLongitude(108000);
+        c.getSubject().setNumPosts(3);
+        c.getSubject().setSubjectID(25);
+        c.getSubject().setPopularity(100);
+        c.getSubject().setTime(System.currentTimeMillis()-150000);
 
-        resp.add(a);
-        resp.add(b);
-        resp.add(c);
+        Drib d = new Drib();
+        d.setText("Hi Ash");
+        d.setLatitude(108000);
+        d.setLongitude(108000);
+        d.setLikeCount(5);
+        d.setTime(System.currentTimeMillis() - 150000);
+        d.setMessageID(51);
+        d.setSubject(new DribSubject());
+        d.getSubject().setName("No Fire");
+        d.getSubject().setLatitude(108000);
+        d.getSubject().setLongitude(108000);
+        d.getSubject().setNumPosts(3);
+        d.getSubject().setSubjectID(45);
+        d.getSubject().setPopularity(100);
+        d.getSubject().setTime(System.currentTimeMillis()-150000);
 
-        logger.info("Reply created");
+        Drib e = new Drib();
+        e.setText("Hi Dribble");
+        e.setLatitude(108000);
+        e.setLongitude(108000);
+        e.setLikeCount(5);
+        e.setTime(System.currentTimeMillis() - 150000);
+        e.setMessageID(52);
+        e.setSubject(new DribSubject());
+        e.getSubject().setName("No Fire");
+        e.getSubject().setLatitude(108000);
+        e.getSubject().setLongitude(108000);
+        e.getSubject().setNumPosts(3);
+        e.getSubject().setSubjectID(46);
+        e.getSubject().setPopularity(100);
+        e.getSubject().setTime(System.currentTimeMillis()-150000);
 
-        return resp;
+        testList.add(a);
+        testList.add(b);
+        testList.add(c);
+        testList.add(d);
+        testList.add(e);
+
+        return testList;
 
     }
 

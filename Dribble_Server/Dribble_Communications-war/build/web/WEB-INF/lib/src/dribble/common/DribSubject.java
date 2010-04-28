@@ -1,8 +1,6 @@
 
 package dribble.common;
 
-
-import java.util.Date;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
 
@@ -16,11 +14,11 @@ public class DribSubject implements Serializable{
 
     private String name;
     private int subjectID;
-    private double latitude;
-    private double longitude;
+    private int latitude;
+    private int longitude;
     private int numViews;
     private int numPosts;
-    private Date time;
+    private long time;
     private int popularity;
     public final static int maxLength = 20;
 
@@ -53,22 +51,22 @@ public class DribSubject implements Serializable{
         return this.subjectID;
     }
 
-    public void setLatitude(double latitude)
+    public void setLatitude(int latitude)
     {
         this.latitude = latitude;
     }
 
-    public double getLatitude()
+    public int getLatitude()
     {
         return latitude;
     }
 
-    public void setLongitude(double longitude)
+    public void setLongitude(int longitude)
     {
         this.longitude = longitude;
     }
 
-    public double getLongitude()
+    public int getLongitude()
     {
         return this.longitude;
     }
@@ -93,12 +91,12 @@ public class DribSubject implements Serializable{
         return this.numPosts;
     }
 
-    public void setTime(Date time)
+    public void setTime(long time)
     {
         this.time = time;
     }
     
-    public Date getTime()
+    public long getTime()
     {
         return this.time;
     }

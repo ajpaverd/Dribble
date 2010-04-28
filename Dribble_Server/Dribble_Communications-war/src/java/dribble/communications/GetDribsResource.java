@@ -37,8 +37,8 @@ import javax.ws.rs.Produces;
 @Path("GetDribs")
 public class GetDribsResource {
 
-    @Context
-    private UriInfo context;
+    //@Context
+    //private UriInfo context;
     static final Logger logger = Logger.getLogger("GetDribsResource");
     private InitialContext jndiContext;
     private QueueConnectionFactory queueConnectionFactory;
@@ -53,23 +53,21 @@ public class GetDribsResource {
         logger.info("GetDribsResource Constructor");
 
         try {
-            jndiContext = new InitialContext();
-            logger.info("JNDI Context Initialised");
 
+            jndiContext = new InitialContext();
             logger.info("Looking up queue");
             queue = (Queue) jndiContext.lookup("jms/getDribsQueue");
-            logger.info("lookup queue connection factory");
+            logger.info("Looking up queue connection factory");
             queueConnectionFactory = (QueueConnectionFactory) jndiContext.lookup("jms/getDribsQueueFactoryPool");
-            logger.info("Lookup context complete");
-
-            //Create a queue connection, a session and a sender object to send the message
-            logger.info("create queue connection");
+            logger.info("Create queue connection");
             queueConnection = queueConnectionFactory.createQueueConnection();
-            logger.info("created, now create queue session");
+            logger.info("Create queue session");
             queueSession = queueConnection.createQueueSession(false, Session.AUTO_ACKNOWLEDGE);
-            logger.info("created, now create queue requestor");
+            logger.info("Create queue sender");
             queueSender = queueSession.createSender(queue);
-            logger.info("queue sender created");
+
+            logger.info("GetDribsResource instance constructed");
+
         } catch (NamingException e) {
             logger.severe("JNDI API lookup failed: " + e.toString());
         } catch (JMSException e) {
@@ -85,9 +83,9 @@ public class GetDribsResource {
     @Produces("application/xml")
     public DribList getXml(@Context UriInfo ui) {
 
-        logger.info("Get Request");
+        logger.info("Get Dribs request");
         if (ui == null) {
-            logger.severe("URI Info was null");
+            logger.severe("Missing URL parameters");
             return null;
         }
 
@@ -100,18 +98,18 @@ public class GetDribsResource {
             String resultsString = queryParams.getFirst("results");
             String subjectIDString = queryParams.getFirst("subjectID");
 
-            double latitude = Double.parseDouble(latitudeString);
-            double longitude = Double.parseDouble(longitudeString);
+            int latitude = Integer.parseInt(latitudeString);
+            int longitude = Integer.parseInt(longitudeString);
             int results = Integer.parseInt(resultsString);
             int subjectID = Integer.parseInt(subjectIDString);
 
             Message msg = queueSession.createMessage();
-            msg.setDoubleProperty("latitude", latitude);
-            msg.setDoubleProperty("longitude", longitude);
+            msg.setIntProperty("latitude", latitude);
+            msg.setIntProperty("longitude", longitude);
             msg.setIntProperty("results", results);
             msg.setIntProperty("subjectID", subjectID);
 
-            logger.info("Message created");
+            logger.info("Request parameters received");
 
             //create a temporary destination
             TemporaryQueue respDest = queueSession.createTemporaryQueue();
@@ -121,38 +119,42 @@ public class GetDribsResource {
 
             QueueReceiver receiver = queueSession.createReceiver(respDest);
 
-            logger.info("created receiver");
+            logger.info("Starting queue connection");
 
             queueConnection.start();
 
-            logger.info("connection started");
+            logger.info("Sending request to processing bean");
 
             queueSender.send(msg);
 
-            logger.info("Sent msg");
+            logger.info("Wating for response");
 
             ObjectMessage response = (ObjectMessage) receiver.receive(10000);
 
+            receiver.close();
+            respDest.delete();
+
             if (response != null) {
 
-                logger.info("Message received");
+                logger.info("Response received");
 
                 ArrayList<Drib> dribList = (ArrayList<Drib>) response.getObject();
 
-                DribList wrapperList = new DribList();
+                logger.info("Wrapping list of Dribs");
 
+                DribList wrapperList = new DribList();
                 wrapperList.list = dribList;
 
-                logger.info("Dribs Sent");
+                logger.info("===== Dribs sent to client =====");
 
                 return wrapperList;
 
             } else {
 
-                logger.severe("Message not received - timeout");
+                logger.severe("Response not received - timeout");
 
                 return null;
-                
+
             }
 
 
@@ -177,5 +179,15 @@ public class GetDribsResource {
     @Consumes("application/xml")
     public void putXml(ArrayList content) {
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    protected void finalize() throws Throwable {
+
+        queueSender.close();
+        queueSession.close();
+        queueConnection.close();
+
+        super.finalize();
     }
 }

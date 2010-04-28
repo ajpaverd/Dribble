@@ -28,7 +28,6 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.GET;
 import javax.ws.rs.Produces;
-import javax.xml.bind.annotation.XmlElementWrapper;
 
 /**
  * REST Web Service
@@ -38,8 +37,8 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 @Path("GetDribSubjects")
 public class GetDribSubjectsResource {
 
-    @Context
-    private UriInfo context;
+    //@Context
+    //private UriInfo context;
     static final Logger logger = Logger.getLogger("GetDribSubjectsResource");
     private InitialContext jndiContext;
     private QueueConnectionFactory queueConnectionFactory;
@@ -48,33 +47,27 @@ public class GetDribSubjectsResource {
     private Queue queue;
     private QueueSender queueSender;
 
-    @XmlElementWrapper(name = "list")
-    private ArrayList<DribSubject> subjectList;
-
     /** Creates a new instance of PutDribResource */
     public GetDribSubjectsResource() {
 
         logger.info("GetDribSubjectsResource Constructor");
 
         try {
-            jndiContext = new InitialContext();
-            logger.info("JNDI Context Initialised");
-            //Connection factory and queue
 
+            jndiContext = new InitialContext();
             logger.info("Looking up queue");
             queue = (Queue) jndiContext.lookup("jms/getDribSubjectsQueue");
-            logger.info("lookup queue connection factory");
+            logger.info("looking up queue connection factory");
             queueConnectionFactory = (QueueConnectionFactory) jndiContext.lookup("jms/getDribSubjectsQueueFactoryPool");
-            logger.info("Lookup context complete");
-
-            //Create a queue connection, a session and a sender object to send the message
-            logger.info("create queue connection");
+            logger.info("Create queue connection");
             queueConnection = queueConnectionFactory.createQueueConnection();
-            logger.info("created, now create queue session");
+            logger.info("Create queue session");
             queueSession = queueConnection.createQueueSession(false, Session.AUTO_ACKNOWLEDGE);
-            logger.info("created, now create queue requestor");
+            logger.info("Create queue sender");
             queueSender = queueSession.createSender(queue);
-            logger.info("queue sender created");
+
+            logger.info("GetDribSubjectsResource instance constructed");
+
         } catch (NamingException e) {
             logger.severe("JNDI API lookup failed: " + e.toString());
         } catch (JMSException e) {
@@ -90,8 +83,10 @@ public class GetDribSubjectsResource {
     @Produces("application/xml")
     public DribSubjectList getXml(@Context UriInfo ui) {
 
-        logger.info("Get Request");
+        logger.info("Get subjects request");
+
         if (ui == null) {
+            logger.severe("Missing url parameters");
             return null;
         }
 
@@ -103,54 +98,59 @@ public class GetDribSubjectsResource {
             String longitudeString = queryParams.getFirst("longitude");
             String resultsString = queryParams.getFirst("results");
 
-            double latitude = Double.parseDouble(latitudeString);
-            double longitude = Double.parseDouble(longitudeString);
+            int latitude = Integer.parseInt(latitudeString);
+            int longitude = Integer.parseInt(longitudeString);
             int results = Integer.parseInt(resultsString);
 
             Message msg = queueSession.createMessage();
-            msg.setDoubleProperty("latitude", latitude);
-            msg.setDoubleProperty("longitude", longitude);
+            msg.setIntProperty("latitude", latitude);
+            msg.setIntProperty("longitude", longitude);
             msg.setIntProperty("results", results);
 
-            logger.info("Message created");
+            logger.info("Request parameters received");
 
-            //create a temporary destination
+            //Create a temporary destination
             TemporaryQueue respDest = queueSession.createTemporaryQueue();
 
-            //set destination for the ping_reply message
+            //Set destination for the reply message
             msg.setJMSReplyTo(respDest);
 
             QueueReceiver receiver = queueSession.createReceiver(respDest);
 
-            logger.info("created receiver");
+            logger.info("Starting queue connection");
 
             queueConnection.start();
 
-            logger.info("connection started");
+            logger.info("Sending request to processing bean");
 
             queueSender.send(msg);
 
-            logger.info("Sent msg");
+            logger.info("Waiting for response");
 
             ObjectMessage response = (ObjectMessage) receiver.receive(10000);
 
+            receiver.close();
+            respDest.delete();
+
             if (response != null) {
 
-                logger.info("Message received");
+                logger.info("Response received");
 
 
-                subjectList = (ArrayList<DribSubject>) response.getObject();
+                ArrayList<DribSubject> subjectList = (ArrayList<DribSubject>) response.getObject();
 
-                logger.info("Subjects Sent");
+                logger.info("Wrapping list of subjects");
 
                 DribSubjectList wrapperList = new DribSubjectList();
                 wrapperList.list = subjectList;
+
+                logger.info("===== DribSubjects sent to client =====");
 
                 return wrapperList;
 
             } else {
 
-                logger.severe("Message not received - timeout");
+                logger.severe("Response not received - timeout");
 
                 return null;
             }
@@ -176,5 +176,15 @@ public class GetDribSubjectsResource {
     @Consumes("application/xml")
     public void putXml(DribSubject content) {
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    protected void finalize() throws Throwable {
+        
+        queueSender.close();
+        queueSession.close();
+        queueConnection.close();
+
+        super.finalize();
     }
 }
