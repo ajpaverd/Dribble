@@ -107,8 +107,8 @@ public class getDribSubjectsBean implements MessageListener {
         logger.info("Request parameter: results = " + results);
 
         logger.info("Retrieving DribSubjects from dataset");
-        //ArrayList<DribSubject> subjectList = dataset.getDribSubjects(latitude, longitude, 25000);
-        ArrayList<DribSubject> subjectList = testSubjectList();
+        ArrayList<DribSubject> subjectList = dataset.getDribSubjects(latitude, longitude, 25000);
+        //ArrayList<DribSubject> subjectList = testSubjectList();
 
         logger.info("Calculating popularity scores");
 
@@ -117,7 +117,6 @@ public class getDribSubjectsBean implements MessageListener {
         while(subjectList.size() > results) {
             subjectList.remove(results);
         }
-        //TODO resize list
 
         return subjectList;
     }

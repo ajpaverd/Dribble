@@ -45,7 +45,7 @@ public abstract class DribblePopularity {
             //Time difference in 5 minute multiples
             deltaTime = ((System.currentTimeMillis() - current.getTime()) / (300000.0));
 
-            popularityDouble = (100 * posts + 100 * views) * Math.pow(0.5, deltaLocation + deltaTime);
+            popularityDouble = (1000 * posts + 1000 * views) * Math.pow(0.5, deltaLocation + deltaTime);
             popularity = (int) Math.ceil(popularityDouble);
 
             current.setPopularity(popularity);
@@ -86,7 +86,7 @@ public abstract class DribblePopularity {
             //Time difference in 5 minute multiples
             deltaTime = ((System.currentTimeMillis() - current.getTime()) / (300000.0));
 
-            popularityDouble = (1000 * likeCount) * Math.pow(0.5, deltaLocation + deltaTime);
+            popularityDouble = (1000 + 1000 * likeCount) * Math.pow(0.5, deltaLocation + deltaTime);
             popularity = (int) Math.ceil(popularityDouble);
 
             current.setPopularity(popularity);

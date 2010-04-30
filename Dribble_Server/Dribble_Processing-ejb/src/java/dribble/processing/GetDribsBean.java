@@ -109,8 +109,8 @@ public class GetDribsBean implements MessageListener {
         logger.info("Request parameter: subjectID = " + subjectID);
 
         logger.info("Retrieving DribSubjects from dataset");
-        //ArrayList<Drib> dribList = dataset.getDribs(subjectID, latitude, longitude, 25000);
-        ArrayList<Drib> dribList = testDribList();
+        ArrayList<Drib> dribList = dataset.getDribs(subjectID, latitude, longitude, 25000);
+        //ArrayList<Drib> dribList = testDribList();
 
         logger.info("Calculating popularity scores");
 

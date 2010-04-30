@@ -98,7 +98,7 @@ public class putDribBean implements MessageListener {
         DribSubject subject = drib.getSubject();
 
         //Get the drib with corresponding ID from the dataset
-        Drib existingDrib = dataset.getDrib(subject, dribID);
+        Drib existingDrib = dataset.getDrib(subject.getSubjectID(), dribID);
 
         if (existingDrib != null) {
 
