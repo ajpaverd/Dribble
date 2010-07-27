@@ -91,14 +91,14 @@ public class SQLCommunicator implements Dataset {
                         + "VALUES (" + "\'" + m.getSubject().getName() + "\'," + m.getSubject().getSubjectID()
                         + "," + m.getSubject().getLatitude() + "," + m.getSubject().getLongitude()
                         + "," + 0 + "," + 0
-                        + "," + 0 + "," + m.getSubject().getTime() + ")");
+                        + "," + 0 + "," + System.currentTimeMillis() + ")");
             }
 
             logger.info("Adding Drib to subject table");
             stmt.execute("INSERT INTO \"" + m.getSubject().getSubjectID() + "\" (DRIB,LAT,LONG,CURRENTIME,DRIBID,DRIBLIKE, DRIBPOPULARITY)"
-                    + "VALUES (" + "\'" + m.getText() + "\'" + "," + m.getLatitude() + "," + m.getLongitude() + "," + m.getTime() + "," + m.getMessageID() + "," + m.getLikeCount() + "," + m.getPopularity() + ")");
+                    + "VALUES (" + "\'" + m.getText() + "\'" + "," + m.getLatitude() + "," + m.getLongitude() + "," + System.currentTimeMillis() + "," + m.getMessageID() + "," + m.getLikeCount() + "," + m.getPopularity() + ")");
 
-            stmt.execute("UPDATE DRIBBLE_SYSTEM_SUBJECTS SET CURRENTIME = " + m.getTime() + " WHERE ID = " + m.getSubject().getSubjectID());
+            stmt.execute("UPDATE DRIBBLE_SYSTEM_SUBJECTS SET CURRENTIME = " + System.currentTimeMillis() + " WHERE ID = " + m.getSubject().getSubjectID());
             logger.info("Drib successfully added to table");
 
             //Incrementing the number of posts of a subject
@@ -134,6 +134,7 @@ public class SQLCommunicator implements Dataset {
             int num_views = updatepost.getInt("VIEWS");
 
             stmt.execute("UPDATE DRIBBLE_SYSTEM_SUBJECTS SET VIEWS = " + (num_views + 1) + "WHERE ID = " + subjectID);
+            stmt.execute("UPDATE DRIBBLE_SYSTEM_SUBJECTS SET CURRENTIME = " + (System.currentTimeMillis()) + "WHERE ID = " + subjectID);
         } catch (SQLException e) {
             logger.severe("Error updtaing views");
         }
@@ -337,4 +338,44 @@ public class SQLCommunicator implements Dataset {
 
         return subject;
     }
+
+    public boolean deleteOldDribSubjects(long qualifyingTime) {
+
+        logger.info("Deleting DribSubject...");
+
+        try {
+            Statement stmt = con.createStatement();
+            stmt.execute("DROP TABLE \"(SELECT ID FROM DRIBBLE_SYSTEM_SUBJECTS WHERE CURRENTIME < " + qualifyingTime + " )\" ");
+            stmt.execute("DELETE FROM DRIBBLE_SYSTEM_SUBJECTS WHERE CURRENTIME < " + qualifyingTime);
+            logger.info("Deleted dribSubjects from subjects table");
+            return true;
+
+        } catch (SQLException e) {
+
+            logger.severe("Error deleting DribSubject: " + e.getMessage());
+
+            return false;
+        }
+    }
+    
+    public boolean deleteOldDribs(long qualifyingTime) {
+
+        logger.info("Deleting old Dribs...");
+
+        try {
+            Statement stmt = con.createStatement();
+            stmt.execute("DELETE FROM (SELECT ID FROM DRIBBLE_SYSTEM_SUBJECTS) WHERE CURRENTIME < " + qualifyingTime);
+            logger.info("Deleted old dribs");
+            return true;
+
+        } catch (SQLException e) {
+
+            logger.severe("Error deleting old Dribs: " + e.getMessage());
+
+            return false;
+        }
+    }
+
+
+
 }

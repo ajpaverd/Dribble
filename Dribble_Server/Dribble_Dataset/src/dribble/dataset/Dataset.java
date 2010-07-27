@@ -11,7 +11,7 @@ import java.util.ArrayList;
 public interface Dataset {
 
     boolean addDrib(Drib m);
-    //vie w of subject
+
     ArrayList<Drib> getDribs(int subjectID, long lat, long longitude, long radius);
 
     ArrayList<DribSubject> getDribSubjects(long lat, long longitude, long radius);
@@ -21,4 +21,8 @@ public interface Dataset {
     boolean updateDrib(Drib m);
 
     Drib getDrib(int subjectID, int DribID);
+
+    boolean deleteOldDribSubjects(long qualifyingTime);
+
+    boolean deleteOldDribs(long qualifyingTime);
 }

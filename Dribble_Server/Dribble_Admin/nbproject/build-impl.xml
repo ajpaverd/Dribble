@@ -1,21 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-*** GENERATED FROM project.xml - DO NOT EDIT  ***
-***         EDIT ../build.xml INSTEAD         ***
+        *** GENERATED FROM project.xml - DO NOT EDIT  ***
+        ***         EDIT ../build.xml INSTEAD         ***
 
-For the purpose of easier reading the script
-is divided into following sections:
+        For the purpose of easier reading the script
+        is divided into following sections:
 
-  - initialization
-  - compilation
-  - dist
-  - execution
-  - debugging
-  - javadoc
-  - cleanup
+        - initialization
+        - compilation
+        - jar
+        - execution
+        - debugging
+        - javadoc
+        - junit compilation
+        - junit execution
+        - junit debugging
+        - applet
+        - cleanup
 
         -->
-<project xmlns:ejbjarproject1="http://www.netbeans.org/ns/j2ee-ejbjarproject/1" xmlns:ejbjarproject2="http://www.netbeans.org/ns/j2ee-ejbjarproject/2" xmlns:ejbjarproject3="http://www.netbeans.org/ns/j2ee-ejbjarproject/3" basedir=".." default="default" name="Dribble_Processing-ejb-impl">
+<project xmlns:carproject="http://www.netbeans.org/ns/car-project/1" basedir=".." default="default" name="Dribble_Admin-impl">
     <import file="ant-deploy.xml"/>
     <fail message="Please build using Ant 1.7.1 or higher.">
         <condition>
@@ -26,32 +30,31 @@ is divided into following sections:
     </fail>
     <target depends="dist,javadoc" description="Build whole project." name="default"/>
     <!-- 
+                ======================
                 INITIALIZATION SECTION 
+                ======================
             -->
     <target name="-pre-init">
         <!-- Empty placeholder for easier customization. -->
         <!-- You can override this target in the ../build.xml file. -->
     </target>
+    <target name="-pre-init-am">
+        <!-- Access Manager pre-initialization -->
+    </target>
     <target depends="-pre-init" name="-init-private">
         <property file="nbproject/private/private.properties"/>
     </target>
-    <target depends="-pre-init,-init-private" name="-init-userdir">
-        <property location="${netbeans.user}/build.properties" name="user.properties.file"/>
-    </target>
-    <target depends="-pre-init,-init-private,-init-userdir" name="-init-user">
+    <target depends="-pre-init,-init-private" name="-init-user">
         <property file="${user.properties.file}"/>
         <!-- The two properties below are usually overridden -->
         <!-- by the active platform. Just a fallback. -->
         <property name="default.javac.source" value="1.4"/>
         <property name="default.javac.target" value="1.4"/>
     </target>
-    <target depends="-pre-init,-init-private,-init-userdir,-init-user" name="-init-project">
+    <target depends="-pre-init,-init-private,-init-user" name="-init-project">
         <property file="nbproject/project.properties"/>
     </target>
-    <target depends="-pre-init,-init-private,-init-userdir,-init-user,-init-project,-init-macrodef-property" name="-do-init">
-        <!-- Ensure configuration directory exists. -->
-        <mkdir dir="${meta.inf}"/>
-        <property name="runmain.jvmargs" value=""/>
+    <target depends="-pre-init,-init-private,-init-user,-init-project,-init-macrodef-property" name="-do-init">
         <condition property="have.tests">
             <or>
                 <available file="${test.src.dir}"/>
@@ -68,28 +71,19 @@ is divided into following sections:
                 <isset property="have.tests"/>
             </and>
         </condition>
+        <property name="javadoc.preview" value="true"/>
         <condition property="no.javadoc.preview">
             <isfalse value="${javadoc.preview}"/>
         </condition>
+        <property name="javac.compilerargs" value=""/>
+        <property name="work.dir" value="${basedir}"/>
+        <condition property="no.deps">
+            <and>
+                <istrue value="${no.dependencies}"/>
+            </and>
+        </condition>
+        <property name="javac.debug" value="true"/>
         <available file="${meta.inf}/MANIFEST.MF" property="has.custom.manifest"/>
-        <!--
-                    Variables needed to support directory deployment.
-                -->
-        <condition property="do.package.with.custom.manifest.not.directory.deploy">
-            <and>
-                <isset property="has.custom.manifest"/>
-                <isfalse value="${directory.deployment.supported}"/>
-            </and>
-        </condition>
-        <condition property="do.package.without.custom.manifest.not.directory.deploy">
-            <and>
-                <not>
-                    <isset property="has.custom.manifest"/>
-                </not>
-                <isfalse value="${directory.deployment.supported}"/>
-            </and>
-        </condition>
-        <!--End Variables needed to support directory deployment.-->
         <condition property="classes.dir" value="${build.ear.classes.dir}">
             <isset property="dist.ear.dir"/>
         </condition>
@@ -103,6 +97,25 @@ is divided into following sections:
             <not>
                 <isset property="dist.ear.dir"/>
             </not>
+        </condition>
+        <condition property="do.display.browser">
+            <istrue value="${display.browser}"/>
+        </condition>
+        <condition else="" property="application.args.param" value="${application.args}">
+            <and>
+                <isset property="application.args"/>
+                <not>
+                    <equals arg1="${application.args}" arg2="" trim="true"/>
+                </not>
+            </and>
+        </condition>
+        <condition else="" property="run.jvmargs.param" value="${run.jvmargs}">
+            <and>
+                <isset property="run.jvmargs"/>
+                <not>
+                    <equals arg1="${run.jvmargs}" arg2="" trim="true"/>
+                </not>
+            </and>
         </condition>
         <property name="source.encoding" value="${file.encoding}"/>
         <condition property="javadoc.encoding.used" value="${javadoc.encoding}">
@@ -121,23 +134,20 @@ is divided into following sections:
             <length length="0" string="${endorsed.classpath}" when="greater"/>
         </condition>
     </target>
-    <target depends="init" name="-init-cos" unless="deploy.on.save">
-        <condition property="deploy.on.save" value="true">
-            <istrue value="${j2ee.deploy.on.save}"/>
-        </condition>
-    </target>
     <target name="-post-init">
         <!-- Empty placeholder for easier customization. -->
         <!-- You can override this target in the ../build.xml file. -->
     </target>
-    <target depends="-pre-init,-init-private,-init-userdir,-init-user,-init-project,-do-init" name="-init-check">
+    <target depends="-pre-init,-init-private,-init-user,-init-project,-do-init" name="-init-check">
         <fail unless="src.dir">Must set src.dir</fail>
         <fail unless="test.src.dir">Must set test.src.dir</fail>
         <fail unless="build.dir">Must set build.dir</fail>
-        <fail unless="build.generated.dir">Must set build.generated.dir</fail>
         <fail unless="dist.dir">Must set dist.dir</fail>
         <fail unless="build.classes.dir">Must set build.classes.dir</fail>
+        <fail unless="build.generated.dir">Must set build.generated.dir</fail>
         <fail unless="dist.javadoc.dir">Must set dist.javadoc.dir</fail>
+        <fail unless="build.test.classes.dir">Must set build.test.classes.dir</fail>
+        <fail unless="build.test.results.dir">Must set build.test.results.dir</fail>
         <fail unless="build.classes.excludes">Must set build.classes.excludes</fail>
         <fail unless="dist.jar">Must set dist.jar</fail>
         <fail unless="j2ee.platform.classpath">
@@ -149,7 +159,7 @@ or ant -Dj2ee.platform.classpath=&lt;server_classpath&gt; (where no properties f
                 </fail>
     </target>
     <target name="-init-macrodef-property">
-        <macrodef name="property" uri="http://www.netbeans.org/ns/j2ee-ejbjarproject/1">
+        <macrodef name="property" uri="http://www.netbeans.org/ns/car-project/1">
             <attribute name="name"/>
             <attribute name="value"/>
             <sequential>
@@ -158,7 +168,7 @@ or ant -Dj2ee.platform.classpath=&lt;server_classpath&gt; (where no properties f
         </macrodef>
     </target>
     <target name="-init-macrodef-javac">
-        <macrodef name="javac" uri="http://www.netbeans.org/ns/j2ee-ejbjarproject/2">
+        <macrodef name="javac" uri="http://www.netbeans.org/ns/car-project/1">
             <attribute default="${src.dir}" name="srcdir"/>
             <attribute default="${build.classes.dir}" name="destdir"/>
             <attribute default="${javac.classpath}:${j2ee.platform.classpath}" name="classpath"/>
@@ -168,7 +178,6 @@ or ant -Dj2ee.platform.classpath=&lt;server_classpath&gt; (where no properties f
             <attribute default="${empty.dir}" name="gensrcdir"/>
             <element name="customize" optional="true"/>
             <sequential>
-                <property name="javac.compilerargs" value=""/>
                 <property location="${build.dir}/empty" name="empty.dir"/>
                 <mkdir dir="${empty.dir}"/>
                 <javac debug="@{debug}" deprecation="${javac.deprecation}" destdir="@{destdir}" encoding="${source.encoding}" excludes="@{excludes}" includeantruntime="false" includes="@{includes}" source="${javac.source}" srcdir="@{srcdir}" target="${javac.target}">
@@ -188,7 +197,7 @@ or ant -Dj2ee.platform.classpath=&lt;server_classpath&gt; (where no properties f
         </macrodef>
     </target>
     <target name="-init-macrodef-junit">
-        <macrodef name="junit" uri="http://www.netbeans.org/ns/j2ee-ejbjarproject/2">
+        <macrodef name="junit" uri="http://www.netbeans.org/ns/car-project/1">
             <attribute default="${includes}" name="includes"/>
             <attribute default="${excludes}" name="excludes"/>
             <attribute default="**" name="testincludes"/>
@@ -202,7 +211,6 @@ or ant -Dj2ee.platform.classpath=&lt;server_classpath&gt; (where no properties f
                     <classpath>
                         <path path="${run.test.classpath}"/>
                         <path path="${j2ee.platform.classpath}"/>
-                        <path path="${j2ee.platform.embeddableejb.classpath}"/>
                     </classpath>
                     <syspropertyset>
                         <propertyref prefix="test-sys-prop."/>
@@ -211,21 +219,22 @@ or ant -Dj2ee.platform.classpath=&lt;server_classpath&gt; (where no properties f
                     <formatter type="brief" usefile="false"/>
                     <formatter type="xml"/>
                     <jvmarg line="${endorsed.classpath.cmd.line.arg}"/>
-                    <jvmarg line="${runmain.jvmargs}"/>
+                    <jvmarg line="${run.jvmargs.param}"/>
                 </junit>
             </sequential>
         </macrodef>
     </target>
     <target name="-init-macrodef-java">
-        <macrodef name="java" uri="http://www.netbeans.org/ns/j2ee-ejbjarproject/3">
+        <macrodef name="java" uri="http://www.netbeans.org/ns/car-project/1">
             <attribute default="${main.class}" name="classname"/>
             <element name="customize" optional="true"/>
             <sequential>
-                <java classname="@{classname}" fork="true">
+                <java classname="@{classname}" dir="${work.dir}" fork="true">
                     <jvmarg line="${endorsed.classpath.cmd.line.arg}"/>
-                    <jvmarg line="${runmain.jvmargs}"/>
+                    <jvmarg line="${j2ee.appclient.tool.jvmoptions}"/>
+                    <jvmarg line="${run.jvmargs.param}"/>
                     <classpath>
-                        <path path="${build.classes.dir}:${javac.classpath}:${j2ee.platform.classpath}"/>
+                        <path path="${dist.jar}:${javac.classpath}:${j2ee.platform.classpath}:${j2ee.appclient.tool.runtime}"/>
                     </classpath>
                     <syspropertyset>
                         <propertyref prefix="run-sys-prop."/>
@@ -237,18 +246,19 @@ or ant -Dj2ee.platform.classpath=&lt;server_classpath&gt; (where no properties f
         </macrodef>
     </target>
     <target depends="-init-debug-args" name="-init-macrodef-nbjpda">
-        <macrodef name="nbjpdastart" uri="http://www.netbeans.org/ns/j2ee-ejbjarproject/1">
+        <macrodef name="nbjpdastart" uri="http://www.netbeans.org/ns/car-project/1">
             <attribute default="${main.class}" name="name"/>
             <attribute default="${debug.classpath}" name="classpath"/>
+            <attribute default="" name="stopclassname"/>
             <sequential>
-                <nbjpdastart addressproperty="jpda.address" name="@{name}" transport="${debug-transport}">
+                <nbjpdastart addressproperty="jpda.address" name="@{name}" stopclassname="@{stopclassname}" transport="${debug-transport}">
                     <classpath>
                         <path path="@{classpath}"/>
                     </classpath>
                 </nbjpdastart>
             </sequential>
         </macrodef>
-        <macrodef name="nbjpdareload" uri="http://www.netbeans.org/ns/j2ee-ejbjarproject/1">
+        <macrodef name="nbjpdareload" uri="http://www.netbeans.org/ns/car-project/1">
             <attribute default="${build.classes.dir}" name="dir"/>
             <sequential>
                 <nbjpdareload>
@@ -285,21 +295,65 @@ or ant -Dj2ee.platform.classpath=&lt;server_classpath&gt; (where no properties f
         </condition>
     </target>
     <target depends="-init-debug-args" name="-init-macrodef-debug">
-        <macrodef name="debug" uri="http://www.netbeans.org/ns/j2ee-ejbjarproject/1">
+        <macrodef name="debug" uri="http://www.netbeans.org/ns/car-project/1">
             <attribute default="${main.class}" name="classname"/>
             <attribute default="${debug.classpath}" name="classpath"/>
-            <attribute default="${application.args}" name="args"/>
             <element name="customize" optional="true"/>
+            <attribute default="${application.args.param}" name="args"/>
             <sequential>
-                <java classname="@{classname}" fork="true">
+                <java classname="@{classname}" dir="${work.dir}" fork="true">
+                    <jvmarg line="${endorsed.classpath.cmd.line.arg}"/>
                     <jvmarg line="${debug-args-line}"/>
                     <jvmarg value="-Xrunjdwp:transport=${debug-transport},address=${jpda.address}"/>
+                    <jvmarg line="${run.jvmargs.param}"/>
                     <classpath>
                         <path path="@{classpath}"/>
                     </classpath>
+                    <syspropertyset>
+                        <propertyref prefix="run-sys-prop."/>
+                        <mapper from="run-sys-prop.*" to="*" type="glob"/>
+                    </syspropertyset>
                     <arg line="@{args}"/>
                     <customize/>
                 </java>
+            </sequential>
+        </macrodef>
+    </target>
+    <target depends="-init-debug-args" name="-init-macrodef-debug-appclient">
+        <macrodef name="debug-appclient" uri="http://www.netbeans.org/ns/car-project/1">
+            <attribute name="mainclass"/>
+            <attribute default="${debug.classpath}" name="classpath"/>
+            <element name="customize" optional="true"/>
+            <attribute default="${application.args.param}" name="args"/>
+            <sequential>
+                <parallel>
+                    <java classname="@{mainclass}" dir="${work.dir}" fork="true">
+                        <jvmarg line="${endorsed.classpath.cmd.line.arg}"/>
+                        <jvmarg line="${j2ee.appclient.tool.jvmoptions}"/>
+                        <jvmarg line="${debug-args-line}"/>
+                        <jvmarg value="-Xrunjdwp:transport=${jpda.transport},server=y,address=${jpda.address},suspend=y"/>
+                        <jvmarg line="${run.jvmargs.param}"/>
+                        <arg line="@{args}"/>
+                        <classpath>
+                            <path path="${javac.classpath}:${j2ee.platform.classpath}:${j2ee.appclient.tool.runtime}"/>
+                            <path path="@{classpath}"/>
+                        </classpath>
+                        <syspropertyset>
+                            <propertyref prefix="run-sys-prop."/>
+                            <mapper from="run-sys-prop.*" to="*" type="glob"/>
+                        </syspropertyset>
+                        <customize/>
+                    </java>
+                    <nbjpdaconnect address="${jpda.address}" host="${jpda.host}" name="${name}" transport="${jpda.transport}">
+                        <classpath>
+                            <path path="${javac.classpath}:${j2ee.platform.classpath}:${j2ee.appclient.tool.runtime}"/>
+                            <path path="@{classpath}"/>
+                        </classpath>
+                        <sourcepath>
+                            <path path="${src.dir}"/>
+                        </sourcepath>
+                    </nbjpdaconnect>
+                </parallel>
             </sequential>
         </macrodef>
     </target>
@@ -316,37 +370,50 @@ exists or setup the property manually. For example like this:
                 </fail>
         <taskdef classpath="${libs.CopyLibs.classpath}" resource="org/netbeans/modules/java/j2seproject/copylibstask/antlib.xml"/>
     </target>
-    <target depends="-pre-init,-init-private,-init-userdir,-init-user,-init-project,-do-init,-post-init,-init-check,-init-macrodef-property,-init-macrodef-javac,-init-macrodef-junit,-init-macrodef-java,-init-macrodef-nbjpda,-init-macrodef-debug,-init-taskdefs" name="init"/>
+    <target depends="-pre-init,-pre-init-am,-init-private,-init-user,-init-project,-do-init,-post-init,-init-check,-init-macrodef-property,-init-macrodef-javac,-init-macrodef-junit,-init-macrodef-java,-init-macrodef-nbjpda,-init-macrodef-debug,-init-macrodef-debug-appclient,-init-taskdefs" name="init"/>
     <!--
+                ===================
                 COMPILATION SECTION
+                ===================
             -->
+    <target name="-check-main-class">
+        <fail>
+                    Main class must be set. Go to Dribble_Admin project properties -&gt; Run and set the main class there.
+                    <condition>
+                <not>
+                    <or>
+                        <isset property="dist.ear.dir"/>
+                        <isset property="main.class"/>
+                    </or>
+                </not>
+            </condition>
+        </fail>
+    </target>
     <target depends="init" if="no.dist.ear.dir" name="-deps-module-jar" unless="no.deps">
-        <ant antfile="${project.Dribble_Dataset}/build.xml" inheritall="false" target="jar">
-            <property name="deploy.on.save" value="false"/>
-        </ant>
+        <ant antfile="${project.Dribble_Dataset}/build.xml" inheritall="false" target="jar"/>
     </target>
     <target depends="init" if="dist.ear.dir" name="-deps-ear-jar" unless="no.deps">
-        <ant antfile="${project.Dribble_Dataset}/build.xml" inheritall="false" target="jar">
-            <property name="deploy.on.save" value="false"/>
-        </ant>
+        <ant antfile="${project.Dribble_Dataset}/build.xml" inheritall="false" target="jar"/>
     </target>
-    <target depends="init, -deps-module-jar, -deps-ear-jar" name="deps-jar"/>
+    <target depends="init, -check-main-class, -deps-module-jar, -deps-ear-jar" name="deps-jar"/>
     <target depends="init,deps-jar" name="-pre-pre-compile">
-        <mkdir dir="${build.classes.dir}"/>
-        <mkdir dir="${build.ear.classes.dir}"/>
+        <mkdir dir="${classes.dir}"/>
     </target>
     <target name="-pre-compile">
         <!-- Empty placeholder for easier customization. -->
         <!-- You can override this target in the ../build.xml file. -->
     </target>
     <target depends="compile" name="library-inclusion-in-archive">
-        <copyfiles files="${libs.Dribble.classpath}" todir="${build.classes.dir}"/>
-        <copyfiles files="${reference.Dribble_Dataset.jar}" todir="${build.classes.dir}"/>
+        <mkdir dir="${build.classes.dir}/META-INF/lib"/>
+        <copyfiles files="${reference.Dribble_Dataset.jar}" todir="${build.classes.dir}/META-INF/lib"/>
+        <copyfiles files="${libs.Dribble.classpath}" todir="${build.classes.dir}/META-INF/lib"/>
     </target>
-    <target depends="compile" name="library-inclusion-in-manifest">
-        <copyfiles files="${libs.Dribble.classpath}" todir="${dist.ear.dir}/lib"/>
-        <copyfiles files="${reference.Dribble_Dataset.jar}" todir="${dist.ear.dir}/lib"/>
-        <manifest file="${build.ear.classes.dir}/META-INF/MANIFEST.MF" mode="update"/>
+    <target depends="compile" if="dist.ear.dir" name="library-inclusion-in-manifest">
+        <copyfiles files="${reference.Dribble_Dataset.jar}" manifestproperty="manifest.reference.Dribble_Dataset.jar" todir="${dist.ear.dir}/lib"/>
+        <copyfiles files="${libs.Dribble.classpath}" manifestproperty="manifest.libs.Dribble.classpath" todir="${dist.ear.dir}/lib"/>
+        <manifest file="${build.ear.classes.dir}/META-INF/MANIFEST.MF" mode="update">
+            <attribute name="Class-Path" value="${manifest.reference.Dribble_Dataset.jar} lib/${manifest.reference.Dribble_Dataset.jar} ${manifest.libs.Dribble.classpath} lib/${manifest.libs.Dribble.classpath} "/>
+        </manifest>
     </target>
     <target name="-copy-meta-inf">
         <copy todir="${classes.dir}">
@@ -357,7 +424,7 @@ exists or setup the property manually. For example like this:
         </copy>
     </target>
     <target depends="init,deps-jar,-pre-pre-compile,-pre-compile,-copy-meta-inf" if="have.sources" name="-do-compile">
-        <ejbjarproject2:javac destdir="${classes.dir}" gensrcdir="${build.generated.sources.dir}"/>
+        <carproject:javac destdir="${classes.dir}" gensrcdir="${build.generated.sources.dir}"/>
         <copy todir="${classes.dir}">
             <fileset dir="${src.dir}" excludes="${build.classes.excludes},${excludes}" includes="${includes}"/>
         </copy>
@@ -373,7 +440,7 @@ exists or setup the property manually. For example like this:
     </target>
     <target depends="init,deps-jar,-pre-pre-compile" name="-do-compile-single">
         <fail unless="javac.includes">Must select some files in the IDE or set javac.includes</fail>
-        <ejbjarproject2:javac excludes="" gensrcdir="${build.generated.sources.dir}" includes="${javac.includes}"/>
+        <carproject:javac excludes="" gensrcdir="${build.generated.sources.dir}" includes="${javac.includes}"/>
     </target>
     <target name="-post-compile-single">
         <!-- Empty placeholder for easier customization. -->
@@ -381,8 +448,14 @@ exists or setup the property manually. For example like this:
     </target>
     <target depends="init,deps-jar,-pre-pre-compile,-pre-compile-single,-do-compile-single,-post-compile-single" name="compile-single"/>
     <!--
+                ====================
                 DIST BUILDING SECTION
+                ====================
             -->
+    <target depends="init" name="-pre-pre-dist">
+        <dirname file="${dist.jar}" property="dist.jar.dir"/>
+        <mkdir dir="${dist.jar.dir}"/>
+    </target>
     <target name="-pre-dist">
         <!-- Empty placeholder for easier customization. -->
         <!-- You can override this target in the ../build.xml file. -->
@@ -390,6 +463,9 @@ exists or setup the property manually. For example like this:
     <target depends="init,compile,-pre-dist,library-inclusion-in-archive" if="has.custom.manifest" name="-do-dist-with-manifest">
         <dirname file="${dist.jar}" property="dist.jar.dir"/>
         <mkdir dir="${dist.jar.dir}"/>
+        <manifest file="${build.classes.dir}/META-INF/MANIFEST.MF" mode="update">
+            <attribute name="Main-Class" value="${main.class}"/>
+        </manifest>
         <jar compress="${jar.compress}" jarfile="${dist.jar}" manifest="${build.classes.dir}/META-INF/MANIFEST.MF">
             <fileset dir="${build.classes.dir}"/>
         </jar>
@@ -401,48 +477,87 @@ exists or setup the property manually. For example like this:
             <fileset dir="${build.classes.dir}"/>
         </jar>
     </target>
-    <!--
-                TARGETS NEEDED TO SUPPORT DIRECTORY DEPLOYMENT
-            -->
-    <target depends="init,compile,-pre-dist,library-inclusion-in-archive" if="do.package.with.custom.manifest.not.directory.deploy" name="-do-tmp-dist-with-manifest">
-        <dirname file="${dist.jar}" property="dist.jar.dir"/>
-        <mkdir dir="${dist.jar.dir}"/>
-        <jar compress="${jar.compress}" jarfile="${dist.jar}" manifest="${build.classes.dir}/META-INF/MANIFEST.MF">
-            <fileset dir="${build.classes.dir}"/>
-        </jar>
-    </target>
-    <target depends="init,compile,-pre-dist,library-inclusion-in-archive" if="do.package.without.custom.manifest.not.directory.deploy" name="-do-tmp-dist-without-manifest">
-        <dirname file="${dist.jar}" property="dist.jar.dir"/>
-        <mkdir dir="${dist.jar.dir}"/>
-        <jar compress="${jar.compress}" jarfile="${dist.jar}">
-            <fileset dir="${build.classes.dir}"/>
-        </jar>
-    </target>
-    <target depends="init,compile,-pre-dist,library-inclusion-in-archive, -do-tmp-dist-without-manifest, -do-tmp-dist-with-manifest" name="-do-dist-directory-deploy"/>
-    <target depends="init,compile,-pre-dist,-do-dist-directory-deploy,-post-dist" description="Build distribution (JAR) - if directory deployment is not supported." name="dist-directory-deploy"/>
-    <!--
-                END TARGETS NEEDED TO SUPPORT DIRECTORY DEPLOYMENT
-            -->
-    <target depends="init,compile,-pre-dist,library-inclusion-in-archive, -do-dist-without-manifest, -do-dist-with-manifest" name="-do-dist"/>
-    <target depends="init,compile,-pre-dist,library-inclusion-in-manifest" name="-do-ear-dist">
+    <target depends="init,compile,-pre-dist" if="has.custom.manifest" name="-do-ear-dist-with-manifest">
         <dirname file="${dist.ear.jar}" property="dist.jar.dir"/>
         <mkdir dir="${dist.jar.dir}"/>
+        <manifest file="${build.ear.classes.dir}/META-INF/MANIFEST.MF" mode="update">
+            <attribute name="Main-Class" value="${main.class}"/>
+        </manifest>
         <jar compress="${jar.compress}" jarfile="${dist.ear.jar}" manifest="${build.ear.classes.dir}/META-INF/MANIFEST.MF">
             <fileset dir="${build.ear.classes.dir}"/>
         </jar>
     </target>
+    <target depends="init,compile,-pre-dist" name="-do-ear-dist-without-manifest" unless="has.custom.manifest">
+        <dirname file="${dist.ear.jar}" property="dist.jar.dir"/>
+        <mkdir dir="${dist.jar.dir}"/>
+        <jar compress="${jar.compress}" jarfile="${dist.ear.jar}">
+            <fileset dir="${build.ear.classes.dir}"/>
+        </jar>
+    </target>
+    <target depends="init,compile,-pre-dist,library-inclusion-in-archive,-do-dist-without-manifest,-do-dist-with-manifest" name="-do-dist"/>
+    <target depends="init,compile,-pre-dist,library-inclusion-in-manifest,-do-ear-dist-without-manifest,-do-ear-dist-with-manifest" name="-do-ear-dist"/>
     <target name="-post-dist">
         <!-- Empty placeholder for easier customization. -->
         <!-- You can override this target in the ../build.xml file. -->
     </target>
     <target depends="init,compile,-pre-dist,-do-dist,-post-dist" description="Build distribution (JAR)." name="dist"/>
-    <target depends="init,-init-cos,compile,-pre-dist,-do-ear-dist,-post-dist" description="Build distribution (JAR) to be packaged into an EAR." name="dist-ear"/>
+    <target depends="init,compile,-pre-dist,-do-ear-dist,-post-dist" description="Build distribution (JAR) to be packaged into an EAR." name="dist-ear"/>
     <!--
+                =================
                 EXECUTION SECTION
+                =================
             -->
-    <target depends="run-deploy" description="Deploy to server." name="run"/>
-    <target name="-init-deploy">
-        <property name="include.jar.manifest" value=""/>
+    <target depends="dist,run-deploy,run-tool2,old-run-jar,run-display-browser" description="Run a main class." name="run"/>
+    <target depends="dist,run-deploy" description="Run a main class." if="j2ee.appclient.tool.args" name="old-run-jar">
+        <antcall target="run-tool"/>
+        <antcall target="run-jar"/>
+    </target>
+    <target depends="init" description="Run a main class." if="j2ee.clientName" name="run-jar" unless="j2ee.appclient.mainclass.args">
+        <carproject:java classname="${main.class}">
+            <customize>
+                <arg line="${application.args.param}"/>
+            </customize>
+        </carproject:java>
+    </target>
+    <target depends="init,-as-retrieve-option-workaround" description="Run a main class." if="j2ee.appclient.mainclass.args" name="run-tool" unless="j2ee.clientName">
+        <java classname="${j2ee.appclient.tool.mainclass}" dir="${work.dir}" fork="true">
+            <jvmarg line="${endorsed.classpath.cmd.line.arg}"/>
+            <jvmarg line="${j2ee.appclient.tool.jvmoptions}"/>
+            <jvmarg line="${run.jvmargs.param}"/>
+            <arg line="${j2ee.appclient.tool.args}"/>
+            <arg line="-client ${client.jar}"/>
+            <arg line="${application.args.param}"/>
+            <classpath>
+                <path path="${javac.classpath}:${j2ee.platform.classpath}:${j2ee.appclient.tool.runtime}"/>
+            </classpath>
+            <syspropertyset>
+                <propertyref prefix="run-sys-prop."/>
+                <mapper from="run-sys-prop.*" to="*" type="glob"/>
+            </syspropertyset>
+        </java>
+    </target>
+    <target depends="init,run-deploy,-as-retrieve-option-workaround" description="Run a main class." name="run-tool2" unless="j2ee.appclient.tool.args">
+        <mkdir dir="${dist.dir}/Dribble_AdminClient"/>
+        <copy file="${dist.jar}" todir="${dist.dir}/Dribble_AdminClient"/>
+        <java dir="${work.dir}" fork="true" jar="${client.jar}">
+            <jvmarg line="${endorsed.classpath.cmd.line.arg}"/>
+            <jvmarg line="${j2ee.appclient.tool.jvmoptions}${client.jar}"/>
+            <jvmarg line="${run.jvmargs.param}"/>
+            <arg line="${application.args.param}"/>
+            <syspropertyset>
+                <propertyref prefix="run-sys-prop."/>
+                <mapper from="run-sys-prop.*" to="*" type="glob"/>
+            </syspropertyset>
+        </java>
+    </target>
+    <target depends="init,compile-single" name="run-single">
+        <fail unless="run.class">Must select one file in the IDE or set run.class</fail>
+        <carproject:java classname="${run.class}"/>
+    </target>
+    <target if="j2ee.appclient.mainclass.args" name="-as-retrieve-option-workaround" unless="j2ee.clientName">
+        <property name="client.jar" value="${dist.dir}/Dribble_AdminClient.jar"/>
+        <sleep seconds="3"/>
+        <copy file="${wa.copy.client.jar.from}/Dribble_Admin/Dribble_AdminClient.jar" todir="${dist.dir}"/>
     </target>
     <target name="pre-run-deploy">
         <!-- Empty placeholder for easier customization. -->
@@ -463,69 +578,141 @@ exists or setup the property manually. For example like this:
     <target name="-run-deploy-am">
         <!-- Task to deploy to the Access Manager runtime. -->
     </target>
-    <target depends="init,-init-cos,-init-deploy,compile,library-inclusion-in-archive,dist-directory-deploy,pre-run-deploy,-pre-nbmodule-run-deploy,-run-deploy-nb,-init-deploy-ant,-deploy-ant,-run-deploy-am,-post-nbmodule-run-deploy,post-run-deploy" name="run-deploy">
+    <target depends="init,compile,dist,pre-run-deploy,-pre-nbmodule-run-deploy,-run-deploy-nb,-init-deploy-ant,-deploy-ant,-run-deploy-am,-post-nbmodule-run-deploy,post-run-deploy" name="run-deploy">
         <nbjpdaappreloaded/>
     </target>
     <target if="netbeans.home" name="-run-deploy-nb">
-        <nbdeploy debugmode="false" forceRedeploy="${forceRedeploy}"/>
+        <nbdeploy clientUrlPart="${client.urlPart}" debugmode="false" forceRedeploy="${forceRedeploy}"/>
     </target>
     <target name="-init-deploy-ant" unless="netbeans.home">
         <property name="deploy.ant.archive" value="${dist.jar}"/>
         <property name="deploy.ant.resource.dir" value="${resource.dir}"/>
         <property name="deploy.ant.enabled" value="true"/>
     </target>
-    <target depends="dist,-run-undeploy-nb,-init-deploy-ant,-undeploy-ant" name="run-undeploy"/>
+    <target depends="init,-run-undeploy-nb,-init-deploy-ant,-undeploy-ant" name="run-undeploy"/>
     <target if="netbeans.home" name="-run-undeploy-nb">
         <fail message="Undeploy is not supported from within the IDE"/>
+    </target>
+    <target depends="run-deploy,-init-display-browser,-display-browser-nb,-display-browser-cl" name="run-display-browser"/>
+    <target if="do.display.browser" name="-init-display-browser">
+        <condition property="do.display.browser.nb">
+            <isset property="netbeans.home"/>
+        </condition>
+        <condition property="do.display.browser.cl">
+            <and>
+                <isset property="deploy.ant.enabled"/>
+                <isset property="deploy.ant.client.url"/>
+            </and>
+        </condition>
+    </target>
+    <target if="do.display.browser.nb" name="-display-browser-nb">
+        <nbbrowse url="${client.url}"/>
+    </target>
+    <target if="do.display.browser.cl" name="-get-browser" unless="browser">
+        <condition property="browser" value="rundll32">
+            <os family="windows"/>
+        </condition>
+        <condition else="" property="browser.args" value="url.dll,FileProtocolHandler">
+            <os family="windows"/>
+        </condition>
+        <condition property="browser" value="/usr/bin/open">
+            <os family="mac"/>
+        </condition>
+        <property environment="env"/>
+        <condition property="browser" value="${env.BROWSER}">
+            <isset property="env.BROWSER"/>
+        </condition>
+        <condition property="browser" value="/usr/bin/firefox">
+            <available file="/usr/bin/firefox"/>
+        </condition>
+        <condition property="browser" value="/usr/local/firefox/firefox">
+            <available file="/usr/local/firefox/firefox"/>
+        </condition>
+        <condition property="browser" value="/usr/bin/mozilla">
+            <available file="/usr/bin/mozilla"/>
+        </condition>
+        <condition property="browser" value="/usr/local/mozilla/mozilla">
+            <available file="/usr/local/mozilla/mozilla"/>
+        </condition>
+        <condition property="browser" value="/usr/sfw/lib/firefox/firefox">
+            <available file="/usr/sfw/lib/firefox/firefox"/>
+        </condition>
+        <condition property="browser" value="/opt/csw/bin/firefox">
+            <available file="/opt/csw/bin/firefox"/>
+        </condition>
+        <condition property="browser" value="/usr/sfw/lib/mozilla/mozilla">
+            <available file="/usr/sfw/lib/mozilla/mozilla"/>
+        </condition>
+        <condition property="browser" value="/opt/csw/bin/mozilla">
+            <available file="/opt/csw/bin/mozilla"/>
+        </condition>
+    </target>
+    <target depends="-get-browser" if="do.display.browser.cl" name="-display-browser-cl">
+        <fail unless="browser">
+                    Browser not found, cannot launch the deployed application. Try to set the BROWSER environment variable.
+                </fail>
+        <property name="browse.url" value="${deploy.ant.client.url}${client.urlPart}"/>
+        <echo>Launching ${browse.url}</echo>
+        <exec executable="${browser}" spawn="true">
+            <arg line="${browser.args} ${browse.url}"/>
+        </exec>
     </target>
     <target depends="dist" name="verify">
         <nbverify file="${dist.jar}"/>
     </target>
     <target depends="init,compile-single" name="run-main">
         <fail unless="run.class">Must select one file in the IDE or set run.class</fail>
-        <ejbjarproject3:java classname="${run.class}"/>
+        <carproject:java classname="${run.class}"/>
     </target>
     <!--
+                =================
                 DEBUGGING SECTION
+                =================
             -->
-    <target depends="init,compile,dist-directory-deploy" description="Debug project in IDE." if="netbeans.home" name="debug">
-        <nbdeploy debugmode="true"/>
-        <antcall target="connect-debugger"/>
-    </target>
-    <target name="connect-debugger" unless="is.debugged">
-        <nbjpdaconnect address="${jpda.address}" host="${jpda.host}" name="${name}" transport="${jpda.transport}">
-            <classpath>
-                <path path="${debug.classpath}"/>
-            </classpath>
-            <sourcepath>
-                <path path="${web.docbase.dir}"/>
-            </sourcepath>
-        </nbjpdaconnect>
-    </target>
     <target depends="init" if="netbeans.home" name="-debug-start-debugger">
-        <ejbjarproject1:nbjpdastart/>
+        <carproject:nbjpdastart name="${debug.class}"/>
     </target>
+    <target depends="init,compile" name="-debug-start-debuggee">
+        <carproject:debug>
+            <customize>
+                <arg line="${application.args.param}"/>
+            </customize>
+        </carproject:debug>
+    </target>
+    <target if="j2ee.clientName" name="debug-jar" unless="j2ee.appclient.mainclass.args">
+        <carproject:debug-appclient args="${application.args.param}" mainclass="${main.class}"/>
+    </target>
+    <target depends="init,-as-retrieve-option-workaround" if="j2ee.appclient.mainclass.args" name="debug-tool" unless="j2ee.clientName">
+        <carproject:debug-appclient args="${j2ee.appclient.mainclass.args} ${application.args.param}" mainclass="${j2ee.appclient.tool.mainclass}"/>
+    </target>
+    <target depends="init,compile,run-deploy,debug-tool,debug-jar" description="Debug project in IDE." if="netbeans.home" name="debug"/>
+    <target depends="init" if="netbeans.home" name="-debug-start-debugger-stepinto">
+        <carproject:nbjpdastart stopclassname="${main.class}"/>
+    </target>
+    <target depends="init,compile,-debug-start-debugger-stepinto,-debug-start-debuggee" if="netbeans.home" name="debug-stepinto"/>
     <target depends="init,compile-single" if="netbeans.home" name="-debug-start-debuggee-single">
-        <fail unless="main.class">Must select one file in the IDE or set main.class</fail>
-        <ejbjarproject1:debug/>
+        <fail unless="debug.class">Must select one file in the IDE or set debug.class</fail>
+        <carproject:debug classname="${debug.class}"/>
     </target>
-    <target depends="init,compile-single,-debug-start-debugger,-debug-start-debuggee-single" if="netbeans.home" name="debug-single-main"/>
+    <target depends="init,compile-single,-debug-start-debugger,-debug-start-debuggee-single" if="netbeans.home" name="debug-single"/>
     <target depends="init" name="-pre-debug-fix">
         <fail unless="fix.includes">Must set fix.includes</fail>
         <property name="javac.includes" value="${fix.includes}.java"/>
     </target>
     <target depends="init,-pre-debug-fix,compile-single" if="netbeans.home" name="-do-debug-fix">
-        <ejbjarproject1:nbjpdareload/>
+        <carproject:nbjpdareload/>
     </target>
     <target depends="init,-pre-debug-fix,-do-debug-fix" if="netbeans.home" name="debug-fix"/>
     <!--
+                ===============
                 JAVADOC SECTION
+                ===============
             -->
-    <target depends="init" name="javadoc-build">
+    <target depends="init" name="-javadoc-build">
         <mkdir dir="${dist.javadoc.dir}"/>
         <javadoc additionalparam="${javadoc.additionalparam}" author="${javadoc.author}" charset="UTF-8" destdir="${dist.javadoc.dir}" docencoding="UTF-8" encoding="${javadoc.encoding.used}" failonerror="true" noindex="${javadoc.noindex}" nonavbar="${javadoc.nonavbar}" notree="${javadoc.notree}" private="${javadoc.private}" source="${javac.source}" splitindex="${javadoc.splitindex}" use="${javadoc.use}" useexternalfile="true" version="${javadoc.version}" windowtitle="${javadoc.windowtitle}">
             <classpath>
-                <path path="${javac.classpath}:${j2ee.platform.classpath}"/>
+                <path path="${javac.classpath}:${j2ee.platform.classpath}:${j2ee.appclient.tool.runtime}"/>
             </classpath>
             <fileset dir="${src.dir}" excludes="${excludes}" includes="${includes}">
                 <filename name="**/*.java"/>
@@ -535,23 +722,24 @@ exists or setup the property manually. For example like this:
             </fileset>
         </javadoc>
     </target>
-    <target depends="init,javadoc-build" if="netbeans.home" name="javadoc-browse" unless="no.javadoc.preview">
+    <target depends="init,-javadoc-build" if="netbeans.home" name="-javadoc-browse" unless="no.javadoc.preview">
         <nbbrowse file="${dist.javadoc.dir}/index.html"/>
     </target>
-    <target depends="init,javadoc-build,javadoc-browse" description="Build Javadoc." name="javadoc"/>
+    <target depends="init,-javadoc-build,-javadoc-browse" description="Build Javadoc." name="javadoc"/>
     <!--
+                =========================
                 JUNIT COMPILATION SECTION
+                =========================
             -->
     <target depends="init,compile" if="have.tests" name="-pre-pre-compile-test">
         <mkdir dir="${build.test.classes.dir}"/>
-        <property name="j2ee.platform.embeddableejb.classpath" value=""/>
     </target>
     <target name="-pre-compile-test">
         <!-- Empty placeholder for easier customization. -->
         <!-- You can override this target in the ../build.xml file. -->
     </target>
     <target depends="init,compile,-pre-pre-compile-test,-pre-compile-test" if="have.tests" name="-do-compile-test">
-        <ejbjarproject2:javac classpath="${javac.test.classpath}:${j2ee.platform.classpath}:${j2ee.platform.embeddableejb.classpath}" debug="true" destdir="${build.test.classes.dir}" srcdir="${test.src.dir}"/>
+        <carproject:javac classpath="${javac.test.classpath}" debug="true" destdir="${build.test.classes.dir}" srcdir="${test.src.dir}"/>
         <copy todir="${build.test.classes.dir}">
             <fileset dir="${test.src.dir}" excludes="${build.classes.excludes},${excludes}" includes="${includes}"/>
         </copy>
@@ -567,7 +755,10 @@ exists or setup the property manually. For example like this:
     </target>
     <target depends="init,compile,-pre-pre-compile-test,-pre-compile-test-single" if="have.tests" name="-do-compile-test-single">
         <fail unless="javac.includes">Must select some files in the IDE or set javac.includes</fail>
-        <ejbjarproject2:javac classpath="${javac.test.classpath}:${j2ee.platform.classpath}:${j2ee.platform.embeddableejb.classpath}" debug="true" destdir="${build.test.classes.dir}" excludes="" includes="${javac.includes}" srcdir="${test.src.dir}"/>
+        <carproject:javac classpath="${javac.test.classpath}" debug="true" destdir="${build.test.classes.dir}" excludes="" includes="${javac.includes}" srcdir="${test.src.dir}"/>
+        <copy todir="${build.test.classes.dir}">
+            <fileset dir="${test.src.dir}" excludes="${build.classes.excludes},${excludes}" includes="${includes}"/>
+        </copy>
     </target>
     <target name="-post-compile-test-single">
         <!-- Empty placeholder for easier customization. -->
@@ -575,13 +766,15 @@ exists or setup the property manually. For example like this:
     </target>
     <target depends="init,compile,-pre-pre-compile-test,-pre-compile-test-single,-do-compile-test-single,-post-compile-test-single" name="compile-test-single"/>
     <!--
+                =======================
                 JUNIT EXECUTION SECTION
+                =======================
             -->
     <target depends="init" if="have.tests" name="-pre-test-run">
         <mkdir dir="${build.test.results.dir}"/>
     </target>
     <target depends="init,compile-test,-pre-test-run" if="have.tests" name="-do-test-run">
-        <ejbjarproject2:junit testincludes="**/*Test.java"/>
+        <carproject:junit testincludes="**/*Test.java"/>
     </target>
     <target depends="init,compile-test,-pre-test-run,-do-test-run" if="have.tests" name="-post-test-run">
         <fail if="tests.failed" unless="ignore.failing.tests">Some tests failed; see details above.</fail>
@@ -594,14 +787,16 @@ exists or setup the property manually. For example like this:
     </target>
     <target depends="init,compile-test-single,-pre-test-run-single" if="have.tests" name="-do-test-run-single">
         <fail unless="test.includes">Must select some files in the IDE or set test.includes</fail>
-        <ejbjarproject2:junit excludes="" includes="${test.includes}"/>
+        <carproject:junit excludes="" includes="${test.includes}"/>
     </target>
     <target depends="init,compile-test-single,-pre-test-run-single,-do-test-run-single" if="have.tests" name="-post-test-run-single">
         <fail if="tests.failed" unless="ignore.failing.tests">Some tests failed; see details above.</fail>
     </target>
     <target depends="init,compile-test-single,-pre-test-run-single,-do-test-run-single,-post-test-run-single" description="Run single unit test." name="test-single"/>
     <!--
+                =======================
                 JUNIT DEBUGGING SECTION
+                =======================
             -->
     <target depends="init,compile-test" if="have.tests" name="-debug-start-debuggee-test">
         <fail unless="test.class">Must select one file in the IDE or set test.class</fail>
@@ -609,24 +804,53 @@ exists or setup the property manually. For example like this:
         <delete file="${test.report.file}"/>
         <!-- the directory must exist, otherwise the XML formatter would fail -->
         <mkdir dir="${build.test.results.dir}"/>
-        <ejbjarproject1:debug args="${test.class}" classname="org.apache.tools.ant.taskdefs.optional.junit.JUnitTestRunner" classpath="${ant.home}/lib/ant.jar:${ant.home}/lib/ant-junit.jar:${debug.test.classpath}:${j2ee.platform.embeddableejb.classpath}">
+        <carproject:debug classname="org.apache.tools.ant.taskdefs.optional.junit.JUnitTestRunner" classpath="${ant.home}/lib/ant.jar:${ant.home}/lib/ant-junit.jar:${debug.test.classpath}">
             <customize>
-                <arg value="showoutput=true"/>
+                <arg value="${test.class}"/>
                 <arg value="formatter=org.apache.tools.ant.taskdefs.optional.junit.BriefJUnitResultFormatter"/>
                 <arg value="formatter=org.apache.tools.ant.taskdefs.optional.junit.XMLJUnitResultFormatter,${test.report.file}"/>
             </customize>
-        </ejbjarproject1:debug>
+        </carproject:debug>
     </target>
     <target depends="init,compile-test" if="netbeans.home+have.tests" name="-debug-start-debugger-test">
-        <ejbjarproject1:nbjpdastart classpath="${debug.test.classpath}" name="${test.class}"/>
+        <carproject:nbjpdastart classpath="${debug.test.classpath}" name="${test.class}"/>
     </target>
     <target depends="init,compile-test,-debug-start-debugger-test,-debug-start-debuggee-test" name="debug-test"/>
     <target depends="init,-pre-debug-fix,compile-test-single" if="netbeans.home" name="-do-debug-fix-test">
-        <ejbjarproject1:nbjpdareload dir="${build.test.classes.dir}"/>
+        <carproject:nbjpdareload dir="${build.test.classes.dir}"/>
     </target>
     <target depends="init,-pre-debug-fix,-do-debug-fix-test" if="netbeans.home" name="debug-fix-test"/>
     <!--
+                =========================
+                APPLET EXECUTION SECTION
+                =========================
+            -->
+    <target depends="init,compile-single" name="run-applet">
+        <fail unless="applet.url">Must select one file in the IDE or set applet.url</fail>
+        <carproject:java classname="sun.applet.AppletViewer">
+            <customize>
+                <arg value="${applet.url}"/>
+            </customize>
+        </carproject:java>
+    </target>
+    <!--
+                =========================
+                APPLET DEBUGGING  SECTION
+                =========================
+            -->
+    <target depends="init,compile-single" if="netbeans.home" name="-debug-start-debuggee-applet">
+        <fail unless="applet.url">Must select one file in the IDE or set applet.url</fail>
+        <carproject:debug classname="sun.applet.AppletViewer">
+            <customize>
+                <arg value="${applet.url}"/>
+            </customize>
+        </carproject:debug>
+    </target>
+    <target depends="init,compile-single,-debug-start-debugger,-debug-start-debuggee-applet" if="netbeans.home" name="debug-applet"/>
+    <!--
+                ===============
                 CLEANUP SECTION
+                ===============
             -->
     <target depends="init" if="no.dist.ear.dir" name="deps-clean" unless="no.deps">
         <ant antfile="${project.Dribble_Dataset}/build.xml" inheritall="false" target="clean"/>
@@ -639,9 +863,6 @@ exists or setup the property manually. For example like this:
         <!-- Empty placeholder for easier customization. -->
         <!-- You can override this target in the ../build.xml file. -->
     </target>
-    <target depends="init" if="netbeans.home" name="undeploy-clean">
-        <nbundeploy failOnError="false" startServer="false"/>
-    </target>
-    <target depends="init,undeploy-clean,deps-clean,-do-clean,-post-clean" description="Clean build products." name="clean"/>
-    <target depends="clean" name="clean-ear"/>
+    <target depends="init,deps-clean,-do-clean,-post-clean" description="Clean build products." name="clean"/>
+    <target depends="clean" description="Clean build products." name="clean-ear"/>
 </project>
