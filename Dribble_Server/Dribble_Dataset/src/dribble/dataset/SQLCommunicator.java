@@ -345,9 +345,26 @@ public class SQLCommunicator implements Dataset {
 
         try {
             Statement stmt = con.createStatement();
-            stmt.execute("DROP TABLE \"(SELECT ID FROM DRIBBLE_SYSTEM_SUBJECTS WHERE CURRENTIME < " + qualifyingTime + " )\" ");
-            stmt.execute("DELETE FROM DRIBBLE_SYSTEM_SUBJECTS WHERE CURRENTIME < " + qualifyingTime);
-            logger.info("Deleted dribSubjects from subjects table");
+
+             ResultSet rs = stmt.executeQuery("SELECT ID, CURRENTIME FROM DRIBBLE_SYSTEM_SUBJECTS");
+
+            //Add the drib subjects to a drib subject list
+              int id;
+              long time;
+            while (rs.next()) {
+             id = rs.getInt("ID");
+             time = rs.getLong("CURRENTIME");
+
+             if(time<qualifyingTime)
+             {
+             stmt.execute("DROP TABLE \""+id+"\"");
+            stmt.execute("DELETE FROM DRIBBLE_SYSTEM_SUBJECTS WHERE ID = " + id);
+            logger.info("Deleted dribSubjects from subjects table "+id);
+                }
+
+            }
+
+            
             return true;
 
         } catch (SQLException e) {
@@ -364,7 +381,18 @@ public class SQLCommunicator implements Dataset {
 
         try {
             Statement stmt = con.createStatement();
-            stmt.execute("DELETE FROM (SELECT ID FROM DRIBBLE_SYSTEM_SUBJECTS) WHERE CURRENTIME < " + qualifyingTime);
+
+              ResultSet rs = stmt.executeQuery("SELECT ID FROM DRIBBLE_SYSTEM_SUBJECTS");
+
+            //Add the drib subjects to a drib subject list
+              int id;
+            while (rs.next()) {
+                id = rs.getInt("ID");
+
+                stmt.execute("DELETE FROM \""+id+"\" WHERE CURRENTIME < " + qualifyingTime);
+                logger.info("Drib Deleted..."+id);
+            }
+            
             logger.info("Deleted old dribs");
             return true;
 
