@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<dribble.common.Drib>
+    <text>Hello</text>
+    <latitude>0</latitude>
+    <longitude>0</longitude>
+    <messageID>0</messageID>
+    <time>10000</time>
+    <subject>
+       <name>Hi</name>
+       <subjectID>0</subjectID>
+       <latitude>0</latitude>
+       <longitude>0</longitude>
+       <numViews>0</numViews>
+       <numPosts>1</numPosts>
+       <time>10000</time>
+       <popularity>100</popularity>
+    </subject>
+    <likeCount>0</likeCount>
+    <popularity>0</popularity>
+</dribble.common.Drib>

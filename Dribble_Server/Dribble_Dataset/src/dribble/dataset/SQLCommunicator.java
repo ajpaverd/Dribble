@@ -339,60 +339,62 @@ public class SQLCommunicator implements Dataset {
         return subject;
     }
 
+    @Override
     public boolean deleteOldDribSubjects(long qualifyingTime) {
 
-        logger.info("Deleting DribSubject...");
+        logger.info("Deleting old DribSubjects...");
 
         try {
             Statement stmt = con.createStatement();
+            Statement stmt1 = con.createStatement();
 
-             ResultSet rs = stmt.executeQuery("SELECT ID, CURRENTIME FROM DRIBBLE_SYSTEM_SUBJECTS");
+            ResultSet rs = stmt.executeQuery("SELECT ID, CURRENTIME FROM DRIBBLE_SYSTEM_SUBJECTS");
 
-            //Add the drib subjects to a drib subject list
-              int id;
-              long time;
+            int id;
+            long time;
             while (rs.next()) {
-             id = rs.getInt("ID");
-             time = rs.getLong("CURRENTIME");
+                id = rs.getInt("ID");
+                time = rs.getLong("CURRENTIME");
 
-             if(time<qualifyingTime)
-             {
-             stmt.execute("DROP TABLE \""+id+"\"");
-            stmt.execute("DELETE FROM DRIBBLE_SYSTEM_SUBJECTS WHERE ID = " + id);
-            logger.info("Deleted dribSubjects from subjects table "+id);
+                if (time < qualifyingTime) {
+                    stmt1.execute("DROP TABLE \"" + id + "\"");
+                    stmt1.execute("DELETE FROM DRIBBLE_SYSTEM_SUBJECTS WHERE ID = " + id);
+                    logger.info("Deleted dribSubject " + id);
                 }
 
             }
 
-            
+
             return true;
 
         } catch (SQLException e) {
 
-            logger.severe("Error deleting DribSubject: " + e.getMessage());
+            logger.severe("Error deleting old DribSubjects: " + e.getMessage());
 
             return false;
         }
     }
-    
+
+    @Override
     public boolean deleteOldDribs(long qualifyingTime) {
 
         logger.info("Deleting old Dribs...");
 
         try {
+
             Statement stmt = con.createStatement();
+            Statement stmt1 = con.createStatement();
 
-              ResultSet rs = stmt.executeQuery("SELECT ID FROM DRIBBLE_SYSTEM_SUBJECTS");
+            ResultSet rs = stmt.executeQuery("SELECT ID FROM DRIBBLE_SYSTEM_SUBJECTS");
 
-            //Add the drib subjects to a drib subject list
-              int id;
+            int id;
             while (rs.next()) {
                 id = rs.getInt("ID");
 
-                stmt.execute("DELETE FROM \""+id+"\" WHERE CURRENTIME < " + qualifyingTime);
-                logger.info("Drib Deleted..."+id);
+                stmt1.execute("DELETE FROM \"" + id + "\" WHERE CURRENTIME < " + qualifyingTime);
+                //logger.info("Drib Deleted from subject " + id);
             }
-            
+
             logger.info("Deleted old dribs");
             return true;
 
@@ -403,7 +405,4 @@ public class SQLCommunicator implements Dataset {
             return false;
         }
     }
-
-
-
 }

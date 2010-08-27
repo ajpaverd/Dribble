@@ -2,7 +2,6 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package dribble.admin;
 
 import javax.ws.rs.core.Context;
@@ -15,18 +14,19 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Produces;
 
 import java.util.logging.Logger;
+
 /**
  * REST Web Service
  *
  * @author Daniel
  */
-
 @Path("deleter")
 public class DeleterResource {
-     static final Logger logger = Logger.getLogger("Dribble_Admin_Main");
-    
+
+    static final Logger logger = Logger.getLogger("Dribble_Admin_Main");
     @Context
     private UriInfo context;
+    private static Dribble_Deleter deleter;
 
     /** Creates a new instance of DeleterResource */
     public DeleterResource() {
@@ -40,11 +40,16 @@ public class DeleterResource {
     @Produces("application/xml")
     public String getDeleter() {
         //TODO return proper representation object
-        
+
         logger.info("Starting Dribble_Deleter...");
 
-        Dribble_Deleter deleter = new Dribble_Deleter();
-        deleter.start();
+        if (deleter == null) {
+            deleter = new Dribble_Deleter();
+        }
+
+        if (deleter.isAlive() == false) {
+            deleter.start();
+        }
 
         logger.info("Dribble_Deleter started");
         return "Deleter started";

@@ -3,7 +3,6 @@ package dribble.admin;
 
 import java.util.logging.Logger;
 
-import dribble.common.*;
 import dribble.dataset.*;
 
 /**
@@ -23,13 +22,12 @@ public class Dribble_Deleter extends Thread {
     @Override
     public void run() {
 
-        logger.info("Running deleter");
-
-        int count = 0;
+        logger.info("Running deleter...");
 
         while (true) {
 
             long qualifyingTime = System.currentTimeMillis() - 1800000;
+            //long qualifyingTime = System.currentTimeMillis() - 60000;
             dataset.deleteOldDribSubjects(qualifyingTime);
             dataset.deleteOldDribs(qualifyingTime);
 

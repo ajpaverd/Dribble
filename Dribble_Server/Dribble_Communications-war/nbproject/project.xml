@@ -10,7 +10,6 @@
         <data xmlns="http://www.netbeans.org/ns/web-project/3">
             <name>Dribble_Communications-war</name>
             <minimum-ant-version>1.6.5</minimum-ant-version>
-            <explicit-platform explicit-source-supported="true"/>
             <web-module-libraries>
                 <library dirs="200">
                     <file>${libs.restlib_gfv3ee6.classpath}</file>
