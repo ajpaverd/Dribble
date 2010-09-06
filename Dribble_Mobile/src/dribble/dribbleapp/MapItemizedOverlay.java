@@ -1,6 +1,4 @@
-// Authors: Dribble
-// Date: 24 April 2010
-// Class: MapItemizedOverlay
+
 
 package dribble.dribbleapp;
 
