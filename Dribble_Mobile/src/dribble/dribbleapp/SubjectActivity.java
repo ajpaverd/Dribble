@@ -33,7 +33,7 @@ import dribble.common.DribSubject;
 public class SubjectActivity extends ListActivity {
 
 	private static final String TAG = "TagActivity";
-	public static int SubjectID = -1;
+	public static int SubjectID = -1; // Default subject ID
 	public static String SubjectName = "No Messages";
 	public static DribSubject CurrentDribSubject = null;
 //	MapView mapView;
@@ -54,17 +54,24 @@ public class SubjectActivity extends ListActivity {
 		final ArrayList<DribSubject> dribTopAr= com.getTopics();
 		
 		Log.i(TAG, "Received List of Topics");
-		String [] topicNameAr = new String[dribTopAr.size()]; 
-		OverlayItem overlayitem;
-		MapsActivity.Itemizedoverlay.clearOverlays();
-		for(int i = 0; i< dribTopAr.size(); i++)
-		{
-			DribSubject ds = ((DribSubject)(dribTopAr.toArray())[i]);
-			topicNameAr[i] = ds.getName();
-			GeoPoint point = new GeoPoint((int)(ds.getLatitude()),(int)(ds.getLongitude()));
-		    overlayitem = new OverlayItem(point, "Drib Topic", ds.getName());
-		    MapsActivity.Itemizedoverlay.addOverlay(overlayitem);
-		}
+		final String [] topicNameAr = new String[dribTopAr.size()]; 
+		Runnable addOverlays = new Runnable(){
+			public void run()
+			{
+				OverlayItem overlayitem;
+				MapsActivity.Itemizedoverlay.clearOverlays();
+				for(int i = 0; i< dribTopAr.size(); i++)
+				{
+					DribSubject ds = ((DribSubject)(dribTopAr.toArray())[i]);
+					topicNameAr[i] = ds.getName();
+					GeoPoint point = new GeoPoint((int)(ds.getLatitude()),(int)(ds.getLongitude()));
+				    overlayitem = new OverlayItem(point, "Drib Topic", ds.getName());
+				    MapsActivity.Itemizedoverlay.addOverlay(overlayitem);
+				}
+			}
+		};
+		Thread thread =  new Thread(null, addOverlays, "OverlayThread");
+	    thread.start();		
 		  
 		  setListAdapter(new ArrayAdapter<String>(this, R.layout.subject_row, topicNameAr));
 		  Log.i(TAG, "List Adapter Set");

@@ -8,12 +8,14 @@ import dribble.dribbleapp.R;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.TabActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TabHost;
 import android.widget.TextView;
 import dribble.common.Drib;
 import dribble.common.DribSubject;
@@ -88,6 +90,16 @@ public class CreateDribActivity extends Activity//extends MapActivity implements
 			  	  dialog.setTitle("Success!");
 			  	  dialog.setMessage("Message sent successfully");
 			  	  dialog.show();
+			  	TabActivity tabActivity = (TabActivity)getParent();
+		    	TabHost tabHost = tabActivity.getTabHost();
+		    	if (newMessage == true)
+		    	{
+		    		tabHost.setCurrentTab(1);
+		    	}
+		    	else
+		    	{
+			    	tabHost.setCurrentTab(2);
+			    }
 			  	  dribMessage.setText("");
 			  	  et.setText("");
 			    	    }

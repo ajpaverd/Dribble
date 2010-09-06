@@ -19,8 +19,7 @@ public class DribbleTabs extends TabActivity  {
 	@Override
 	public void onConfigurationChanged(Configuration newConfig) {
 		Log.w(TAG, "Override Function - Change Configuration");
-		super.onConfigurationChanged(newConfig);
-		
+		super.onConfigurationChanged(newConfig);		
 	}
 
 	private static final String TAG = "DribbleTabs";
@@ -47,7 +46,7 @@ public class DribbleTabs extends TabActivity  {
 
 	    // Do the same for the other tabs
 	    intent = new Intent().setClass(this, SubjectActivity.class);
-	    spec = tabHost.newTabSpec("topics").setIndicator("Topics",
+	    spec = tabHost.newTabSpec("subjects").setIndicator("Subjects",
 	                      res.getDrawable(R.drawable.ic_tab_topics))
 	                  .setContent(intent);
 	    tabHost.addTab(spec);

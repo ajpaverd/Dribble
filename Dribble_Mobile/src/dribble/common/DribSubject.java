@@ -24,7 +24,6 @@ public class DribSubject {
 
     public DribSubject ()
     {
-  
     }
     
     public DribSubject (String name, int subjectID, int latitude, int longitude, int numViews, int numPosts, long time, int popularity)

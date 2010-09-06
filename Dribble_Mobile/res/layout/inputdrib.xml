@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<RelativeLayout
+<ScrollView
 android:layout_width="fill_parent"
 android:layout_height="fill_parent"
 xmlns:android="http://schemas.android.com/apk/res/android">
+<RelativeLayout
+android:layout_width="fill_parent"
+android:layout_height="fill_parent"
+>
 <TextView
 	android:id="@+id/heading"
     android:layout_width="fill_parent"
@@ -47,3 +51,4 @@ xmlns:android="http://schemas.android.com/apk/res/android">
     android:layout_marginLeft="10dip"
     android:text="Submit"/>
 </RelativeLayout>
+</ScrollView>

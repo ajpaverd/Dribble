@@ -1,32 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<LinearLayout
+
+<RelativeLayout
 android:layout_width="fill_parent"
-android:layout_height="fill_parent"
+android:layout_height="wrap_content"
 android:orientation="vertical"
 xmlns:android="http://schemas.android.com/apk/res/android">
 <TextView
-	android:id="@+id/topicNameForMessages"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:padding="10dp"
-    android:textStyle="bold"
-    android:gravity="center"
-    android:textSize="20sp"
-    android:text="No Messages"/>
+android:id="@+id/topicNameForMessages"
+android:layout_width="fill_parent"
+android:layout_height="wrap_content"
+android:padding="10dp"
+android:textStyle="bold"
+android:gravity="center"
+android:textSize="20sp"
+android:text="No Messages"/>
 <ListView
 android:id="@+id/android:list"
 android:layout_width="fill_parent"
-android:layout_height="wrap_content"/>			   
+android:layout_height="wrap_content"
+android:layout_above="@+id/buttonreply"
+android:layout_below="@id/topicNameForMessages"/>
 <TextView
     android:id="@+id/android:empty"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
+    android:layout_below="@id/topicNameForMessages"
     android:padding="10dp"
     android:text="Select from Topics"/>
    <Button
   android:id="@+id/buttonreply"
+  android:layout_below="@+id/android:list"
   android:layout_width="wrap_content"
   android:layout_height="wrap_content"
+  android:layout_alignParentBottom="true"
   android:text="Reply"
   android:gravity="center"/>
-</LinearLayout>
+</RelativeLayout>

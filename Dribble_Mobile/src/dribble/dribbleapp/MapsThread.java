@@ -39,7 +39,7 @@ public class MapsThread extends MapActivity implements Runnable,LocationListener
 				
 //				LATITUDE = myLocOverlay.getMyLocation().getLatitudeE6();
 //            	LONGITUDE = myLocOverlay.getMyLocation().getLongitudeE6();
-				Thread.currentThread().sleep(10000, 0);
+				Thread.currentThread().sleep(600000, 0);
 				Log.i("Location Thread", "Latitude: " + LATITUDE + " , " + "Latitude: " + LONGITUDE);
 				
 			}

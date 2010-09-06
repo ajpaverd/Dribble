@@ -29,7 +29,7 @@ import dribble.common.DribSubjectList;
 public class DribCom {
 
 	String urlToSendRequest;
-	String targetDomain = "ajpaverd.dyndns.org:8080";
+	String targetDomain = "lab1.cetas.ac.za:8080";
 	int results = 5;
 	
 	private static final String TAG = "DribCom";
