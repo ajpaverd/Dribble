@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RelativeLayout
+	android:layout_width="fill_parent"
+	android:layout_height="wrap_content"
+	xmlns:android="http://schemas.android.com/apk/res/android">
+	<EditText
+		android:id="@+id/topicInput"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:inputType="textShortMessage"
+		android:maxLength="20"
+		android:hint="Topic" />
+	<EditText
+		android:id="@+id/dribInput"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:gravity="top"
+		android:focusable="true"
+		android:inputType="textShortMessage|textAutoCorrect|textMultiLine"
+		android:imeOptions="actionSend|flagNoEnterAction"
+		android:lines="4"
+		android:maxLength="144"
+		android:hint="Drib"
+		android:layout_below="@id/topicInput" />
+	<Button
+		android:id="@+id/submit"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:layout_below="@id/dribInput"
+		android:text="Submit" />
+</RelativeLayout>
