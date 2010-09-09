@@ -4,21 +4,30 @@
 
 package dribble.common;
 
-import java.util.Calendar;
-import java.util.Date;
+import org.simpleframework.xml.Element;
+import org.simpleframework.xml.Root;
 
 import android.util.Log;
 
+@Root
 public class DribSubject {
-
+	@Element
     private String name;
+	@Element
     private int subjectID;
-    private int latitude;
+	@Element
+	private int latitude;
+	@Element
     private int longitude;
+	@Element
     private int numViews;
+	@Element
     private int numPosts;
+	@Element
     private long time;
+	@Element
     private int popularity;
+	
     public final static int maxLength = 20;
     private static final String TAG = "DribTopic";
 
@@ -40,7 +49,6 @@ public class DribSubject {
 
     public void setName(String name)
     {
-
         //Make sure the string length is not larger than 144 characters
         if(name.length()>=maxLength)
            name = name.substring(0,maxLength);

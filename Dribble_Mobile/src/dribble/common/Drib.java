@@ -4,24 +4,33 @@
 
 package dribble.common;
 
-	import java.util.Calendar;
-import java.util.Date;
+import org.simpleframework.xml.Element;
+import org.simpleframework.xml.Root;
 
 import android.util.Log;
 
+	@Root (name="dribble.common.Drib")
 	public class Drib {
 	/*
 	 * To change this template, choose Tools | Templates
 	 * and open the template in the editor.
 	 */
 		private static final String TAG = "Drib";
+		@Element
 	    private String text;
+		@Element
 	    private int latitude;
+		@Element
 	    private int longitude;
+		@Element
 	    private int messageID;
+		@Element
 	    private long time;
+		@Element
 	    private DribSubject subject;
+		@Element
 	    private int likeCount;
+		@Element
 	    private int popularity;
 	    public static final int maxLength = 144;
 

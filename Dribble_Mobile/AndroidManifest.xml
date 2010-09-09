@@ -4,9 +4,10 @@
       android:versionName="1.0" package="dribble.dribbleapp"
       >
       
-    <application android:icon="@drawable/dribicon" android:label="@string/app_name" android:debuggable="true">
+    <application android:icon="@drawable/drib_icon_2" android:label="@string/app_name" android:debuggable="true">
         <activity android:name=".Splash" android:label="@string/app_name"
-          android:theme="@android:style/Theme.NoTitleBar">       
+          android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+          android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -14,23 +15,27 @@
             </intent-filter>
             
         </activity>
+         <activity android:name=".DribbleMain"
+        android:label = "@string/app_name"
+        android:theme = "@@android:style/Theme.NoTitleBar.Fullscreen"></activity>
         <activity android:name=".DribbleTabs"
         android:configChanges = "keyboardHidden|orientation"
         android:label = "@string/app_name"
-        android:theme = "@android:style/Theme.NoTitleBar"></activity>
+        android:theme = "@@android:style/Theme.NoTitleBar"></activity>
         <activity android:name=".SubjectActivity"
         android:label = "@string/app_name"
-        android:theme = "@android:style/Theme.NoTitleBar"></activity>
+        android:theme = "@@android:style/Theme.NoTitleBar"></activity>
         <activity android:name=".MapsActivity"
         android:label = "@string/app_name"
-        android:theme = "@android:style/Theme.NoTitleBar"></activity>
+        android:theme = "@style/Theme.NoBackground"></activity>
         <activity android:name=".DribActivity"
         android:label = "@string/app_name"
-        android:theme = "@android:style/Theme.NoTitleBar"></activity>
+        android:theme = "@@android:style/Theme.NoTitleBar"></activity>
          <activity android:name=".CreateDribActivity"
-        android:label = "@string/app_name"
-        android:theme = "@android:style/Theme.NoTitleBar">
-        </activity>
+        android:label = "Create Drib"
+        android:theme = "@android:style/Theme.Dialog"
+        android:configChanges = "keyboardHidden|orientation"
+        android:windowSoftInputMode="stateVisible|adjustResize"></activity>
         
         <uses-library android:name="com.google.android.maps" />
         
@@ -38,6 +43,7 @@
               
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-sdk android:minSdkVersion="3" />
 
 </manifest> 

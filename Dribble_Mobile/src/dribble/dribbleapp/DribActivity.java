@@ -5,15 +5,13 @@
 package dribble.dribbleapp;
 
 import java.util.ArrayList;
-import java.util.Date;
 
 import android.app.ListActivity;
 import android.app.ProgressDialog;
-import android.app.TabActivity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Message;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,167 +20,204 @@ import android.view.View.OnClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.ListView;
-import android.widget.TabHost;
 import android.widget.TextView;
 import dribble.common.Drib;
 
-public class DribActivity extends ListActivity{
-    
-	private static final String TAG = "MessageActivity";
-	private ProgressDialog pd;
-	private ArrayList<Drib> messageList;
-	private Runnable getDribs;
-	private int subjectID;
- 	private String subjectName;
-	
-	private DribCom dribCom = new DribCom();
-	
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        Log.i(TAG, "Tab Loaded");
-        setContentView(R.layout.messages);        
-        
-        Button buttonReply = (Button)findViewById(R.id.buttonreply);
-        buttonReply.setEnabled(false);
+public class DribActivity extends ListActivity {
 
-    	buttonReply.setOnClickListener(new OnClickListener() 
-        {
-		    public void onClick(View v)
-		    {
-		    	CreateDribActivity.newMessage=false;
-		    	TabActivity tabActivity = (TabActivity)getParent();
-		    	TabHost tabHost = tabActivity.getTabHost();
-		    	tabHost.setCurrentTab(3);
-		    }		    
-        });
-    }
-    
-private void refreshContent()
-{   	
-	 pd = ProgressDialog.show(this,    
-             "Please wait...", "Retrieving data ...", true);
-	 
-	getDribs = new Runnable(){
-		public void run()
-		{
-		    subjectID = SubjectActivity.SubjectID;
-	    	subjectName = SubjectActivity.SubjectName;
-			DribCom com = new DribCom();
-	    	messageList = com.getMessages(subjectID);
-	    	Log.i(TAG, "Tab Loaded HERE");   	    	
-	    	
-	    	runOnUiThread(returnRes);
+	private static final String TAG = "MessageActivity";
+	private static ProgressDialog pd;
+	private static ArrayList<Drib> messageList;
+	private static int subjectID;
+	private static String subjectName;
+
+	private Handler mHandler = new Handler();
+
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		Log.i(TAG, "Tab Loaded");
+		setContentView(R.layout.messages);
+
+		Button buttonReply = (Button) findViewById(R.id.buttonreply);
+		buttonReply.setEnabled(false);
+
+		buttonReply.setOnClickListener(new OnClickListener() {
+			public void onClick(View v) {
+				CreateDribActivity.newMessage = false;
+				Intent mainIntent = new Intent(DribActivity.this,
+						CreateDribActivity.class);
+				Log.i(TAG, "Start Dribble Activity");
+				DribActivity.this.startActivity(mainIntent);
+			}
+		});
+	}
+
+	private void refreshContent() {
+	//	pd = new ProgressDialog(this);
+	//	pd.setMessage("Retrieving Dribs...");
+	//	pd.setIndeterminate(true);
+	//	pd.setCancelable(true);
+	//	pd.show();
+
+		Thread getDribs = new Thread() {
+			public void run() {
+				subjectID = SubjectActivity.SubjectID;
+				subjectName = SubjectActivity.SubjectName;
+				messageList = DribCom.getMessages(subjectID);
+				Log.i(TAG, "Tab Loaded HERE");
+
+				mHandler.post(mUpdateResults);
+			}
+		};
+		getDribs.start();
+	}
+
+	// Create runnable for posting
+	final Runnable mUpdateResults = new Runnable() {
+		public void run() {
+			updateResultsInUi();
 		}
 	};
-	Thread thread =  new Thread(null, getDribs, "GetDribsThread");
-    thread.start();
+
+	private void updateResultsInUi() {
+		TextView messageText = (TextView) findViewById(R.id.topicNameForMessages);
+		if (messageList.isEmpty()) {
+			messageText.setText("Topics");
+		} else {
+			// Get Topic Name from TabActivity Tab
+			messageText.setText(subjectName);
+		}
+		Log.i(TAG, "Topic name set");
+
+		setListAdapter(new DribAdapter(getApplicationContext(),
+				R.layout.message_row, messageList));
+
+		Log.i(TAG, "Topic Messages Added To Display");
+		
+		// pd.dismiss();
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
+		Button buttonReply = (Button) findViewById(R.id.buttonreply);
+		if (SubjectActivity.SubjectID != -1) {
+			refreshContent();
+			buttonReply.setEnabled(true);
+		}
+
+	}
+
+	private static class ViewHolder {
+		TextView message;
+		TextView info;
+		ImageButton like;
+		ImageButton dislike;
+	}
+
+	private String getElapsed(long millis) {
+		long time = millis / 1000;
+		String seconds = Integer.toString((int) (time % 60));
+		String minutes = Integer.toString((int) ((time % 3600) / 60));
+		String hours = Integer.toString((int) (time / 3600));
+		// String days =
+
+		if (seconds.equals("0")) {
+			seconds = "";
+		} else {
+			seconds += "s ";
+		}
+		if (minutes.equals("0")) {
+			minutes = "";
+		} else {
+			minutes += "min ";
+		}
+		if (hours.equals("0")) {
+			hours = "";
+		} else {
+			hours += "hrs ";
+		}
+
+		return hours + minutes + seconds;
+
+	}
+
+	private class DribAdapter extends ArrayAdapter<Drib> {
+
+		private ArrayList<Drib> items;
+
+		public DribAdapter(Context context, int textViewResourceId,
+				ArrayList<Drib> items) {
+
+			super(context, textViewResourceId, items);
+			this.items = items;
+			Log.i(TAG, "Drib Adapter Used");
+		}
+
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent) {
+			final ViewHolder holder;
+			Log.w(TAG, "Override Function - getView Function");
+			if (convertView == null) {
+				LayoutInflater mInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+				convertView = mInflater.inflate(R.layout.message_row, null);
+
+				holder = new ViewHolder();
+				holder.message = (TextView) convertView
+						.findViewById(R.id.textmsg);
+				holder.info = (TextView) convertView.findViewById(R.id.info);
+				holder.like = (ImageButton) convertView
+						.findViewById(R.id.buttonlike);
+				holder.dislike = (ImageButton) convertView
+						.findViewById(R.id.buttondislike);
+
+				convertView.setTag(holder);
+
+			} else {
+				holder = (ViewHolder) convertView.getTag();
+			}
+
+			final Drib drib = items.get(position);
+
+			if (drib != null) {
+				holder.like.setOnClickListener(new OnClickListener() {
+					public void onClick(View v) {
+						drib.setLikeCount(1);
+						new Runnable() {
+							public void run() {
+								DribCom.sendDrib(drib);
+							}
+						};
+
+						holder.like.setEnabled(false);
+						holder.dislike.setEnabled(false);
+					}
+				});
+
+				holder.dislike.setOnClickListener(new OnClickListener() {
+					public void onClick(View v) {
+						drib.setLikeCount(-1);
+						new Runnable() {
+							public void run() {
+								DribCom.sendDrib(drib);
+							}
+						};
+						holder.like.setEnabled(false);
+						holder.dislike.setEnabled(false);
+					}
+				});
+
+				holder.message.setText(drib.getText());
+				holder.info.setText("Sent : "
+						+ getElapsed(System.currentTimeMillis()
+								- drib.getCurrentTime()) + "ago" + "\nDRank: "
+						+ drib.getPopularity());
+
+			}
+
+			return convertView;
+		}
+	}
+
 }
-    
-private Runnable returnRes = new Runnable() {
-
-        public void run() {
-        	 TextView messageText = (TextView)findViewById(R.id.topicNameForMessages);
-         	if (messageList.isEmpty())
-         	{    	
-         		messageText.setText("Topics");
-         	}
-         	else
-         	{    	
-         	// Get Topic Name from TabActivity Tab
-         	messageText.setText(subjectName);
-         	}
-         	Log.i(TAG, "Topic name set"); 
-         	
-         	setListAdapter(new DribAdapter(getApplicationContext(), R.layout.message_row, messageList));
-         	    	 
-         	Log.i(TAG, "Topic Messages Added To Display");
-            pd.dismiss();
-        }
-    };    	  
-
-   
-@Override
-public void onResume() {
-    super.onResume();
-    Button buttonReply = (Button)findViewById(R.id.buttonreply); 
-	if(SubjectActivity.SubjectID!=-1)
-	{
-		refreshContent();
-		buttonReply.setEnabled(true);
-	}		
-}    
-    
-private class DribAdapter extends ArrayAdapter<Drib> {
-
-    private ArrayList<Drib> items;
-
-    public DribAdapter(Context context, int textViewResourceId, ArrayList<Drib> items) {
-    	
-        super(context, textViewResourceId, items);
-        this.items = items;
-        Log.i(TAG, "Drib Adapter Used");
-    }
-
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-    	Log.w(TAG, "Override Function - getView Function");
-            View v = convertView;
-            if (v == null) {
-                LayoutInflater vi = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                v = vi.inflate(R.layout.message_row, null);               
-                
-            }
-            final Drib drib = items.get(position);
-                        
-            if (drib != null)
-            {
-            	final ImageButton buttonLike = (ImageButton)v.findViewById(R.id.buttonlike);
-            	final ImageButton buttonDislike = (ImageButton)v.findViewById(R.id.buttondislike);
-                buttonLike.setOnClickListener(new OnClickListener() 
-                {
-        		    public void onClick(View v)
-        		    {
-        		    	drib.setLikeCount(1);
-        		    	dribCom.sendDrib(drib);
-        		    	buttonLike.setEnabled(false);
-        		    	buttonDislike.setEnabled(false);
-        		    }        		    
-                });
-                
-                buttonDislike.setOnClickListener(new OnClickListener() 
-                {
-        		    public void onClick(View v)
-        		    {
-        		    	drib.setLikeCount(-1);
-        		    	dribCom.sendDrib(drib);
-        		    	buttonLike.setEnabled(false);
-        		    	buttonDislike.setEnabled(false);
-        		    }        		    
-                });
-                
-            	TextView message = (TextView)v.findViewById(R.id.textmsg);
-            	if (message != null)
-            	{
-            		message.setText(drib.getText());
-            	}
-            	TextView timeStamp = (TextView)v.findViewById(R.id.timestamp);
-            	if (timeStamp != null)
-            	{
-            		timeStamp.setText(new Date(drib.getCurrentTime()).toString());
-            	} 
-            	TextView drank = (TextView)v.findViewById(R.id.drank);
-            	if (drank != null)
-            	{
-            		drank.setText("DRank: " + drib.getPopularity());
-            	}  
-            	
-            }            
-            
-            return v;
-    }
-}
-
-}
-
