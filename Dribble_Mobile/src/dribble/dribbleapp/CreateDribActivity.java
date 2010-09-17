@@ -4,139 +4,130 @@
 
 package dribble.dribbleapp;
 
-import dribble.dribbleapp.R;
-
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
+import android.app.TabActivity;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
+import android.widget.TabHost;
+import android.widget.Toast;
 import dribble.common.Drib;
 import dribble.common.DribSubject;
 
-public class CreateDribActivity extends Activity//extends MapActivity implements LocationListener{
-{
-	
-//	MapView mapView;
-//	MyLocationOverlay myLocOverlay;
-//	LocationManager locMgr = null;
-//	int latitude;
-//	int longitude;
+public class CreateDribActivity extends Activity {
 	private static final String TAG = "CreateDribActivity";
-	public static boolean newMessage = true;
-	DribSubject dribSubject;
-		
-	public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        Log.i(TAG, "Tab Loaded");
-        setContentView(R.layout.inputdrib);
-             
-//        mapView = new MapView(this, "0usNXcFTYLvKUSt_4ERmhFbYl2UD8_iUrDjlBhw");
-//        myLocOverlay = new MyLocationOverlay(this, mapView);
-	}
-	
-	public void refreshContent()
-	{
-		final EditText et = (EditText)findViewById(R.id.topicInput);
-		EditText dribTopic = (EditText)findViewById(R.id.topicInput);
-		dribTopic.setText("");
-		et.setText("");
-		 if (newMessage==false)
-     	{
-     	dribSubject = SubjectActivity.CurrentDribSubject;
-     	TextView tv = (TextView)findViewById(R.id.topicLabel);
-     	tv.setText("Topic: " + dribSubject.getName());
-     	tv = (TextView)findViewById(R.id.heading);
-     	tv.setText("Reply");     	
-//     	et.setText(dribSubject.getName());
-     	et.setVisibility(EditText.INVISIBLE);
-     	
-     	}
-		//locMgr = (LocationManager)this.getSystemService(Context.LOCATION_SERVICE);
-	        //locMgr.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
-		
-	        Button buttonSubmit = (Button)findViewById(R.id.submit);
-	        buttonSubmit.setOnClickListener(new OnClickListener() 
-	        {
-			    public void onClick(View v)
-			    {
-			    	Log.i(TAG, "Button Listener Activated (Button Clicked)");
-//			    	myLocOverlay.enableMyLocation();
-//				
-//					myLocOverlay.runOnFirstFix(new Runnable() {
-//			            public void run() {
-//			                int latitude = myLocOverlay.getMyLocation().getLatitudeE6();
-//			                int longitude= myLocOverlay.getMyLocation().getLongitudeE6();
-			    	//Close the application
-			    	EditText dribTopic = (EditText)findViewById(R.id.topicInput);
-			    	String dripTopicName = dribTopic.getText().toString();
-			    	if (newMessage)
-			    		dribSubject = new DribSubject (dripTopicName, 0, MapsActivity.LATITUDE, MapsActivity.LONGTIUDE, 0, 0, System.currentTimeMillis(), 0);			    		
-			            
-			    	EditText dribMessage = (EditText)findViewById(R.id.dribInput);
-			    	String dribText = dribMessage.getText().toString();
-			    	Drib newDrib = new Drib(dribSubject, dribText, MapsActivity.LATITUDE, MapsActivity.LONGTIUDE);
-			    	DribCom dribCom = new DribCom();
-			    	Log.i(TAG, "Submit new message");
-			    	dribCom.sendDrib(newDrib);
-			    	Log.i(TAG, "Message Successfully Submitted");
-			    	AlertDialog.Builder dialog = new AlertDialog.Builder(getParent());
-			  	  dialog.setTitle("Success!");
-			  	  dialog.setMessage("Message sent successfully");
-			  	  dialog.show();
-			  	  dribMessage.setText("");
-			  	  et.setText("");
-			    	    }
-			        });
-					    }		
+	public static boolean newMessage;
+	private static DribSubject dribSubject;
+	private static ProgressDialog pd;
+	private Handler mHandler = new Handler();
 
-	
-    
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		Log.i(TAG, "Tab Loaded");
+		newMessage=true;
+		setContentView(R.layout.input_drib);
+	}
+
+	public void refreshContent() {
+		EditText et = (EditText) findViewById(R.id.topicInput);
+		if (newMessage == false) {
+			dribSubject = SubjectActivity.CurrentDribSubject;
+			et.setVisibility(EditText.GONE);
+		}
+		Button buttonSubmit = (Button) findViewById(R.id.submit);
+		buttonSubmit.setOnClickListener(new OnClickListener() {
+			public void onClick(View v) {
+				Log.i(TAG, "Button Listener Activated (Button Clicked)");
+				
+				EditText dribTopic = (EditText) findViewById(R.id.topicInput);
+				String dribTopicName = dribTopic.getText().toString();
+				EditText dribMessage = (EditText) findViewById(R.id.dribInput);
+				String dribText = dribMessage.getText().toString();
+
+				if ((dribTopicName.equals("") && newMessage)
+						|| dribText.equals("")) {
+					new AlertDialog.Builder(CreateDribActivity.this).setTitle(
+							"Error").setMessage("Inputs Can't be Empty")
+							.setPositiveButton("OK", null).show();
+				} else {
+					
+					if (newMessage)
+						dribSubject = new DribSubject(dribTopicName, 0,
+								MapsThread.LATITUDE, MapsThread.LONGITUDE, 0,
+								0, System.currentTimeMillis(), 0);
+					final Drib newDrib = new Drib(dribSubject, dribText,
+							MapsThread.LATITUDE, MapsThread.LONGITUDE);
+					Log.i(TAG, "Submit new message");
+
+//					pd = new ProgressDialog(v.getContext());
+//					pd.setMessage("Sending Drib...");
+//					pd.setIndeterminate(true);
+//					pd.setCancelable(true);
+//					pd.show();
+
+					Thread sendDrib = new Thread() {
+						public void run() {
+
+							DribCom.sendDrib(newDrib);
+							mHandler.post(mUpdateResults);
+						}
+					};
+					sendDrib.start();
+				}
+
+			}
+		});
+	}
+
+	// Create runnable for posting
+	final Runnable mUpdateResults = new Runnable() {
+		public void run() {
+			updateResultsInUi();
+		}
+	};
+
+	private void updateResultsInUi() {
+
+		// pd.dismiss();
+		
+		Log.i(TAG, "Message Successfully Submitted");
+		Toast success = Toast.makeText(getApplicationContext(),
+				"Message sent successfully", Toast.LENGTH_SHORT);
+		success.show();
+
+		TabActivity tabActivity = (TabActivity) getParent();
+		if (tabActivity == null) {
+			this.finish();
+		} else {
+			TabHost tabHost = tabActivity.getTabHost();
+			tabHost.setCurrentTab(1);
+		}
+	}
+
 	@Override
-    public void onResume() {
-        super.onResume();
-    		refreshContent();
-    }
-	
+	public void onResume() {
+		super.onResume();
+		if ((TabActivity) getParent() == null) {
+			newMessage = false;
+		}
+		refreshContent();
+	}
+
 	@Override
 	public void onPause() {
 		super.onPause();
+		newMessage = true;
+		EditText et = (EditText) findViewById(R.id.topicInput);
+		et.setVisibility(EditText.VISIBLE);
+		et.setText("");
+		EditText drib = (EditText) findViewById(R.id.dribInput);
+		drib.setText("");
 
-		newMessage=true;
-		TextView tv = (TextView)findViewById(R.id.heading);
-     	tv.setText("Create New");
-     	tv = (TextView)findViewById(R.id.topicLabel);
-     	tv.setText("Topic");
-     	EditText et = (EditText)findViewById(R.id.topicInput);
-     	et.setVisibility(EditText.VISIBLE);
 	}
 }
-//	
-//    @Override
-//    protected boolean isRouteDisplayed() {
-//   
-//        return false;
-//    } 
-//	
-//    public void onLocationChanged(Location location) {
-//        this.latitude = (int)location.getLatitude();
-//        this.longitude = (int)location.getLongitude();
-//        //Log.i("Location change",""+latitude+ " : "+longitude) ;
-//    }
-//    
-//    public void onProviderDisabled(String provider) {
-//       
-//    }
-//    
-//    public void onProviderEnabled(String provider) {
-//       
-//    }
-//    
-//    public void onStatusChanged(String provider, int status, Bundle extras) {
-//       
-//    }
-//}

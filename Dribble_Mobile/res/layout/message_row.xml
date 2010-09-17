@@ -1,52 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <RelativeLayout
-xmlns:android="http://schemas.android.com/apk/res/android"
-android:layout_width="fill_parent"
-android:layout_height="?android:attr/listPreferredItemHeight"
-android:orientation="horizontal"
-android:padding ="2dip">
-<ImageView
-android:id="@+id/icon"
-android:layout_width="wrap_content"
-android:layout_height="wrap_content"
-android:paddingRight="10dip"
-android:src="@drawable/dribicon"/>
-<TextView
-  android:id="@+id/textmsg"
-  android:layout_width="wrap_content"
-  android:layout_height="fill_parent"
-  android:padding ="5dip"
-  android:layout_toRightOf ="@id/icon"/>
-  <TextView
-  android:id="@+id/timestamp"
-  android:layout_width="wrap_content"
-  android:layout_height="wrap_content"
-   android:layout_below="@id/textmsg"
-   android:layout_alignLeft="@id/textmsg"
-   android:textSize="10dip"/>
-   <TextView
-  android:id="@+id/drank"
-  android:layout_width="wrap_content"
-  android:layout_height="wrap_content"
-   android:layout_below="@id/timestamp"
-   android:layout_alignLeft="@id/textmsg"
-   android:textSize="10dip"/>
-  <ImageButton
-  android:id="@+id/buttondislike"
-  android:layout_width="wrap_content"
-  android:layout_height="wrap_content"
-  android:src="@drawable/icon_dislike" 
-  android:background="@id/android:empty"
-  android:layout_below="@id/drank"
-  android:layout_alignParentRight="true"/>
- <ImageButton
-  android:id="@+id/buttonlike"
-  android:layout_width="wrap_content"
-  android:layout_height="wrap_content"
-  android:src="@drawable/icon_like"
-  android:padding="2dip"
-  android:background="@id/android:empty"
-  android:layout_toLeftOf="@id/buttondislike"
-  android:layout_alignTop="@id/buttondislike"/>
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent"
+	android:layout_height="?android:attr/listPreferredItemHeight">
+	<TextView
+		android:id="@+id/textmsg"
+		android:layout_width="wrap_content"
+		android:layout_height="fill_parent"
+		android:padding="5dip"
+		android:drawableLeft="@drawable/drib_icon_2_smallest"/>
+	<TextView
+		android:id="@+id/info"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_below="@id/textmsg"
+		android:layout_alignLeft="@id/textmsg"
+		android:textSize="10dip" />
+	<ImageButton
+		android:id="@+id/buttondislike"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:src="@drawable/icon_dislike"
+		android:background="@id/android:empty"
+		android:layout_alignParentRight="true"
+		android:layout_alignBottom="@id/info" />
+	<ImageButton
+		android:id="@+id/buttonlike"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:src="@drawable/icon_like"
+		android:background="@id/android:empty"
+		android:layout_toLeftOf="@id/buttondislike"
+		android:layout_alignTop="@id/buttondislike" />
 
- </RelativeLayout>
+</RelativeLayout>

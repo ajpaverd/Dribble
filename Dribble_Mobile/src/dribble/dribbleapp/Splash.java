@@ -16,8 +16,7 @@ import android.util.Log;
 	public class Splash extends Activity {
 		
 		private static final String TAG = "Splash";
-	     
-		private final int SPLASH_DISPLAY_LENGHT = 100;
+	    private static final int SPLASH_DISPLAY_LENGTH = 3000;
 
 	     @Override
 	     public void onCreate(Bundle icicle) {
@@ -30,14 +29,14 @@ import android.util.Log;
 	          new Handler().postDelayed(new Runnable(){
 	               public void run() {
 	                    /* Create an Intent that will start the Menu-Activity. */
-	                    Intent mainIntent = new Intent(Splash.this,DribbleTabs.class);
+	                    Intent mainIntent = new Intent(Splash.this,DribbleMain.class);
 	                    Log.i(TAG, "Start Dribble Activity");
 	                    Splash.this.startActivity(mainIntent);
 	                   
 	                    Splash.this.finish();
 	                    Log.i(TAG, "Splash Activity Finished");
 	               }
-	          }, SPLASH_DISPLAY_LENGHT);
+	          }, SPLASH_DISPLAY_LENGTH);
 	     }
 	}
 
