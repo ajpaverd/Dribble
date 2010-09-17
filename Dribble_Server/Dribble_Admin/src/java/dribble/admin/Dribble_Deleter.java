@@ -26,7 +26,7 @@ public class Dribble_Deleter extends Thread {
 
         while (true) {
 
-            long qualifyingTime = System.currentTimeMillis() - 1800000;
+            long qualifyingTime = System.currentTimeMillis() - 172800000;
             //long qualifyingTime = System.currentTimeMillis() - 60000;
             dataset.deleteOldDribSubjects(qualifyingTime);
             dataset.deleteOldDribs(qualifyingTime);

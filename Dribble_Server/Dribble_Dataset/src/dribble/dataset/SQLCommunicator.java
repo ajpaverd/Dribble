@@ -342,7 +342,7 @@ public class SQLCommunicator implements Dataset {
     @Override
     public boolean deleteOldDribSubjects(long qualifyingTime) {
 
-        logger.info("Deleting old DribSubjects...");
+        //logger.info("Deleting old DribSubjects...");
 
         try {
             Statement stmt = con.createStatement();
@@ -378,7 +378,7 @@ public class SQLCommunicator implements Dataset {
     @Override
     public boolean deleteOldDribs(long qualifyingTime) {
 
-        logger.info("Deleting old Dribs...");
+        //logger.info("Deleting old Dribs...");
 
         try {
 
@@ -392,10 +392,10 @@ public class SQLCommunicator implements Dataset {
                 id = rs.getInt("ID");
 
                 stmt1.execute("DELETE FROM \"" + id + "\" WHERE CURRENTIME < " + qualifyingTime);
-                //logger.info("Drib Deleted from subject " + id);
+                logger.info("Dribs Deleted from subject " + id);
             }
 
-            logger.info("Deleted old dribs");
+            //logger.info("Deleted old dribs");
             return true;
 
         } catch (SQLException e) {
