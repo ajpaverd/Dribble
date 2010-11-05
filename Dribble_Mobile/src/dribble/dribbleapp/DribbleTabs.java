@@ -82,13 +82,13 @@ public class DribbleTabs extends TabActivity {
 		TabHost.TabSpec spec; // Reusable TabSpec for each tab
 		Intent intent; // Reusable Intent for each tab
 
-		// Create an Intent to launch an Activity for the tab (to be reused)
-		intent = new Intent().setClass(this, MapsActivity.class);
-		// Initialize a TabSpec for each tab and add it to the TabHost
-		spec = tabHost.newTabSpec("maps").setIndicator("Map",
-				res.getDrawable(R.drawable.ic_tab_map)).setContent(intent);
-		tabHost.addTab(spec);
-		Log.i(TAG, "Add Maps Tab");
+//		// Create an Intent to launch an Activity for the tab (to be reused)
+//		intent = new Intent().setClass(this, MapsActivity.class);
+//		// Initialize a TabSpec for each tab and add it to the TabHost
+//		spec = tabHost.newTabSpec("maps").setIndicator("Map",
+//				res.getDrawable(R.drawable.ic_tab_map)).setContent(intent);
+//		tabHost.addTab(spec);
+//		Log.i(TAG, "Add Maps Tab");
 
 		// Do the same for the other tabs
 		intent = new Intent().setClass(this, SubjectActivity.class);

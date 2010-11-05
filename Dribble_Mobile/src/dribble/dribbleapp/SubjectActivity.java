@@ -62,27 +62,26 @@ public class SubjectActivity extends ListActivity {
 				
 				Log.i(TAG, "Received List of Topics");
 				mHandler.post(mUpdateResults);
-				mHandler.post(mAddOverlays);								
+				//mHandler.post(mAddOverlays);								
 			}
 		};
 		getDribSubjects.start();
 	}
 	
-	// Create runnable for posting
-	final Runnable mAddOverlays = new Runnable() {
-		public void run()
-		{
-			OverlayItem overlayitem;
-			MapsActivity.Itemizedoverlay.clearOverlays();
-			for(int i = 0; i< dribTopAr.size(); i++)
-			{
-				DribSubject ds = ((DribSubject)(dribTopAr.toArray())[i]);
-				GeoPoint point = new GeoPoint((int)(ds.getLatitude()),(int)(ds.getLongitude()));
-			    overlayitem = new OverlayItem(point, "Drib Topic", ds.getName());
-			    MapsActivity.Itemizedoverlay.addOverlay(overlayitem);
-			}
-		}
-	};
+//	// Create runnable for posting
+//	final Runnable mAddOverlays = new Runnable() {
+//		public void run()
+//		{
+//			OverlayItem overlayitem;
+//			MapsActivity.Itemizedoverlay.clearOverlays();
+//			for(int i = 0; i< dribTopAr.size(); i++)			{
+//				DribSubject ds = ((DribSubject)(dribTopAr.toArray())[i]);
+//				GeoPoint point = new GeoPoint((int)(ds.getLatitude()),(int)(ds.getLongitude()));
+//			    overlayitem = new OverlayItem(point, "Drib Topic", ds.getName());
+//			    MapsActivity.Itemizedoverlay.addOverlay(overlayitem);
+//			}
+//		}
+//	};
 	
 	// Create runnable for posting
 	final Runnable mUpdateResults = new Runnable() {
@@ -113,7 +112,7 @@ public class SubjectActivity extends ListActivity {
 	    	SubjectName = selectedTopic.getName();
 	    	TabActivity tabActivity = (TabActivity)getParent();
 	    	TabHost tabHost = tabActivity.getTabHost();
-	    	tabHost.setCurrentTab(2);
+	    	tabHost.setCurrentTab(1);
 	    }
 	    	  });
 }

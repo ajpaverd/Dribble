@@ -39,9 +39,9 @@ public class DribActivity extends ListActivity {
 		Log.i(TAG, "Tab Loaded");
 		setContentView(R.layout.messages);
 
-		Button buttonReply = (Button) findViewById(R.id.buttonreply);
+		Button buttonReply = (Button) findViewById(R.id.buttonReply);
 		buttonReply.setEnabled(false);
-
+		
 		buttonReply.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
 				CreateDribActivity.newMessage = false;
@@ -49,6 +49,17 @@ public class DribActivity extends ListActivity {
 						CreateDribActivity.class);
 				Log.i(TAG, "Start Dribble Activity");
 				DribActivity.this.startActivity(mainIntent);
+			}
+		});
+		
+		Button viewMap = (Button) findViewById(R.id.viewMap);
+		viewMap.setEnabled(false);
+		
+		viewMap.setOnClickListener(new OnClickListener() {
+			public void onClick(View v) {
+				Intent maps = new Intent(DribActivity.this,
+						MapsActivity.class);
+				DribActivity.this.startActivity(maps);
 			}
 		});
 	}
@@ -101,10 +112,12 @@ public class DribActivity extends ListActivity {
 	@Override
 	public void onResume() {
 		super.onResume();
-		Button buttonReply = (Button) findViewById(R.id.buttonreply);
+		Button buttonReply = (Button) findViewById(R.id.buttonReply);
+		Button viewMap = (Button) findViewById(R.id.viewMap);
 		if (SubjectActivity.SubjectID != -1) {
 			refreshContent();
 			buttonReply.setEnabled(true);
+			viewMap.setEnabled(true);
 		}
 
 	}
@@ -120,8 +133,9 @@ public class DribActivity extends ListActivity {
 		long time = millis / 1000;
 		String seconds = Integer.toString((int) (time % 60));
 		String minutes = Integer.toString((int) ((time % 3600) / 60));
-		String hours = Integer.toString((int) (time / 3600));
-		// String days =
+		int tempHours = (int) (time / 3600);
+		String days = Integer.toString(tempHours / 24);
+		String hours = Integer.toString(tempHours%24);
 
 		if (seconds.equals("0")) {
 			seconds = "";
@@ -138,9 +152,13 @@ public class DribActivity extends ListActivity {
 		} else {
 			hours += "hrs ";
 		}
+		if (days.equals("0")) {
+			days = "";
+		} else {
+			days += "days ";
+		}
 
-		return hours + minutes + seconds;
-
+		return days + hours + minutes + seconds;
 	}
 
 	private class DribAdapter extends ArrayAdapter<Drib> {
@@ -215,7 +233,6 @@ public class DribActivity extends ListActivity {
 						+ drib.getPopularity());
 
 			}
-
 			return convertView;
 		}
 	}

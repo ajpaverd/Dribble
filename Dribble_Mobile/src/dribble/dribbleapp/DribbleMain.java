@@ -13,6 +13,9 @@ public class DribbleMain extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 		
+		final Thread myThread = new Thread(new MapsThread(), "MapsThread");
+		myThread.start();
+		
 		Button buttonEnter = (Button) findViewById(R.id.buttonEnter);
 
 		buttonEnter.setOnClickListener(new OnClickListener() {
@@ -20,7 +23,6 @@ public class DribbleMain extends Activity {
 				CreateDribActivity.newMessage = false;
 				Intent tabs = new Intent(DribbleMain.this, DribbleTabs.class);
 				DribbleMain.this.startActivity(tabs);
-				
 			}
 
 		});

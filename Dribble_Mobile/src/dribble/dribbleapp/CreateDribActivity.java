@@ -106,7 +106,7 @@ public class CreateDribActivity extends Activity {
 			this.finish();
 		} else {
 			TabHost tabHost = tabActivity.getTabHost();
-			tabHost.setCurrentTab(1);
+			tabHost.setCurrentTab(0);
 		}
 	}
 

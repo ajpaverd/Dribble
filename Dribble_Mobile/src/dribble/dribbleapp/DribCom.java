@@ -26,9 +26,8 @@ import dribble.common.DribSubjectList;
 
 public class DribCom {
 
-
 	private static String urlToSendRequest;
-	private static final String targetDomain = "lab1.cetas.ac.za:8080";
+	private static final String targetDomain = "lab2.cetas.ac.za:80";
 	private static final int results = 5;	
 	private static final String TAG = "DribCom";
 	

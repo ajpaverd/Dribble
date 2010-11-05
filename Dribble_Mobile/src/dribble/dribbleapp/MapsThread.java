@@ -1,7 +1,10 @@
 package dribble.dribbleapp;
 
+import android.content.Context;
+import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -12,8 +15,14 @@ public class MapsThread implements Runnable,
 	public static int LONGITUDE;
 
 	public void run() {
-		Log.i("Thread Running", "Location listening thread");
+//		Log.i("Thread Running", "Location listening thread");
+//		LocationManager locationManager;
+//		locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+//		Criteria criteria = new Criteria();
+//		String bestProvider = locationManager.getBestProvider(criteria, false);
+//		locationManager.requestLocationUpdates(bestProvider, 20000, 1, this);
 		while (true) {
+			
 			try {
 				Thread.sleep(60000);
 				Log.i("Location Thread", "Latitude: " + LATITUDE + " , "

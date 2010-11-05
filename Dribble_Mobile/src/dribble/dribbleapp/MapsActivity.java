@@ -18,6 +18,8 @@ import com.google.android.maps.MyLocationOverlay;
 import com.google.android.maps.Overlay;
 import com.google.android.maps.OverlayItem;
 
+import dribble.common.DribSubject;
+
 public class MapsActivity extends MapActivity {
 	/** Called when the activity is first created. */
 
@@ -59,7 +61,6 @@ public class MapsActivity extends MapActivity {
 		mapOverlays.add(myLocOverlay);
 		mapController = mapView.getController();
 
-		final Thread myThread = new Thread(new MapsThread(), "MapsThread");
 		myLocOverlay.runOnFirstFix(new Runnable() {
 			public void run() {
 				MapsThread.LATITUDE = myLocOverlay.getMyLocation()
@@ -68,24 +69,25 @@ public class MapsActivity extends MapActivity {
 						.getLongitudeE6();
 				mapController.animateTo(myLocOverlay.getMyLocation());
 				mapController.setCenter(myLocOverlay.getMyLocation());
-				mapController.setZoom(16);
-				myThread.start();
+				
 			}
 		});
+		
+		DribSubject dribSubj = SubjectActivity.CurrentDribSubject;
+		GeoPoint geopoint = new GeoPoint((int)(dribSubj.getLatitude()),(int)(dribSubj.getLongitude()));
+		OverlayItem overlayitem = new OverlayItem(geopoint, "Drib Topic", dribSubj.getName());
+	    Itemizedoverlay.addOverlay(overlayitem);
+//		GeoPoint geopoint = new GeoPoint(MapsThread.LATITUDE,
+//				MapsThread.LONGITUDE);
+	    mapController.setZoom(16);
+		mapController.animateTo(geopoint);
 
-		GeoPoint point = new GeoPoint(-26191794, 28027023);
-		OverlayItem overlayitem = new OverlayItem(point, "Dribble HQ",
-				"Chamber of Mines, Wits University");
-		Itemizedoverlay.addOverlay(overlayitem);
+//		GeoPoint point = new GeoPoint(-26191794, 28027023);
+//		OverlayItem overlayitem = new OverlayItem(point, "Dribble HQ",
+//				"Chamber of Mines, Wits University");
+//		Itemizedoverlay.addOverlay(overlayitem);
 
 		mapOverlays.add(Itemizedoverlay);
 		Log.i(TAG, "Add Itemized Overlay onto Map");
 	}
-
-	protected void onDestroy() {
-		super.onDestroy();
-		// After this is called, your app process is no longer available in DDMS
-		android.os.Process.killProcess(android.os.Process.myPid());
-	}
-
 }
