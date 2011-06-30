@@ -44,29 +44,32 @@ public class SubjectActivity extends ListActivity {
     
 	private void refreshContent()
 	{
-//		pd = new ProgressDialog(this);
-//		pd.setMessage("Retrieving Subjects...");
-//		pd.setIndeterminate(true);
-//		pd.setCancelable(true);
-//		pd.show();
+		pd = new ProgressDialog(this);
+		pd.setMessage("Retrieving Subjects...");
+		pd.setIndeterminate(true);
+		pd.setCancelable(true);
+		pd.show();
 
 		Thread getDribSubjects = new Thread() {
 			public void run() {
 				dribTopAr= DribCom.getTopics();
-				topicNameAr = new String[dribTopAr.size()];
-				for(int i = 0; i< dribTopAr.size(); i++)
+				if (dribTopAr != null)
 				{
-					DribSubject ds = ((DribSubject)(dribTopAr.toArray())[i]);
-					topicNameAr[i] = ds.getName();
-				}
+					topicNameAr = new String[dribTopAr.size()];
+					for(int i = 0; i< dribTopAr.size(); i++)
+					{
+						DribSubject ds = ((DribSubject)(dribTopAr.toArray())[i]);
+						topicNameAr[i] = ds.getName();
+					}
 				
-				Log.i(TAG, "Received List of Topics");
-				mHandler.post(mUpdateResults);
-				//mHandler.post(mAddOverlays);								
+					Log.i(TAG, "Received List of Topics");
+					mHandler.post(mUpdateResults);
+					//mHandler.post(mAddOverlays);	
+				}
 			}
 		};
 		getDribSubjects.start();
-	}
+		}
 	
 //	// Create runnable for posting
 //	final Runnable mAddOverlays = new Runnable() {
@@ -93,7 +96,7 @@ public class SubjectActivity extends ListActivity {
 	private void updateResultsInUi() {
 	  setListAdapter(new ArrayAdapter<String>(this, R.layout.subject_row, topicNameAr));
 	  
-	  //pd.dismiss();
+	  pd.dismiss();
 	  
 	  Log.i(TAG, "List Adapter Set");
 	  ListView lv = getListView();
@@ -105,7 +108,7 @@ public class SubjectActivity extends ListActivity {
 	    	Log.i(TAG, "List Item Clicked");
 	    	DribSubject selectedTopic = ((DribSubject)(dribTopAr.toArray())[position]);
 	    		    	
-          Log.i(TAG, "Start Dribble Activity");
+            Log.i(TAG, "Start Dribble Activity");
 	    	
 	    	SubjectID = selectedTopic.getSubjectID();
 	    	CurrentDribSubject = selectedTopic;

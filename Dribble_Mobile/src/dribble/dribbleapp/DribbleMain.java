@@ -13,8 +13,7 @@ public class DribbleMain extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 		
-		final Thread myThread = new Thread(new MapsThread(), "MapsThread");
-		myThread.start();
+		GpsListener listener = new GpsListener(this);
 		
 		Button buttonEnter = (Button) findViewById(R.id.buttonEnter);
 

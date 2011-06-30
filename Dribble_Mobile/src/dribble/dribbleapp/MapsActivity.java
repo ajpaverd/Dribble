@@ -37,8 +37,8 @@ public class MapsActivity extends MapActivity {
 	public void onResume() {
 		super.onResume();
 		if (myLocOverlay.getLastFix() != null) {
-			GeoPoint geopoint = new GeoPoint(MapsThread.LATITUDE,
-					MapsThread.LONGITUDE);
+			GeoPoint geopoint = new GeoPoint(GpsListener.getLatitude(),
+					GpsListener.getLongitude());
 			mapController.animateTo(geopoint);
 		}
 	}
@@ -63,10 +63,6 @@ public class MapsActivity extends MapActivity {
 
 		myLocOverlay.runOnFirstFix(new Runnable() {
 			public void run() {
-				MapsThread.LATITUDE = myLocOverlay.getMyLocation()
-						.getLatitudeE6();
-				MapsThread.LONGITUDE = myLocOverlay.getMyLocation()
-						.getLongitudeE6();
 				mapController.animateTo(myLocOverlay.getMyLocation());
 				mapController.setCenter(myLocOverlay.getMyLocation());
 				
@@ -77,15 +73,13 @@ public class MapsActivity extends MapActivity {
 		GeoPoint geopoint = new GeoPoint((int)(dribSubj.getLatitude()),(int)(dribSubj.getLongitude()));
 		OverlayItem overlayitem = new OverlayItem(geopoint, "Drib Topic", dribSubj.getName());
 	    Itemizedoverlay.addOverlay(overlayitem);
-//		GeoPoint geopoint = new GeoPoint(MapsThread.LATITUDE,
-//				MapsThread.LONGITUDE);
 	    mapController.setZoom(16);
 		mapController.animateTo(geopoint);
 
-//		GeoPoint point = new GeoPoint(-26191794, 28027023);
-//		OverlayItem overlayitem = new OverlayItem(point, "Dribble HQ",
-//				"Chamber of Mines, Wits University");
-//		Itemizedoverlay.addOverlay(overlayitem);
+		GeoPoint point = new GeoPoint(-26191794, 28027023);
+		OverlayItem overlayitem2 = new OverlayItem(point, "Dribble HQ",
+				"Chamber of Mines, Wits University");
+		Itemizedoverlay.addOverlay(overlayitem2);
 
 		mapOverlays.add(Itemizedoverlay);
 		Log.i(TAG, "Add Itemized Overlay onto Map");

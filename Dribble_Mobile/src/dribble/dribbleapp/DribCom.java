@@ -27,9 +27,10 @@ import dribble.common.DribSubjectList;
 public class DribCom {
 
 	private static String urlToSendRequest;
-	private static final String targetDomain = "lab2.cetas.ac.za:80";
+	private static final String targetDomain = "50.18.104.62:8080";
 	private static final int results = 5;	
 	private static final String TAG = "DribCom";
+	private static final Serializer serializer = new Persister();
 	
 	@SuppressWarnings("unchecked")
 	private static Object XMLStreamToClass (HttpGet httpGet, Class clss)
@@ -38,19 +39,20 @@ public class DribCom {
 		{
 			Log.i(TAG, "Execute HTTP Request");
 			HttpClient httpClient = HttpUtils.getThreadSafeClient();
-			HttpResponse response = httpClient.execute(httpGet);		
-			Serializer serializer = new Persister();
+			HttpResponse response = httpClient.execute(httpGet);	
+			
 			Object obj = null;
 			try 
 			{
 				InputStream res = response.getEntity().getContent();
-				obj = serializer.read(clss, res);
+				obj = serializer.read(clss, res);	
+				return obj;
 			} 
 			catch (Exception e) 
 			{
 				e.printStackTrace();
-			}
-			return obj;
+				return null;
+			}			
 		} 
 		catch (ClientProtocolException e1) 
 		{  
@@ -61,7 +63,7 @@ public class DribCom {
 		{  
 			Log.e(TAG, "IO Exception: " + e2);			
 			return null;
-		}
+		} 
 	}
 	
 	public static ArrayList<DribSubject> getTopics() //GET - list of topics
@@ -71,10 +73,13 @@ public class DribCom {
 		
 		urlToSendRequest =  "http://"+targetDomain+"/Dribble_Communications-war/resources/GetDribSubjects";
 		
-		HttpGet httpGet = new HttpGet(urlToSendRequest + "?latitude=" + MapsThread.LATITUDE + "&longitude=" +
-				MapsThread.LONGITUDE + "&results=" + results);
+		HttpGet httpGet = new HttpGet(urlToSendRequest + "?latitude=" + GpsListener.getLatitude() + "&longitude=" +
+				GpsListener.getLongitude() + "&results=" + results);
 		DribSubjectList subjectList =  (DribSubjectList)XMLStreamToClass(httpGet, DribSubjectList.class);
-		return subjectList.list;
+		if (subjectList != null)
+			return subjectList.list;
+		else
+			return null;
 	}
 
 	public static ArrayList<Drib> getMessages(int SubjectID) //GET - messages for a topic 
@@ -84,7 +89,7 @@ public class DribCom {
        
 		urlToSendRequest = "http://"+targetDomain+"/Dribble_Communications-war/resources/GetDribs";
 			
-		HttpGet httpGet = new HttpGet(urlToSendRequest+ "?latitude=" + MapsThread.LATITUDE + "&longitude=" + MapsThread.LONGITUDE +
+		HttpGet httpGet = new HttpGet(urlToSendRequest+ "?latitude=" + GpsListener.getLatitude() + "&longitude=" + GpsListener.getLongitude() +
 				"&results=" + results +"&subjectID=" + SubjectID);
 		DribList dribList =  (DribList)XMLStreamToClass(httpGet, DribList.class);
 		return dribList.list;

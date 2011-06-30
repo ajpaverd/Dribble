@@ -65,11 +65,11 @@ public class DribActivity extends ListActivity {
 	}
 
 	private void refreshContent() {
-	//	pd = new ProgressDialog(this);
-	//	pd.setMessage("Retrieving Dribs...");
-	//	pd.setIndeterminate(true);
-	//	pd.setCancelable(true);
-	//	pd.show();
+		pd = new ProgressDialog(this);
+		pd.setMessage("Retrieving Dribs...");
+		pd.setIndeterminate(true);
+		pd.setCancelable(true);
+		pd.show();
 
 		Thread getDribs = new Thread() {
 			public void run() {
@@ -106,7 +106,7 @@ public class DribActivity extends ListActivity {
 
 		Log.i(TAG, "Topic Messages Added To Display");
 		
-		// pd.dismiss();
+		 pd.dismiss();
 	}
 
 	@Override

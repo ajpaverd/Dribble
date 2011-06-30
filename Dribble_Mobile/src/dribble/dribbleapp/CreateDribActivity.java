@@ -8,6 +8,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.app.TabActivity;
+import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -58,11 +59,12 @@ public class CreateDribActivity extends Activity {
 				} else {
 					
 					if (newMessage)
-						dribSubject = new DribSubject(dribTopicName, 0,
-								MapsThread.LATITUDE, MapsThread.LONGITUDE, 0,
+					{
+						dribSubject = new DribSubject(dribTopicName, 0, GpsListener.getLatitude(), GpsListener.getLongitude(), 0,
 								0, System.currentTimeMillis(), 0);
+					}
 					final Drib newDrib = new Drib(dribSubject, dribText,
-							MapsThread.LATITUDE, MapsThread.LONGITUDE);
+							GpsListener.getLatitude(), GpsListener.getLongitude());
 					Log.i(TAG, "Submit new message");
 
 //					pd = new ProgressDialog(v.getContext());

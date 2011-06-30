@@ -50,23 +50,25 @@ public final class R {
         public static final int topicicong=0x7f020024;
     }
     public static final class id {
-        public static final int about=0x7f070010;
-        public static final int buttonEnter=0x7f070005;
-        public static final int buttonReply=0x7f07000d;
-        public static final int buttondislike=0x7f070009;
-        public static final int buttonlike=0x7f07000a;
-        public static final int dribInput=0x7f070001;
-        public static final int help=0x7f07000f;
-        public static final int helpText=0x7f070004;
-        public static final int info=0x7f070008;
-        public static final int logo=0x7f070003;
-        public static final int mapview=0x7f070006;
-        public static final int splashscreen=0x7f07000e;
-        public static final int submit=0x7f070002;
-        public static final int textmsg=0x7f070007;
-        public static final int topicInput=0x7f070000;
-        public static final int topicNameForMessages=0x7f07000b;
-        public static final int viewMap=0x7f07000c;
+        public static final int about=0x7f080012;
+        public static final int buttonEnter=0x7f080005;
+        public static final int buttonReply=0x7f08000d;
+        public static final int buttondislike=0x7f080009;
+        public static final int buttonlike=0x7f08000a;
+        public static final int dribInput=0x7f080001;
+        public static final int drib_widget=0x7f080010;
+        public static final int dribble_icon=0x7f08000f;
+        public static final int help=0x7f080011;
+        public static final int helpText=0x7f080004;
+        public static final int info=0x7f080008;
+        public static final int logo=0x7f080003;
+        public static final int mapview=0x7f080006;
+        public static final int splashscreen=0x7f08000e;
+        public static final int submit=0x7f080002;
+        public static final int textmsg=0x7f080007;
+        public static final int topicInput=0x7f080000;
+        public static final int topicNameForMessages=0x7f08000b;
+        public static final int viewMap=0x7f08000c;
     }
     public static final class layout {
         public static final int input_drib=0x7f030000;
@@ -78,18 +80,22 @@ public final class R {
         public static final int subject_row=0x7f030006;
         public static final int subjects=0x7f030007;
         public static final int tabs=0x7f030008;
+        public static final int widget=0x7f030009;
     }
     public static final class menu {
-        public static final int drib_menu=0x7f060000;
+        public static final int drib_menu=0x7f070000;
     }
     public static final class string {
-        public static final int about=0x7f040001;
-        public static final int about_text=0x7f040003;
-        public static final int app_name=0x7f040000;
-        public static final int help=0x7f040002;
-        public static final int help_text=0x7f040004;
+        public static final int about=0x7f050001;
+        public static final int about_text=0x7f050003;
+        public static final int app_name=0x7f050000;
+        public static final int help=0x7f050002;
+        public static final int help_text=0x7f050004;
     }
     public static final class style {
-        public static final int Theme_NoBackground=0x7f050000;
+        public static final int Theme_NoBackground=0x7f060000;
+    }
+    public static final class xml {
+        public static final int widget_provider=0x7f040000;
     }
 }
