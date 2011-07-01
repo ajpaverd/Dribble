@@ -26,28 +26,29 @@ public final class R {
         public static final int ic_menu_info_details=0x7f02000c;
         public static final int ic_menu_mapmode=0x7f02000d;
         public static final int ic_menu_mylocation=0x7f02000e;
-        public static final int ic_tab_dribs=0x7f02000f;
-        public static final int ic_tab_map=0x7f020010;
-        public static final int ic_tab_new=0x7f020011;
-        public static final int ic_tab_topics=0x7f020012;
-        public static final int icon=0x7f020013;
-        public static final int icon_dislike=0x7f020014;
-        public static final int icon_like=0x7f020015;
-        public static final int mapicon=0x7f020016;
-        public static final int mapicong=0x7f020017;
-        public static final int newicon=0x7f020018;
-        public static final int newicong=0x7f020019;
-        public static final int splash=0x7f02001a;
-        public static final int thumbsdown=0x7f02001b;
-        public static final int thumbsdownlarge=0x7f02001c;
-        public static final int thumbsdownlargeg=0x7f02001d;
-        public static final int thumbsdownselect=0x7f02001e;
-        public static final int thumbsup=0x7f02001f;
-        public static final int thumbsuplarge=0x7f020020;
-        public static final int thumbsuplargeg=0x7f020021;
-        public static final int thumbsupselect=0x7f020022;
-        public static final int topicicon=0x7f020023;
-        public static final int topicicong=0x7f020024;
+        public static final int ic_menu_preferences=0x7f02000f;
+        public static final int ic_tab_dribs=0x7f020010;
+        public static final int ic_tab_map=0x7f020011;
+        public static final int ic_tab_new=0x7f020012;
+        public static final int ic_tab_topics=0x7f020013;
+        public static final int icon=0x7f020014;
+        public static final int icon_dislike=0x7f020015;
+        public static final int icon_like=0x7f020016;
+        public static final int mapicon=0x7f020017;
+        public static final int mapicong=0x7f020018;
+        public static final int newicon=0x7f020019;
+        public static final int newicong=0x7f02001a;
+        public static final int splash=0x7f02001b;
+        public static final int thumbsdown=0x7f02001c;
+        public static final int thumbsdownlarge=0x7f02001d;
+        public static final int thumbsdownlargeg=0x7f02001e;
+        public static final int thumbsdownselect=0x7f02001f;
+        public static final int thumbsup=0x7f020020;
+        public static final int thumbsuplarge=0x7f020021;
+        public static final int thumbsuplargeg=0x7f020022;
+        public static final int thumbsupselect=0x7f020023;
+        public static final int topicicon=0x7f020024;
+        public static final int topicicong=0x7f020025;
     }
     public static final class id {
         public static final int about=0x7f080012;
@@ -63,6 +64,7 @@ public final class R {
         public static final int info=0x7f080008;
         public static final int logo=0x7f080003;
         public static final int mapview=0x7f080006;
+        public static final int settings_option_item=0x7f080013;
         public static final int splashscreen=0x7f08000e;
         public static final int submit=0x7f080002;
         public static final int textmsg=0x7f080007;
@@ -86,16 +88,25 @@ public final class R {
         public static final int drib_menu=0x7f070000;
     }
     public static final class string {
-        public static final int about=0x7f050001;
-        public static final int about_text=0x7f050003;
+        public static final int about=0x7f050009;
+        public static final int about_text=0x7f05000b;
+        public static final int app_description=0x7f050001;
         public static final int app_name=0x7f050000;
-        public static final int help=0x7f050002;
-        public static final int help_text=0x7f050004;
+        public static final int help=0x7f05000a;
+        public static final int help_text=0x7f05000c;
+        public static final int pref_key_num_dribs=0x7f050006;
+        public static final int pref_key_use_gps=0x7f050003;
+        public static final int pref_summary_num_dribs=0x7f050007;
+        public static final int pref_summary_use_gps=0x7f050004;
+        public static final int pref_title_num_dribs=0x7f050008;
+        public static final int pref_title_use_gps=0x7f050005;
+        public static final int settings=0x7f050002;
     }
     public static final class style {
         public static final int Theme_NoBackground=0x7f060000;
     }
     public static final class xml {
-        public static final int widget_provider=0x7f040000;
+        public static final int prefs=0x7f040000;
+        public static final int widget_provider=0x7f040001;
     }
 }

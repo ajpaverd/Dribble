@@ -84,6 +84,8 @@ public class DribActivity extends ListActivity {
 		pd.setIndeterminate(true);
 		pd.setCancelable(true);
 		pd.show();
+		
+		final int results = DribbleSharedPrefs.getNumDribTopics(this);
 
 		Thread getDribs = new Thread()
 		{
@@ -93,7 +95,7 @@ public class DribActivity extends ListActivity {
 				//
 				subjectID = SubjectActivity.SubjectID;
 				subjectName = SubjectActivity.SubjectName;
-				messageList = DribCom.getMessages(subjectID);
+				messageList = DribCom.getMessages(subjectID, results);
 				Log.i(TAG, "Tab Loaded HERE");
 
 				mHandler.post(mUpdateResults);

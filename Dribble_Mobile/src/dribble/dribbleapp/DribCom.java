@@ -19,6 +19,8 @@ import org.apache.http.entity.StringEntity;
 import org.simpleframework.xml.Serializer;
 import org.simpleframework.xml.core.Persister;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.util.Log;
 import dribble.common.Drib;
 import dribble.common.DribList;
@@ -30,7 +32,6 @@ public class DribCom {
 
 	private static String urlToSendRequest;
 	private static final String targetDomain = "50.18.104.62:8080";
-	private static final int results = 5;	
 	private static final String TAG = "DribCom";
 	private static final Serializer serializer = new Persister();
 	
@@ -71,7 +72,7 @@ public class DribCom {
 	}
 	
 	//GET - list of topics
-	public static ArrayList<DribSubject> getTopics() 
+	public static ArrayList<DribSubject> getTopics(int results) 
 	{   
 		Log.i(TAG, "Attempt: Retrieve List of Topics");
 		
@@ -88,7 +89,7 @@ public class DribCom {
 	}
 
 	//GET - messages for a topic 
-	public static ArrayList<Drib> getMessages(int SubjectID) 
+	public static ArrayList<Drib> getMessages(int SubjectID, int results) 
 	{
 		Log.i(TAG, "Application Server Communication");
 		Log.i(TAG, "Attempt: Retrieve all messages for selected topic");

@@ -50,6 +50,8 @@ public class SubjectActivity extends ListActivity {
 		pd.setIndeterminate(true);
 		pd.setCancelable(true);
 		pd.show();
+		
+		final int results = DribbleSharedPrefs.getNumDribTopics(this);
 
 		// Create thread to fetch subjects
 		//
@@ -57,7 +59,7 @@ public class SubjectActivity extends ListActivity {
 		{
 			public void run()
 			{
-				dribTopAr= DribCom.getTopics();
+				dribTopAr= DribCom.getTopics(results);
 				// If returned topics
 				//
 				if (dribTopAr != null)

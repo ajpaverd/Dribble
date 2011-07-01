@@ -35,9 +35,14 @@ public class DribbleTabs extends TabActivity
 	// Creates menu using resource (could be seperated into another class?)
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) 
-	{
+	{		
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.drib_menu, menu);
+		
+		Intent prefsIntent = new Intent(this, DribblePreferencesActivity.class);
+		MenuItem preferences = menu.findItem(R.id.settings_option_item);
+		preferences.setIntent(prefsIntent);
+		
 		return true;
 	}
 
@@ -74,6 +79,9 @@ public class DribbleTabs extends TabActivity
 							});
 			AlertDialog about = builderAbout.create();
 			about.show();
+			return true;
+		case R.id.settings_option_item:
+			getCurrentActivity().startActivity(item.getIntent());
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
