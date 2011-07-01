@@ -18,7 +18,7 @@ import android.util.Log;
 	http://android-developers.blogspot.com/2011/06/deep-dive-into-location.html
 	and http://blog.radioactiveyak.com/2011/06/deep-dive-into-location-part-2-being.html
 */
-public class GpsListener extends Activity implements LocationListener, GpsStatus.Listener, OnSharedPreferenceChangeListener {
+public class GpsListener extends Activity implements LocationListener, GpsStatus.Listener {
 
 	static String provider;
     static LocationManager locationManager;
@@ -28,22 +28,23 @@ public class GpsListener extends Activity implements LocationListener, GpsStatus
 	// minimum distance required between updates (meters)
 	static int minDistance = 2;
     Context mContext;
-	static SharedPreferences prefs;
-	boolean useGPS = false;
     
 	public GpsListener(Context mContext)
 	{
 		this.mContext = mContext;
-		SharedPreferences prefs = mContext.getSharedPreferences(DribbleSharedPrefs.PREFS_NAME, 0);
-        // register preference change listener
-        prefs.registerOnSharedPreferenceChangeListener(this);
 		Log.i("Thread Running", "Location listening thread");
         locationManager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
 		locationManager.addGpsStatusListener(this);
 		// Define the criteria how to select the location provider -> use default
 		// Defualt criteria - find best provider based on accuracy
-		Criteria criteria = new Criteria();
-		provider = locationManager.getBestProvider(criteria, false);
+		if (DribbleSharedPrefs.getUseGPS(mContext))
+		{
+			provider = locationManager.GPS_PROVIDER;
+		}
+		else
+		{
+			provider = locationManager.NETWORK_PROVIDER;
+		}
 		locationManager.requestLocationUpdates(provider, minTime, minDistance, this);
 }
 	
@@ -80,7 +81,7 @@ public class GpsListener extends Activity implements LocationListener, GpsStatus
 	public void onProviderDisabled(String provider)
 	{
 		
-		 if (useGPS)
+		 if (DribbleSharedPrefs.getUseGPS(mContext))
 		 {
 			 provider = locationManager.GPS_PROVIDER;
 		 }
@@ -95,7 +96,7 @@ public class GpsListener extends Activity implements LocationListener, GpsStatus
 	public void onProviderEnabled(String provider)
 	{
 		// find new best provider
-		 if (useGPS)
+		 if (DribbleSharedPrefs.getUseGPS(mContext))
 		 {
 			 provider = locationManager.GPS_PROVIDER;
 		 }
@@ -113,11 +114,5 @@ public class GpsListener extends Activity implements LocationListener, GpsStatus
 
 	public void onGpsStatusChanged(int event) {
 		
-	}
-	
-	public void  onSharedPreferenceChanged  (SharedPreferences  sharedPreferences, String  key)
-	{
-		useGPS = prefs.getBoolean("pref_key_use_gps", false);
-	}
-		 
+	}		 
 }

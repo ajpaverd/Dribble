@@ -17,12 +17,5 @@ public class DribbleSharedPrefs {
         SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, 0);
         return Integer.parseInt(prefs.getString(context.getString(R.string.pref_key_num_dribs), "5"));
     }
- 
-    public static void setUseGPS(Context context, boolean newValue) {
-        SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, 0);
-        Editor prefsEditor = prefs.edit();
-        prefsEditor.putBoolean(context.getString(R.string.pref_key_use_gps),newValue);
-        prefsEditor.commit();
-    }
 }
     
