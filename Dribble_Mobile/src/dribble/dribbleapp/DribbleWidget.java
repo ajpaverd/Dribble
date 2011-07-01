@@ -9,13 +9,12 @@ import android.appwidget.AppWidgetProvider;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 import android.widget.RemoteViews;
 import dribble.common.DribSubject;
 
+// Creates a dribble widget for the homescreen
 public class DribbleWidget extends AppWidgetProvider 
 {
-
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		if (intent.getAction() == null) 
@@ -36,7 +35,6 @@ public class DribbleWidget extends AppWidgetProvider
 
 public static class DribbleService extends IntentService 
 { 
-	
 	public DribbleService() 
 	{
 		super("DribbleWidget$DribbleService"); 

@@ -7,18 +7,24 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 
+// Main activity to show initial help text and logo
 public class DribbleMain extends Activity {
 
-	public void onCreate(Bundle savedInstanceState) {
+	public void onCreate(Bundle savedInstanceState) 
+	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 		
-		GpsListener listener = new GpsListener(this);
+		// Start location listening
+		new GpsListener(this);
 		
 		Button buttonEnter = (Button) findViewById(R.id.buttonEnter);
 
-		buttonEnter.setOnClickListener(new OnClickListener() {
-			public void onClick(View v) {
+		buttonEnter.setOnClickListener(new OnClickListener() 
+		{
+			public void onClick(View v) 
+			{
+				// Create tabs
 				CreateDribActivity.newMessage = false;
 				Intent tabs = new Intent(DribbleMain.this, DribbleTabs.class);
 				DribbleMain.this.startActivity(tabs);

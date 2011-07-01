@@ -1,5 +1,6 @@
 // Authors: Dribble
 // Date: 24 April 2010
+// Updated 01/07/2011
 // Class: DribbleTabs
 
 package dribble.dribbleapp;
@@ -17,43 +18,54 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.TabHost;
 
-public class DribbleTabs extends TabActivity {
-	/** Called when the activity is first created. */
+// Configures and displays all tabs and menu options
+public class DribbleTabs extends TabActivity 
+{
+	private static final String TAG = "DribbleTabs";
+	
+	/** Called when the activity is first created.
+	 * Used to allow updates when screen orientation changes*/
 	@Override
-	public void onConfigurationChanged(Configuration newConfig) {
-		Log.w(TAG, "Override Function - Change Configuration");
+	public void onConfigurationChanged(Configuration newConfig) 
+	{
+		Log.w(TAG, "Orientation Changed");
 		super.onConfigurationChanged(newConfig);
 	}
 
+	// Creates menu using resource (could be seperated into another class?)
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
+	public boolean onCreateOptionsMenu(Menu menu) 
+	{
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.drib_menu, menu);
 		return true;
 	}
 
+	// 
 	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
+	public boolean onOptionsItemSelected(MenuItem item)
+	{
 		// Handle item selection
-		switch (item.getItemId()) {
-		case R.id.help:
-			AlertDialog.Builder builderHelp = new AlertDialog.Builder(this);
-			builderHelp.setMessage(R.string.help_text).setCancelable(true).setTitle("Help")
-					.setNeutralButton("OK",
-							new DialogInterface.OnClickListener() {
-								public void onClick(DialogInterface dialog,
-										int id) {
-									dialog.cancel();
-								}
-							});
+		switch (item.getItemId()) 
+		{
+			// help menu item selected
+		   //
+			case R.id.help:
+				AlertDialog.Builder builderHelp = new AlertDialog.Builder(this);
+				builderHelp.setMessage(R.string.help_text).setCancelable(true).setTitle("Help").setNeutralButton("OK", new DialogInterface.OnClickListener(){
+						public void onClick(DialogInterface dialog, int id) {
+							dialog.cancel();
+						}
+					});
 			AlertDialog help = builderHelp.create();
 			help.show();
 			return true;
+			
+	    // About menu item selected
+		//
 		case R.id.about:
 			AlertDialog.Builder builderAbout = new AlertDialog.Builder(this);
-			builderAbout
-					.setMessage(R.string.about_text)
-					.setCancelable(true).setNeutralButton("OK",
+			builderAbout.setMessage(R.string.about_text).setCancelable(true).setNeutralButton("OK",
 							new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog,
 										int id) {
@@ -68,8 +80,6 @@ public class DribbleTabs extends TabActivity {
 		}
 	}
 
-	private static final String TAG = "DribbleTabs";
-
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
@@ -77,7 +87,6 @@ public class DribbleTabs extends TabActivity {
 		setContentView(R.layout.tabs);
 
 		Resources res = getResources(); // Resource object to get Drawables
-		Log.i(TAG, "Load Drawable Items From Resources");
 		TabHost tabHost = getTabHost(); // The activity TabHost
 		TabHost.TabSpec spec; // Reusable TabSpec for each tab
 		Intent intent; // Reusable Intent for each tab
@@ -92,7 +101,7 @@ public class DribbleTabs extends TabActivity {
 
 		// Do the same for the other tabs
 		intent = new Intent().setClass(this, SubjectActivity.class);
-		spec = tabHost.newTabSpec("subjects").setIndicator("Subjects",
+		spec = tabHost.newTabSpec("topics").setIndicator("Topics",
 				res.getDrawable(R.drawable.ic_tab_topics)).setContent(intent);
 		tabHost.addTab(spec);
 		Log.i(TAG, "Add Tag Tab");

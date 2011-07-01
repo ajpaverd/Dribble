@@ -1,5 +1,6 @@
 // Authors: Dribble
 // Date: 24 April 2010
+// Updated 01/07/2011
 // Class: DribCom
 
 package dribble.dribbleapp;
@@ -24,6 +25,7 @@ import dribble.common.DribList;
 import dribble.common.DribSubject;
 import dribble.common.DribSubjectList;
 
+// Communications class
 public class DribCom {
 
 	private static String urlToSendRequest;
@@ -32,15 +34,17 @@ public class DribCom {
 	private static final String TAG = "DribCom";
 	private static final Serializer serializer = new Persister();
 	
-	@SuppressWarnings("unchecked")
-	private static Object XMLStreamToClass (HttpGet httpGet, Class clss)
+	// Converts/casts XML streams to defined classes
+	private static Object XMLStreamToClass (HttpGet httpGet, Class<?> clss)
 	{
 		try 
 		{
 			Log.i(TAG, "Execute HTTP Request");
 			HttpClient httpClient = HttpUtils.getThreadSafeClient();
+			// Get http response
 			HttpResponse response = httpClient.execute(httpGet);	
 			
+			// initialise object
 			Object obj = null;
 			try 
 			{
@@ -48,29 +52,30 @@ public class DribCom {
 				obj = serializer.read(clss, res);	
 				return obj;
 			} 
-			catch (Exception e) 
+			catch (Exception e)
 			{
-				e.printStackTrace();
+				Log.e(TAG, "Exception: " + e.getMessage());
 				return null;
 			}			
 		} 
 		catch (ClientProtocolException e1) 
 		{  
-			Log.e(TAG, "Client Protocol Exception: " + e1);
+			Log.e(TAG, "Client Protocol Exception: " + e1.getMessage());
 			return null;
 		} 
 		catch (IOException e2) 
 		{  
-			Log.e(TAG, "IO Exception: " + e2);			
+			Log.e(TAG, "IO Exception: " + e2.getMessage());			
 			return null;
 		} 
 	}
 	
-	public static ArrayList<DribSubject> getTopics() //GET - list of topics
+	//GET - list of topics
+	public static ArrayList<DribSubject> getTopics() 
 	{   
-		Log.i(TAG, "Application Server Communication");
 		Log.i(TAG, "Attempt: Retrieve List of Topics");
 		
+		// request url
 		urlToSendRequest =  "http://"+targetDomain+"/Dribble_Communications-war/resources/GetDribSubjects";
 		
 		HttpGet httpGet = new HttpGet(urlToSendRequest + "?latitude=" + GpsListener.getLatitude() + "&longitude=" +
@@ -82,7 +87,8 @@ public class DribCom {
 			return null;
 	}
 
-	public static ArrayList<Drib> getMessages(int SubjectID) //GET - messages for a topic 
+	//GET - messages for a topic 
+	public static ArrayList<Drib> getMessages(int SubjectID) 
 	{
 		Log.i(TAG, "Application Server Communication");
 		Log.i(TAG, "Attempt: Retrieve all messages for selected topic");
@@ -95,17 +101,19 @@ public class DribCom {
 		return dribList.list;
 	} 
 	
-	public static void sendDrib(Object objectToSend) //POST - send message
+	//POST - send message
+	public static void sendDrib(Object objectToSend) 
 	{
-		Log.i(TAG, "Application Server Communication");
-		
 		//Serialise the object
 		StringWriter sw = new StringWriter();
 		Serializer serializer = new Persister();
-		try {				
+		try 
+		{				
 			serializer.write(objectToSend, sw);
-		} catch (Exception e) {
-			e.printStackTrace();
+		} 
+		catch (Exception e) 
+		{
+			Log.e(TAG, "Client Protocol Exception: " + e.getMessage());
 		}
 		String xmlToSend = sw.toString();
 		HttpClient httpClient = HttpUtils.getThreadSafeClient();
@@ -124,10 +132,11 @@ public class DribCom {
 		}
 		catch (ClientProtocolException e1) 
 		{  
-			Log.e(TAG, "Client Protocol Exception: " + e1);
-		} catch (IOException e2) 
+			Log.e(TAG, "Client Protocol Exception: " + e1.getMessage());
+		} 
+		catch (IOException e2) 
 		{  
-			Log.e(TAG, "IO Exception: " + e2); 
+			Log.e(TAG, "IO Exception: " + e2.getMessage()); 
 		}
 	}
 }

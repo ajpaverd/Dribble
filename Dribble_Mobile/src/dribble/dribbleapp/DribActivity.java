@@ -1,6 +1,7 @@
 // Authors: Dribble
 // Date: 24 April 2010
-// Class: MessageActivity
+// Updated 01/07/2011
+// Class: DribActivity
 
 package dribble.dribbleapp;
 
@@ -25,7 +26,7 @@ import dribble.common.Drib;
 
 public class DribActivity extends ListActivity {
 
-	private static final String TAG = "MessageActivity";
+	private static final String TAG = "DribActivity";
 	private static ProgressDialog pd;
 	private static ArrayList<Drib> messageList;
 	private static int subjectID;
@@ -34,45 +35,62 @@ public class DribActivity extends ListActivity {
 	private Handler mHandler = new Handler();
 
 	@Override
-	public void onCreate(Bundle savedInstanceState) {
+	public void onCreate(Bundle savedInstanceState) 
+	{
 		super.onCreate(savedInstanceState);
 		Log.i(TAG, "Tab Loaded");
 		setContentView(R.layout.messages);
 
+		// disable reply button by default if no messages
+		//
 		Button buttonReply = (Button) findViewById(R.id.buttonReply);
 		buttonReply.setEnabled(false);
 		
-		buttonReply.setOnClickListener(new OnClickListener() {
-			public void onClick(View v) {
+		buttonReply.setOnClickListener(new OnClickListener() 
+		{
+			public void onClick(View v) 
+			{
+				// Show create drib activity if reply is clicked
+				//
 				CreateDribActivity.newMessage = false;
-				Intent mainIntent = new Intent(DribActivity.this,
-						CreateDribActivity.class);
+				Intent mainIntent = new Intent(DribActivity.this, CreateDribActivity.class);
 				Log.i(TAG, "Start Dribble Activity");
 				DribActivity.this.startActivity(mainIntent);
 			}
 		});
 		
+		// Disable map if no messages
+		//
 		Button viewMap = (Button) findViewById(R.id.viewMap);
 		viewMap.setEnabled(false);
 		
-		viewMap.setOnClickListener(new OnClickListener() {
-			public void onClick(View v) {
-				Intent maps = new Intent(DribActivity.this,
-						MapsActivity.class);
+		viewMap.setOnClickListener(new OnClickListener()
+		{
+			public void onClick(View v) 
+			{
+				// Display map if show on map is clicked
+				//
+				Intent maps = new Intent(DribActivity.this, MapsActivity.class);
 				DribActivity.this.startActivity(maps);
 			}
 		});
 	}
 
-	private void refreshContent() {
+	private void refreshContent() 
+	{
+		// Show progress dialog
 		pd = new ProgressDialog(this);
 		pd.setMessage("Retrieving Dribs...");
 		pd.setIndeterminate(true);
 		pd.setCancelable(true);
 		pd.show();
 
-		Thread getDribs = new Thread() {
-			public void run() {
+		Thread getDribs = new Thread()
+		{
+			public void run() 
+			{
+				// Get selected subjectID and name and return list of associated messages
+				//
 				subjectID = SubjectActivity.SubjectID;
 				subjectName = SubjectActivity.SubjectName;
 				messageList = DribCom.getMessages(subjectID);
@@ -85,51 +103,68 @@ public class DribActivity extends ListActivity {
 	}
 
 	// Create runnable for posting
-	final Runnable mUpdateResults = new Runnable() {
-		public void run() {
+	//
+	final Runnable mUpdateResults = new Runnable() 
+	{
+		public void run() 
+		{
+			// Update results in main (UI) Thread
+			//
 			updateResultsInUi();
 		}
 	};
 
-	private void updateResultsInUi() {
+	private void updateResultsInUi() 
+	{
 		TextView messageText = (TextView) findViewById(R.id.topicNameForMessages);
-		if (messageList.isEmpty()) {
+		if (messageList.isEmpty()) 
+		{
 			messageText.setText("Topics");
-		} else {
+		} else 
+		{
 			// Get Topic Name from TabActivity Tab
 			messageText.setText(subjectName);
 		}
-		Log.i(TAG, "Topic name set");
 
-		setListAdapter(new DribAdapter(getApplicationContext(),
-				R.layout.message_row, messageList));
+		setListAdapter(new DribAdapter(getApplicationContext(), R.layout.message_row, messageList));
 
 		Log.i(TAG, "Topic Messages Added To Display");
 		
-		 pd.dismiss();
+		// dismiss progress dialog
+		//
+		pd.dismiss();
 	}
 
 	@Override
-	public void onResume() {
+	public void onResume() 
+	{
 		super.onResume();
 		Button buttonReply = (Button) findViewById(R.id.buttonReply);
 		Button viewMap = (Button) findViewById(R.id.viewMap);
-		if (SubjectActivity.SubjectID != -1) {
+		
+		// If a subject is selected, re-enable buttons
+		//
+		if (SubjectActivity.SubjectID != -1) 
+		{
 			refreshContent();
 			buttonReply.setEnabled(true);
 			viewMap.setEnabled(true);
 		}
-
 	}
 
-	private static class ViewHolder {
+	// Class to hold custom list view information
+	//
+	private static class ViewHolder 
+	{
 		TextView message;
 		TextView info;
 		ImageButton like;
 		ImageButton dislike;
 	}
 
-	private String getElapsed(long millis) {
+	// Show elapsed time since post
+	private String getElapsed(long millis) 
+	{
 		long time = millis / 1000;
 		String seconds = Integer.toString((int) (time % 60));
 		String minutes = Integer.toString((int) ((time % 3600) / 60));
@@ -161,49 +196,58 @@ public class DribActivity extends ListActivity {
 		return days + hours + minutes + seconds;
 	}
 
+	// Custom list view implementation
+	//
 	private class DribAdapter extends ArrayAdapter<Drib> {
 
 		private ArrayList<Drib> items;
 
-		public DribAdapter(Context context, int textViewResourceId,
-				ArrayList<Drib> items) {
-
+		// Set list items
+		public DribAdapter(Context context, int textViewResourceId, ArrayList<Drib> items)
+		{
 			super(context, textViewResourceId, items);
 			this.items = items;
-			Log.i(TAG, "Drib Adapter Used");
 		}
 
+		// Override default list view
 		@Override
-		public View getView(int position, View convertView, ViewGroup parent) {
+		public View getView(int position, View convertView, ViewGroup parent) 
+		{
 			final ViewHolder holder;
-			Log.w(TAG, "Override Function - getView Function");
-			if (convertView == null) {
+			if (convertView == null) 
+			{
 				LayoutInflater mInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 				convertView = mInflater.inflate(R.layout.message_row, null);
 
 				holder = new ViewHolder();
-				holder.message = (TextView) convertView
-						.findViewById(R.id.textmsg);
+				holder.message = (TextView) convertView.findViewById(R.id.textmsg);
 				holder.info = (TextView) convertView.findViewById(R.id.info);
-				holder.like = (ImageButton) convertView
-						.findViewById(R.id.buttonlike);
-				holder.dislike = (ImageButton) convertView
-						.findViewById(R.id.buttondislike);
+				holder.like = (ImageButton) convertView.findViewById(R.id.buttonlike);
+				holder.dislike = (ImageButton) convertView.findViewById(R.id.buttondislike);
 
 				convertView.setTag(holder);
-
-			} else {
+			} 
+			else 
+			{
 				holder = (ViewHolder) convertView.getTag();
 			}
 
 			final Drib drib = items.get(position);
 
-			if (drib != null) {
-				holder.like.setOnClickListener(new OnClickListener() {
-					public void onClick(View v) {
+			// Set drib like count
+			if (drib != null)
+			{
+				holder.like.setOnClickListener(new OnClickListener() 
+				{
+					public void onClick(View v) 
+					{
+						// Increase like count
 						drib.setLikeCount(1);
-						new Runnable() {
-							public void run() {
+						new Runnable() 
+						{
+							public void run() 
+							{
+								// send drib like
 								DribCom.sendDrib(drib);
 							}
 						};
@@ -213,11 +257,18 @@ public class DribActivity extends ListActivity {
 					}
 				});
 
-				holder.dislike.setOnClickListener(new OnClickListener() {
-					public void onClick(View v) {
+				// set drib dislike
+				holder.dislike.setOnClickListener(new OnClickListener() 
+				{
+					public void onClick(View v) 
+					{
+						// increase dislike
 						drib.setLikeCount(-1);
-						new Runnable() {
-							public void run() {
+						new Runnable() 
+						{
+							public void run() 
+							{
+								// send displike
 								DribCom.sendDrib(drib);
 							}
 						};
@@ -227,13 +278,10 @@ public class DribActivity extends ListActivity {
 				});
 
 				holder.message.setText(drib.getText());
-				holder.info.setText("Sent : "
-						+ getElapsed(System.currentTimeMillis()
-								- drib.getCurrentTime()) + "ago" + "\nDRank: "
-						+ drib.getPopularity());
-
+				// Create drib info text
+				holder.info.setText("Sent : " + getElapsed(System.currentTimeMillis() - drib.getCurrentTime()) + "ago" + "\nDRank: " + drib.getPopularity());
 			}
-			return convertView;
+			return convertView; // return custom view
 		}
 	}
 

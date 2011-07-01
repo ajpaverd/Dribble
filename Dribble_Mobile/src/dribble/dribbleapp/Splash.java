@@ -1,5 +1,6 @@
 // Authors: Dribble
 // Date: 24 April 2010
+// Updated 01/07/2011
 // Class: Splash
 
 package dribble.dribbleapp;
@@ -16,18 +17,22 @@ import android.util.Log;
 	public class Splash extends Activity {
 		
 		private static final String TAG = "Splash";
+		// Splash screen display length (milliseconds)
 	    private static final int SPLASH_DISPLAY_LENGTH = 3000;
 
 	     @Override
-	     public void onCreate(Bundle icicle) {
+	     public void onCreate(Bundle icicle) 
+	     {
 	          super.onCreate(icicle);
-	          Log.i(TAG, "Dribble Application Started");
+	          Log.i(TAG, "Splash displayed");
 	          setContentView(R.layout.splash);
 	          
 	          /* New Handler to start the Menu-Activity
 	           * and close this Splash-Screen after some seconds.*/
-	          new Handler().postDelayed(new Runnable(){
-	               public void run() {
+	          new Handler().postDelayed(new Runnable()
+	          {
+	               public void run() 
+	               {
 	                    /* Create an Intent that will start the Menu-Activity. */
 	                    Intent mainIntent = new Intent(Splash.this,DribbleMain.class);
 	                    Log.i(TAG, "Start Dribble Activity");
