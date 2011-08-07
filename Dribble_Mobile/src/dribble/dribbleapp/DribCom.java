@@ -5,8 +5,10 @@
 
 package dribble.dribbleapp;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
 
@@ -31,7 +33,9 @@ import dribble.common.DribSubjectList;
 public class DribCom {
 
 	private static String urlToSendRequest;
-	private static final String targetDomain = "50.18.104.62:8080";
+	// 10.0.2.2 resolves to localhost in emulator
+	//
+	private static final String targetDomain = "10.0.2.2:8080";
 	private static final String TAG = "DribCom";
 	private static final Serializer serializer = new Persister();
 	
@@ -50,7 +54,15 @@ public class DribCom {
 			try 
 			{
 				InputStream res = response.getEntity().getContent();
-				obj = serializer.read(clss, res);	
+//				BufferedReader r = new BufferedReader(new InputStreamReader(res));
+//				StringBuilder total = new StringBuilder();
+//				String line;
+//				while ((line = r.readLine()) != null) {
+//				    total.append(line);
+//				}
+//				Log.d(clss.getSimpleName(), total.toString());
+				obj = serializer.read(clss, res);
+				Log.d(clss.getSimpleName(), clss.toString());
 				return obj;
 			} 
 			catch (Exception e)
@@ -111,6 +123,7 @@ public class DribCom {
 		try 
 		{				
 			serializer.write(objectToSend, sw);
+			Log.d(TAG, "Sent: " + sw);
 		} 
 		catch (Exception e) 
 		{

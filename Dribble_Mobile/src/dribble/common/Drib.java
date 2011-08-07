@@ -26,7 +26,7 @@ import android.util.Log;
 	    private int messageID;
 		@Element
 	    private long time;
-		@Element
+		@Element(required = false)
 	    private DribSubject subject;
 		@Element
 	    private int likeCount;
@@ -93,6 +93,7 @@ import android.util.Log;
 	    {
 	        return this.time;
 	    }
+	    
 	    //Set and get the subject for the message
 	    public void setSubject(DribSubject subject)
 	    {
@@ -102,7 +103,6 @@ import android.util.Log;
 	    {
 	        return this.subject;
 	    }
-
 
 	    //Set and get the message id
 	    public void setMessageID(int messageID)
@@ -136,7 +136,4 @@ import android.util.Log;
 	    {
 	        return popularity;
 	    }
-
-
-
 	}

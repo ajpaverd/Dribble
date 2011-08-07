@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Dribble</string>   
-    <string name="app_description">Dribble - the anonymous geosocial networking application</string>   
+    <string name="app_description">Dribble - the anonymous geosocial networking application</string>  
+    
+    <string name="domain_live">50.18.104.62</string> 
+     <string name="domain_dev">10.0.2.2</string> 
     
     <string name="settings">Settings</string>
     
