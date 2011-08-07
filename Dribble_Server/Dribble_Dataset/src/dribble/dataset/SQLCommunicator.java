@@ -182,8 +182,8 @@ public class SQLCommunicator implements Dataset {
 
             Statement stmt = con.createStatement();
             logger.info("Connection Established");
-            ResultSet rs = stmt.executeQuery("SELECT * FROM DRIBBLE_SYSTEM_SUBJECTS");
-
+            // TODO limit subjects near latitude and longitude
+            ResultSet rs = stmt.executeQuery("SELECT * FROM DRIBBLE_SYSTEM_SUBJECTS"); 
             //Add the drib subjects to a drib subject list
             while (rs.next()) {
                 if (!(getDribsInternal(rs.getInt("ID"), lat, longitude, radius).isEmpty())) {
@@ -339,63 +339,33 @@ public class SQLCommunicator implements Dataset {
         return subject;
     }
 
-    @Override
     public boolean deleteOldDribSubjects(long qualifyingTime) {
 
-        //logger.info("Deleting old DribSubjects...");
+        logger.info("Deleting DribSubject...");
 
         try {
             Statement stmt = con.createStatement();
-            Statement stmt1 = con.createStatement();
-
-            ResultSet rs = stmt.executeQuery("SELECT ID, CURRENTIME FROM DRIBBLE_SYSTEM_SUBJECTS");
-
-            int id;
-            long time;
-            while (rs.next()) {
-                id = rs.getInt("ID");
-                time = rs.getLong("CURRENTIME");
-
-                if (time < qualifyingTime) {
-                    stmt1.execute("DROP TABLE \"" + id + "\"");
-                    stmt1.execute("DELETE FROM DRIBBLE_SYSTEM_SUBJECTS WHERE ID = " + id);
-                    logger.info("Deleted dribSubject " + id);
-                }
-
-            }
-
-
+            stmt.execute("DROP TABLE \"(SELECT ID FROM DRIBBLE_SYSTEM_SUBJECTS WHERE CURRENTIME < " + qualifyingTime + " )\" ");
+            stmt.execute("DELETE FROM DRIBBLE_SYSTEM_SUBJECTS WHERE CURRENTIME < " + qualifyingTime);
+            logger.info("Deleted dribSubjects from subjects table");
             return true;
 
         } catch (SQLException e) {
 
-            logger.severe("Error deleting old DribSubjects: " + e.getMessage());
+            logger.severe("Error deleting DribSubject: " + e.getMessage());
 
             return false;
         }
     }
-
-    @Override
+    
     public boolean deleteOldDribs(long qualifyingTime) {
 
-        //logger.info("Deleting old Dribs...");
+        logger.info("Deleting old Dribs...");
 
         try {
-
             Statement stmt = con.createStatement();
-            Statement stmt1 = con.createStatement();
-
-            ResultSet rs = stmt.executeQuery("SELECT ID FROM DRIBBLE_SYSTEM_SUBJECTS");
-
-            int id;
-            while (rs.next()) {
-                id = rs.getInt("ID");
-
-                stmt1.execute("DELETE FROM \"" + id + "\" WHERE CURRENTIME < " + qualifyingTime);
-                logger.info("Dribs Deleted from subject " + id);
-            }
-
-            //logger.info("Deleted old dribs");
+            stmt.execute("DELETE FROM (SELECT ID FROM DRIBBLE_SYSTEM_SUBJECTS) WHERE CURRENTIME < " + qualifyingTime);
+            logger.info("Deleted old dribs");
             return true;
 
         } catch (SQLException e) {
@@ -405,4 +375,7 @@ public class SQLCommunicator implements Dataset {
             return false;
         }
     }
+
+
+
 }

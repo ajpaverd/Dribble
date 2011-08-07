@@ -15,7 +15,7 @@ public class Dribble_Deleter extends Thread {
     private Dataset dataset;
 
     public Dribble_Deleter() {
-        dataset = new SQLCommunicator();
+        dataset = new MongoDBCommunicator();
         logger.info("Deleter connected to DB");
     }
 

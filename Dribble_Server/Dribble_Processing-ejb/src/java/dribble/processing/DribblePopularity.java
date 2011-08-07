@@ -16,6 +16,7 @@ public abstract class DribblePopularity {
     private static DribComparator dribComparator = new DribComparator();
     private static DribSubjectComparator dribSubjectComparator  = new DribSubjectComparator();
 
+    // TODO use mongo 
     public static ArrayList<DribSubject> rankSubjects(ArrayList<DribSubject> input, int latitude, int longitude) {
 
         ListIterator<DribSubject> iterator = input.listIterator();
@@ -39,6 +40,8 @@ public abstract class DribblePopularity {
             deltaLatitude = latitude - current.getLatitude();
             deltaLongitude = longitude - current.getLongitude();
 
+            // TODO When using mongoDB geonear function returns distance between current location and found location
+            //
             //Location difference in kilometers (assuming 8000 microDegrees = 1 km)
             deltaLocation = Math.sqrt(Math.pow(deltaLatitude, 2) + Math.pow(deltaLongitude, 2))/8000.0;
 

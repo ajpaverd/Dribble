@@ -51,7 +51,7 @@ public class getDribSubjectsBean implements MessageListener {
             logger.info("Create queue session");
             queueSession = queueConnection.createQueueSession(true, Session.AUTO_ACKNOWLEDGE);
             logger.info("Create Dataset connection");
-            dataset = new SQLCommunicator();
+            dataset = new MongoDBCommunicator();
 
             logger.info("GetDribSubjectsBean instance created");
 
@@ -64,6 +64,7 @@ public class getDribSubjectsBean implements MessageListener {
 
     }
 
+    @Override
     public void onMessage(Message message) {
 
         logger.info("Processing request received");
@@ -107,6 +108,8 @@ public class getDribSubjectsBean implements MessageListener {
         logger.info("Request parameter: results = " + results);
 
         logger.info("Retrieving DribSubjects from dataset");
+        
+        // TODO get rid of hardcoded radius!
         ArrayList<DribSubject> subjectList = dataset.getDribSubjects(latitude, longitude, 125000);
         //ArrayList<DribSubject> subjectList = testSubjectList();
 

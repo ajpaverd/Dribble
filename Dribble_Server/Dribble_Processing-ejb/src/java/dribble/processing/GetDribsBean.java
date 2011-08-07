@@ -52,7 +52,7 @@ public class GetDribsBean implements MessageListener {
             logger.info("Create queue session");
             queueSession = queueConnection.createQueueSession(true, Session.AUTO_ACKNOWLEDGE);
             logger.info("Create Dataset connection");
-            dataset = new SQLCommunicator();
+            dataset = new MongoDBCommunicator();
 
             logger.info("GetDribsBean instance created");
 

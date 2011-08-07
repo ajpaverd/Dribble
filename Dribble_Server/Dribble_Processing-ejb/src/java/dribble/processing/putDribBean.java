@@ -30,7 +30,7 @@ public class putDribBean implements MessageListener {
 
         logger.info("Constructing PutDribBean");
 
-        dataset = new SQLCommunicator();
+        dataset = new MongoDBCommunicator();
 
         logger.info("PutDribBean instance constructed");
     }
@@ -58,7 +58,6 @@ public class putDribBean implements MessageListener {
 
         //Set or update the times of the Drib and Subject
         drib.setTime(System.currentTimeMillis());
-        drib.getSubject().setTime(System.currentTimeMillis());
 
         //Check if this is a new drib or an update
         if (drib.getMessageID() == 0) {
@@ -74,20 +73,19 @@ public class putDribBean implements MessageListener {
         logger.info("New Drib: " + drib.getText());
 
         //Assign a new message ID
-        drib.setMessageID(DribbleIdentifier.getUniqueID());
+       drib.setMessageID(DribbleIdentifier.getUniqueID());
 
         if (drib.getSubject().getSubjectID() == 0) {
             //Assigin a new subject ID
             drib.getSubject().setSubjectID(DribbleIdentifier.getUniqueID());
         }
-
+       
         //Add to dataset
         boolean result = dataset.addDrib(drib);
 
         if (result == true) {
             logger.info("===== Drib added to dataset =====");
         }
-
     }
 
     //Update the drib in the current dataset
