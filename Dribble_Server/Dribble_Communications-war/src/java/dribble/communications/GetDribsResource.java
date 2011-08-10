@@ -98,14 +98,14 @@ public class GetDribsResource {
             String resultsString = queryParams.getFirst("results");
             String subjectIDString = queryParams.getFirst("subjectID");
 
-            int latitude = Integer.parseInt(latitudeString);
-            int longitude = Integer.parseInt(longitudeString);
+            double latitude = Double.parseDouble(latitudeString);
+            double longitude = Double.parseDouble(longitudeString);
             int results = Integer.parseInt(resultsString);
             int subjectID = Integer.parseInt(subjectIDString);
 
             Message msg = queueSession.createMessage();
-            msg.setIntProperty("latitude", latitude);
-            msg.setIntProperty("longitude", longitude);
+            msg.setDoubleProperty("latitude", latitude);
+            msg.setDoubleProperty("longitude", longitude);
             msg.setIntProperty("results", results);
             msg.setIntProperty("subjectID", subjectID);
 

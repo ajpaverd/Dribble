@@ -13,6 +13,7 @@ public class Dribble_Deleter extends Thread {
 
     static final Logger logger = Logger.getLogger("Dribble_Deleter");
     private Dataset dataset;
+    private boolean DEBUG = false;
 
     public Dribble_Deleter() {
         dataset = new MongoDBCommunicator();
@@ -28,8 +29,12 @@ public class Dribble_Deleter extends Thread {
 
             long qualifyingTime = System.currentTimeMillis() - 172800000;
             //long qualifyingTime = System.currentTimeMillis() - 60000;
+            
+            if (DEBUG)
+            {
             dataset.deleteOldDribSubjects(qualifyingTime);
             dataset.deleteOldDribs(qualifyingTime);
+            }
 
             try {
                 this.currentThread().sleep(60000);

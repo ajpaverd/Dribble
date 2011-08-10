@@ -79,8 +79,8 @@ public class GetDribsBean implements MessageListener {
 
                 QueueSender sender = queueSession.createSender(dest);
 
-                int latitude = message.getIntProperty("latitude");
-                int longitude = message.getIntProperty("longitude");
+                double latitude = message.getDoubleProperty("latitude");
+                double longitude = message.getDoubleProperty("longitude");
                 int results = message.getIntProperty("results");
                 int subjectID = message.getIntProperty("subjectID");
 
@@ -101,7 +101,7 @@ public class GetDribsBean implements MessageListener {
 
     }
 
-    public ArrayList<Drib> getDribs(int latitude, int longitude, int results, int subjectID) {
+    public ArrayList<Drib> getDribs(double latitude, double longitude, int results, int subjectID) {
 
         logger.info("Request parameter: latitude = " + latitude);
         logger.info("Request parameter: longitude = " + longitude);

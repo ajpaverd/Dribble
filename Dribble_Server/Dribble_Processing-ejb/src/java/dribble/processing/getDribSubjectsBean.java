@@ -79,8 +79,8 @@ public class getDribSubjectsBean implements MessageListener {
 
                 QueueSender sender = queueSession.createSender(dest);
 
-                int latitude = message.getIntProperty("latitude");
-                int longitude = message.getIntProperty("longitude");
+                double latitude = message.getDoubleProperty("latitude");
+                double longitude = message.getDoubleProperty("longitude");
                 int results = message.getIntProperty("results");
 
                 ArrayList<DribSubject> subjectList = getDribSubjects(latitude, longitude, results);
@@ -101,7 +101,7 @@ public class getDribSubjectsBean implements MessageListener {
 
     }
 
-    public ArrayList<DribSubject> getDribSubjects(int latitude, int longitude, int results) {
+    public ArrayList<DribSubject> getDribSubjects(double latitude, double longitude, int results) {
 
         logger.info("Request parameter: latitude = " + latitude);
         logger.info("Request parameter: longitude = " + longitude);

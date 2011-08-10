@@ -17,15 +17,15 @@ public abstract class DribblePopularity {
     private static DribSubjectComparator dribSubjectComparator  = new DribSubjectComparator();
 
     // TODO use mongo 
-    public static ArrayList<DribSubject> rankSubjects(ArrayList<DribSubject> input, int latitude, int longitude) {
+    public static ArrayList<DribSubject> rankSubjects(ArrayList<DribSubject> input, double latitude, double longitude) {
 
         ListIterator<DribSubject> iterator = input.listIterator();
         DribSubject current;
 
         int posts;
         int views;
-        int deltaLatitude;
-        int deltaLongitude;
+        double deltaLatitude;
+        double deltaLongitude;
         double deltaLocation;
         double deltaTime;
         double popularityDouble;
@@ -62,14 +62,14 @@ public abstract class DribblePopularity {
 
     }
 
-    public static ArrayList<Drib> rankDribs(ArrayList<Drib> input, int latitude, int longitude) {
+    public static ArrayList<Drib> rankDribs(ArrayList<Drib> input, double latitude, double longitude) {
 
         ListIterator<Drib> iterator = input.listIterator();
         Drib current;
 
         int likeCount;
-        int deltaLatitude;
-        int deltaLongitude;
+        double deltaLatitude;
+        double deltaLongitude;
         double deltaLocation;
         double deltaTime;
         double popularityDouble;

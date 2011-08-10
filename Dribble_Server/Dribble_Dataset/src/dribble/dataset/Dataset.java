@@ -12,9 +12,9 @@ public interface Dataset {
 
     boolean addDrib(Drib m);
 
-    ArrayList<Drib> getDribs(int subjectID, long lat, long longitude, long radius);
+    ArrayList<Drib> getDribs(int subjectID, double lat, double longitude, long radius);
 
-    ArrayList<DribSubject> getDribSubjects(long lat, long longitude, long radius);
+    ArrayList<DribSubject> getDribSubjects(double lat, double longitude, long radius);
 
     boolean deleteDrib(Drib m);
 

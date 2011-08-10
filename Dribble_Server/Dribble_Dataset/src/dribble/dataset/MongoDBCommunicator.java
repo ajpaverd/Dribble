@@ -53,7 +53,7 @@ public class MongoDBCommunicator implements Dataset
 
     @Override
     //Get all the DribSubjects available in a specific region
-    public ArrayList<DribSubject> getDribSubjects(long latitude, long longitude, long radius)
+    public ArrayList<DribSubject> getDribSubjects(double latitude, double longitude, long radius)
     {
         logger.info("Getting all the DribTopics...");
         ArrayList<DribSubject> DribList = new ArrayList<DribSubject>();
@@ -191,7 +191,7 @@ public class MongoDBCommunicator implements Dataset
 
     // Get a list of dribs for a topic
     @Override
-    public ArrayList<Drib> getDribs(int subjectID, long latitude, long longitude, long radius)
+    public ArrayList<Drib> getDribs(int subjectID, double latitude, double longitude, long radius)
     {
         logger.info("Getting Drib messages for a particular subject...");
         ArrayList<Drib> dribs = new ArrayList<Drib>();
@@ -359,5 +359,4 @@ public class MongoDBCommunicator implements Dataset
 
         return drib;
     }
-
 }

@@ -98,13 +98,13 @@ public class GetDribSubjectsResource {
             String longitudeString = queryParams.getFirst("longitude");
             String resultsString = queryParams.getFirst("results");
 
-            int latitude = Integer.parseInt(latitudeString);
-            int longitude = Integer.parseInt(longitudeString);
+            double latitude = Double.parseDouble(latitudeString);
+            double longitude = Double.parseDouble(longitudeString);
             int results = Integer.parseInt(resultsString);
 
             Message msg = queueSession.createMessage();
-            msg.setIntProperty("latitude", latitude);
-            msg.setIntProperty("longitude", longitude);
+            msg.setDoubleProperty("latitude", latitude);
+            msg.setDoubleProperty("longitude", longitude);
             msg.setIntProperty("results", results);
 
             logger.info("Request parameters received");
