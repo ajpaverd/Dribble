@@ -1,0 +1,7 @@
+*.class
+*/dist/
+*/*/dist/
+*/build/
+*/bin/
+*/*/build/
+*/*/bin/
