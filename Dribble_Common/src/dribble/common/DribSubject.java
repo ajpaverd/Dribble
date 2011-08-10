@@ -9,13 +9,13 @@ import java.io.Serializable;
  * @author Dribble
  */
 
-@XmlRootElement(name="dribble.common.DribSubject")
+@XmlRootElement(name="com.dribble.common.DribSubject")
 public class DribSubject implements Serializable{
 
     private String name;
     private int subjectID;
-    private int latitude;
-    private int longitude;
+    private double latitude;
+    private double longitude;
     private int numViews;
     private int numPosts;
     private long time;
@@ -51,22 +51,22 @@ public class DribSubject implements Serializable{
         return this.subjectID;
     }
 
-    public void setLatitude(int latitude)
+    public void setLatitude(double latitude)
     {
         this.latitude = latitude;
     }
 
-    public int getLatitude()
+    public double getLatitude()
     {
         return latitude;
     }
 
-    public void setLongitude(int longitude)
+    public void setLongitude(double longitude)
     {
         this.longitude = longitude;
     }
 
-    public int getLongitude()
+    public double getLongitude()
     {
         return this.longitude;
     }

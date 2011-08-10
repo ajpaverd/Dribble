@@ -10,13 +10,13 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author Dribble
  */
 
-@XmlRootElement(name="dribble.common.Drib")
+@XmlRootElement(name="com.dribble.common.Drib")
 public class Drib implements Serializable {
 
 
     private String text;
-    private int latitude;
-    private int longitude;
+    private double latitude;
+    private double longitude;
     private int messageID;
     private long time;
     private DribSubject subject;
@@ -29,7 +29,7 @@ public class Drib implements Serializable {
     }
 
     //Set the message constructor
-    public Drib(DribSubject Message_subject, String text, int latitude, int longitude)
+    public Drib(DribSubject Message_subject, String text, double latitude, double longitude)
     {
         //Set the message subject
         setSubject(Message_subject);
@@ -54,23 +54,23 @@ public class Drib implements Serializable {
     }
 
     //Set and get the latitude coordinates of the message
-    public void setLatitude(int latitude)
+    public void setLatitude(double latitude)
     {
         this.latitude = latitude;
     }
 
-    public int getLatitude()
+    public double getLatitude()
     {
         return latitude;
     }
 
     //Set and get the longitude coordinates of the message
-    public void setLongitude(int longitude)
+    public void setLongitude(double longitude)
     {
         this.longitude = longitude;
     }
 
-    public int getLongitude()
+    public double getLongitude()
     {
         return this.longitude;
     }
