@@ -19,5 +19,5 @@
     <string name="about">About</string>
     <string name="help">Help</string>   
     <string name="about_text">Dribble\n\nCreated By:\nAndrew Paverd\nAshleigh Campbell\nDaniel Mankowitz\nChad Epstein</string>   
-    <string name="help_text"><b>Maps Tab: </b>Click to see where you are and surrounding subjects.\n\n<b>Subjects Tab: </b>Discover subjects from the area around you.  Click on a subject to retrieve its Dribs.\n\n<b>Dribs Tab: </b>View Dribs for a particular subject and like/dislike them.  Click \'reply\' to reply to the subject.\n\n<b>New Tab: </b>Creates a new Drib, click \'Submit\' to send.</string>
+    <string name="help_text"><b>Maps Tab: </b>Click to see where you are and surrounding topics.\n\n<b>Near Me Tab: </b>Discover topics from the area around you.  Click on a topic to retrieve its Dribs.\n\n<b>Dribs Tab: </b>View Dribs for a particular topic and like/dislike them.  Click on a Drib to view it on the map.  Click \'reply\' to reply to the conversation.\n\n<b>New Tab: </b>Creates a new Drib, click \'Submit\' to send.</string>
 </resources>

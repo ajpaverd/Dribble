@@ -13,23 +13,13 @@
 		android:gravity="center"
 		android:textSize="18sp"
 		android:text="No Messages" />
-		<Button
-		android:id="@+id/viewMap"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:text="Show on Map"
-		android:clickable="true"
-		android:layout_alignParentLeft="true"
-		android:layout_alignParentBottom="true"/>
 	<Button
 		android:id="@+id/buttonReply"
-		android:layout_width="wrap_content"
+		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
 		android:text="Reply"
 		android:clickable="true"
-		android:layout_alignParentRight="true"
-		android:layout_alignParentBottom="true"
-		android:layout_toRightOf="@id/viewMap"/>
+		android:layout_alignParentBottom="true"/>
 		
 	<ListView
 		android:id="@+id/android:list"

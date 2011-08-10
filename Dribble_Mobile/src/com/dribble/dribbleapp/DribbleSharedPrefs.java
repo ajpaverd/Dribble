@@ -1,5 +1,6 @@
-package dribble.dribbleapp;
+package com.dribble.dribbleapp;
 
+import com.dribble.dribbleapp.R;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;

@@ -1,6 +1,10 @@
-package dribble.dribbleapp;
+package com.dribble.dribbleapp;
 
 import java.util.ArrayList;
+
+import com.dribble.common.DribSubject;
+
+import com.dribble.dribbleapp.R;
 
 import android.app.IntentService;
 import android.app.PendingIntent;
@@ -10,7 +14,6 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.widget.RemoteViews;
-import dribble.common.DribSubject;
 
 // Creates a dribble widget for the homescreen
 public class DribbleWidget extends AppWidgetProvider 

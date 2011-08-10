@@ -3,8 +3,9 @@
 // Updated 01/07/2011
 // Class: DribbleTabs
 
-package dribble.dribbleapp;
+package com.dribble.dribbleapp;
 
+import com.dribble.dribbleapp.R;
 import android.app.AlertDialog;
 import android.app.TabActivity;
 import android.content.DialogInterface;
@@ -99,26 +100,26 @@ public class DribbleTabs extends TabActivity
 		TabHost.TabSpec spec; // Reusable TabSpec for each tab
 		Intent intent; // Reusable Intent for each tab
 
-//		// Create an Intent to launch an Activity for the tab (to be reused)
-//		intent = new Intent().setClass(this, MapsActivity.class);
-//		// Initialize a TabSpec for each tab and add it to the TabHost
-//		spec = tabHost.newTabSpec("maps").setIndicator("Map",
-//				res.getDrawable(R.drawable.ic_tab_map)).setContent(intent);
-//		tabHost.addTab(spec);
-//		Log.i(TAG, "Add Maps Tab");
-
 		// Do the same for the other tabs
 		intent = new Intent().setClass(this, SubjectActivity.class);
-		spec = tabHost.newTabSpec("topics").setIndicator("Topics",
+		spec = tabHost.newTabSpec("near_me").setIndicator("Near Me",
 				res.getDrawable(R.drawable.ic_tab_topics)).setContent(intent);
 		tabHost.addTab(spec);
-		Log.i(TAG, "Add Tag Tab");
+		Log.i(TAG, "Add Near Me Tab");
 
 		intent = new Intent().setClass(this, DribActivity.class);
 		spec = tabHost.newTabSpec("msg").setIndicator("Dribs",
 				res.getDrawable(R.drawable.ic_tab_dribs)).setContent(intent);
 		tabHost.addTab(spec);
-		Log.i(TAG, "Add Message Tab");
+		Log.i(TAG, "Add Dribs Tab");
+		
+		// Create an Intent to launch an Activity for the tab (to be reused)
+		intent = new Intent().setClass(this, MapsActivity.class);
+		// Initialize a TabSpec for each tab and add it to the TabHost
+		spec = tabHost.newTabSpec("maps").setIndicator("Map",
+				res.getDrawable(R.drawable.ic_tab_map)).setContent(intent);
+		tabHost.addTab(spec);
+		Log.i(TAG, "Add Maps Tab");
 
 		intent = new Intent().setClass(this, CreateDribActivity.class);
 		spec = tabHost.newTabSpec("make_drib").setIndicator("New",

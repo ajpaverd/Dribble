@@ -1,4 +1,4 @@
-package dribble.dribbleapp;
+package com.dribble.dribbleapp;
 
 import android.app.Activity;
 import android.content.Context;
@@ -55,21 +55,23 @@ public class GpsListener extends Activity implements LocationListener, GpsStatus
 	}
 	
 	// get longitude in millidegress
-	public static int getLongitude()
+	public static double getLongitude()
 	{
 		Location location = locationManager.getLastKnownLocation(provider);
 		if (location!=null)
-			return (int)(location.getLongitude() * 1E6);
+			//return (int)(location.getLongitude() * 1E6);
+			return location.getLongitude();
 		else
 			return 0;
 	}
 	
 	// get latitude in millidegress
-	public static int getLatitude()
+	public static double getLatitude()
 	{
 		Location location = locationManager.getLastKnownLocation(provider);
 		if (location!=null)
-			return (int)(location.getLatitude() * 1E6);
+			//return (int)(location.getLatitude() * 1E6);
+		    return location.getLatitude();
 		else
 			return 0;
 	}

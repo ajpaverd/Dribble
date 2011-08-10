@@ -1,5 +1,6 @@
-package dribble.dribbleapp;
+package com.dribble.dribbleapp;
 
+import com.dribble.dribbleapp.R;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
 
