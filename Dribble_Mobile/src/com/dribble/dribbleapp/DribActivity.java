@@ -155,17 +155,17 @@ public class DribActivity extends ListActivity {
 	private String getElapsed(long millis) 
 	{
 		long time = millis / 1000;
-		String seconds = Integer.toString((int) (time % 60));
+		//String seconds = Integer.toString((int) (time % 60));
 		String minutes = Integer.toString((int) ((time % 3600) / 60));
 		int tempHours = (int) (time / 3600);
 		String days = Integer.toString(tempHours / 24);
 		String hours = Integer.toString(tempHours%24);
 
-		if (seconds.equals("0")) {
-			seconds = "";
-		} else {
-			seconds += "s ";
-		}
+//		if (seconds.equals("0")) {
+//			seconds = "";
+//		} else {
+//			seconds += "s ";
+//		}
 		if (minutes.equals("0")) {
 			minutes = "";
 		} else {
@@ -182,7 +182,8 @@ public class DribActivity extends ListActivity {
 			days += "days ";
 		}
 
-		return days + hours + minutes + seconds;
+		//return days + hours + minutes + seconds;
+		return days + hours + minutes;
 	}
 
 	// Custom list view implementation
@@ -240,15 +241,15 @@ public class DribActivity extends ListActivity {
 					public void onClick(View v) 
 					{
 						// Increase like count
-						drib.setLikeCount(1);
-						new Runnable() 
+						drib.setLikeCount(drib.getLikeCount() + 1);
+						new Thread(new Runnable()
 						{
-							public void run() 
+							public void run()
 							{
 								// send drib like
 								DribCom.sendDrib(drib);
 							}
-						};
+						}).start();
 
 						holder.like.setEnabled(false);
 						holder.dislike.setEnabled(false);
@@ -261,15 +262,15 @@ public class DribActivity extends ListActivity {
 					public void onClick(View v) 
 					{
 						// increase dislike
-						drib.setLikeCount(-1);
-						new Runnable() 
+						drib.setLikeCount(drib.getLikeCount() - 1);
+						new Thread(new Runnable() 
 						{
 							public void run() 
 							{
 								// send displike
 								DribCom.sendDrib(drib);
 							}
-						};
+						}).start();
 						holder.like.setEnabled(false);
 						holder.dislike.setEnabled(false);
 					}

@@ -22,7 +22,7 @@ import com.google.android.maps.OverlayItem;
 
 import com.dribble.dribbleapp.R;
 
-public class MapsActivity extends MapActivity 
+public class MapsActivity extends MapActivity
 {
 	/** Called when the activity is first created. */
 
@@ -30,26 +30,29 @@ public class MapsActivity extends MapActivity
 	MapController mapController;
 	MapView mapView;
 	private static final String TAG = "MapsActivity";
-	public static MapItemizedOverlay Itemizedoverlay;
+	public static MapItemizedOverlay Itemizedoverlay = null;
 
 	@Override
-	protected boolean isRouteDisplayed() 
+	protected boolean isRouteDisplayed()
 	{
 		return false;
 	}
 
-	public void onResume() 
+	public void onResume()
 	{
 		super.onResume();
-	// Navigate to current location - not used anymore since navigating to topic location now
-	//		if (GpsListener.getLocation() != null) 
-	//		{
-	//			GeoPoint geopoint = new GeoPoint(GpsListener.getLatitude(), GpsListener.getLongitude());
-	//			mapController.animateTo(geopoint);
-	//		}
+
+		// Navigate to current location - not used anymore since navigating to
+		// topic location now
+		// if (GpsListener.getLocation() != null)
+		// {
+		// GeoPoint geopoint = new GeoPoint(GpsListener.getLatitude(),
+		// GpsListener.getLongitude());
+		// mapController.animateTo(geopoint);
+		// }
 	}
 
-	public void onCreate(Bundle savedInstanceState) 
+	public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.map);
@@ -58,33 +61,40 @@ public class MapsActivity extends MapActivity
 		mapView = (MapView) findViewById(R.id.mapview);
 		mapView.setBuiltInZoomControls(true);
 
-		//Get overlay items
+		// Get overlay items
 		List<Overlay> mapOverlays = mapView.getOverlays();
 		Drawable drawable = this.getResources().getDrawable(R.drawable.drib_icon_pushpin);
-		Itemizedoverlay = new MapItemizedOverlay(drawable, this);
+		
+		// Itemizedoverlay = new MapItemizedOverlay(drawable, this);
+		//if (Itemizedoverlay == null)
+		{
+			Itemizedoverlay = new MapItemizedOverlay(drawable, mapView);
+			// Set balloon height above icon
+			Itemizedoverlay.setBalloonBottomOffset(40);
+		}
 
 		myLocOverlay = new MyLocationOverlay(this, mapView);
-		//myLocOverlay.enableMyLocation();
+		// myLocOverlay.enableMyLocation();
 		mapOverlays.add(myLocOverlay);
 		mapController = mapView.getController();
 
 		// Not animating to user's location anymore
-		//		myLocOverlay.runOnFirstFix(new Runnable() {
-		//			public void run() {
-		//				mapController.animateTo(myLocOverlay.getMyLocation());
-		//				mapController.setCenter(myLocOverlay.getMyLocation());
-		//				
-		//			}
-		//		});
-		
+		// myLocOverlay.runOnFirstFix(new Runnable() {
+		// public void run() {
+		// mapController.animateTo(myLocOverlay.getMyLocation());
+		// mapController.setCenter(myLocOverlay.getMyLocation());
+		//
+		// }
+		// });
+
 		// Get selected subject
 		if (SubjectActivity.CurrentDribSubject != null)
 		{
 			DribSubject dribSubj = SubjectActivity.CurrentDribSubject;
-			GeoPoint geopoint = new GeoPoint((int)(dribSubj.getLatitude() * 1E6),(int) (dribSubj.getLongitude() *1E6));
+			GeoPoint geopoint = new GeoPoint((int) (dribSubj.getLatitude() * 1E6), (int) (dribSubj.getLongitude() * 1E6));
 			OverlayItem overlayitem = new OverlayItem(geopoint, "Drib Topic", dribSubj.getName());
-		    Itemizedoverlay.addOverlay(overlayitem);
-		    mapController.setZoom(16);
+			Itemizedoverlay.addOverlay(overlayitem);
+			mapController.setZoom(16);
 			mapController.animateTo(geopoint);
 		}
 

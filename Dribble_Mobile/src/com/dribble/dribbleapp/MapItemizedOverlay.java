@@ -9,27 +9,32 @@ import java.util.ArrayList;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
+import android.widget.Toast;
 
 import com.google.android.maps.ItemizedOverlay;
+import com.google.android.maps.MapView;
 import com.google.android.maps.OverlayItem;
+import com.readystatesoftware.mapviewballoons.BalloonItemizedOverlay;
 
 // Class to add overlay items to Google map
-public class MapItemizedOverlay extends ItemizedOverlay<OverlayItem> {
+//public class MapItemizedOverlay extends ItemizedOverlay<OverlayItem> {
+	public class MapItemizedOverlay extends BalloonItemizedOverlay<OverlayItem>{
 
 	private static ArrayList<OverlayItem> mOverlays = new ArrayList<OverlayItem>();
 	private static Context mContext;
 
-	public MapItemizedOverlay(Drawable defaultMarker) 
+	public MapItemizedOverlay(Drawable defaultMarker, MapView mapView) 
 	{
 		// draws marker like a "pin"
-		super(boundCenterBottom(defaultMarker));
+		super(boundCenterBottom(defaultMarker), mapView);
+		mContext = mapView.getContext();
 	}
 
-	public MapItemizedOverlay(Drawable defaultMarker, Context context) 
-	{
-		super(boundCenterBottom(defaultMarker));
-		mContext = context;
-	}
+//	public MapItemizedOverlay(Drawable defaultMarker, Context context) 
+//	{
+//		super(boundCenterBottom(defaultMarker));
+//		mContext = context;
+//	}
 
 	public void addOverlay(OverlayItem overlay) 
 	{
@@ -55,11 +60,20 @@ public class MapItemizedOverlay extends ItemizedOverlay<OverlayItem> {
 		return mOverlays.size();
 	}
 
-	// Show title of overlay on tap
+//	// Show title of overlay on tap
+//	@Override
+//	public boolean onTap(int index) 
+//	{
+//		OverlayItem item = mOverlays.get(index);
+//		AlertDialog.Builder dialog = new AlertDialog.Builder(mContext);
+//		dialog.setTitle(item.getTitle());
+//		dialog.setMessage(item.getSnippet());
+//		dialog.show();
+//		return true;
+//	}
+	
 	@Override
-	public boolean onTap(int index) 
-	{
-		OverlayItem item = mOverlays.get(index);
+	protected boolean onBalloonTap(int index, OverlayItem item) {
 		AlertDialog.Builder dialog = new AlertDialog.Builder(mContext);
 		dialog.setTitle(item.getTitle());
 		dialog.setMessage(item.getSnippet());

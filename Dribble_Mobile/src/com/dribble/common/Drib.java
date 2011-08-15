@@ -26,8 +26,9 @@ import android.util.Log;
 	    private int messageID;
 		@Element
 	    private long time;
-		@Element(required = false)
+		@Element
 	    private DribSubject subject;
+		//private int subjectID;
 		@Element
 	    private int likeCount;
 		@Element

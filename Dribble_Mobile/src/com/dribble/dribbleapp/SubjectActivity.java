@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import com.dribble.common.DribSubject;
 
 import com.dribble.dribbleapp.R;
+import com.google.android.maps.GeoPoint;
+import com.google.android.maps.OverlayItem;
 
 import android.app.ListActivity;
 import android.app.ProgressDialog;
@@ -89,20 +91,20 @@ public class SubjectActivity extends ListActivity {
 		getDribSubjects.start();
 	}
 	
-//	// Create thread for adding all topics to map
-//	final Runnable mAddOverlays = new Runnable() {
-//		public void run()
-//		{
-//			OverlayItem overlayitem;
-//			MapsActivity.Itemizedoverlay.clearOverlays();
-//			for(int i = 0; i< dribTopAr.size(); i++)			{
-//				DribSubject ds = ((DribSubject)(dribTopAr.toArray())[i]);
-//				GeoPoint point = new GeoPoint((int)(ds.getLatitude()),(int)(ds.getLongitude()));
-//			    overlayitem = new OverlayItem(point, "Drib Topic", ds.getName());
-//			    MapsActivity.Itemizedoverlay.addOverlay(overlayitem);
-//			}
-//		}
-//	};
+	// Create thread for adding all topics to map
+	final Runnable mAddOverlays = new Runnable() {
+		public void run()
+		{
+			OverlayItem overlayitem;
+			MapsActivity.Itemizedoverlay.clearOverlays();
+			for(DribSubject subject : dribTopAr)
+			{			
+				GeoPoint point = new GeoPoint((int)(subject.getLatitude()),(int)(subject.getLongitude()));
+			    overlayitem = new OverlayItem(point, "Drib Topic", subject.getName());
+			    MapsActivity.Itemizedoverlay.addOverlay(overlayitem);
+			}
+		}
+	};
 	
 	// Create runnable for posting
 	final Runnable mUpdateResults = new Runnable() 
