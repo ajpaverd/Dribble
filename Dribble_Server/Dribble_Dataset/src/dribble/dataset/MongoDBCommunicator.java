@@ -219,7 +219,8 @@ public class MongoDBCommunicator implements Dataset
 
         // Temporary, might be better to use Morphia library to annotate Drib and DribSubject classes
         BasicDBList list = (BasicDBList) topic.get("dribs");
-        for (int i = 0; i < list.size(); i++)
+        int numDribs = list.size();
+        for (int i = 0; i < numDribs; i++)
         {
             DBObject doc = (DBObject) list.get(i);
 
@@ -234,6 +235,14 @@ public class MongoDBCommunicator implements Dataset
             drib.setText(doc.get("drib").toString());
             drib.setTime(Long.valueOf(doc.get("currentTime").toString()));
             drib.setPopularity(Integer.valueOf(doc.get("dribPopularity").toString()));
+            
+            // TODO get rid of eventually - each drib shouldn't contain whole subject
+            //-------------------------------------------------------------------
+            DribSubject subject = new DribSubject();
+            subject.setSubjectID(Integer.valueOf(topic.get("_id").toString()));
+            subject.setName(topic.get("name").toString());
+            drib.setSubject(subject);
+            //-------------------------------------------------------------------
 
             dribs.add(drib);
         }
@@ -310,28 +319,29 @@ public class MongoDBCommunicator implements Dataset
         return true;
     }
 
-    // Haven't tested, not used
     @Override
     public boolean updateDrib(Drib m)
-    {
-        BasicDBObject newDrib = new BasicDBObject();
-
-        newDrib.put("lat", m.getLatitude());
-        newDrib.put("long", m.getLongitude());
-        newDrib.put("_id", m.getMessageID());
-        newDrib.put("dribPopularity", m.getPopularity());
-        newDrib.put("dribLike", m.getLikeCount());
-        newDrib.put("currentTime", m.getTime());
-        newDrib.put("drib", m.getText());
-
+    {        
         QueryBuilder query = new QueryBuilder();
         // Set criteria to get topics within certain radius from location
-        DBObject criteria = query.start("dribs._id").is(Integer.valueOf(m.getMessageID())).get();
+        DBObject topicCriteria = query.start("_id").is(Integer.valueOf(m.getSubject().getSubjectID())).get();
 
         // Fetch first topic matching criteria
-        DBObject drib = dribTopics.findOne(criteria);
-
-        dribTopics.update(drib, newDrib);
+        DBObject topic = dribTopics.findOne(topicCriteria);
+        
+        BasicDBList list = (BasicDBList) topic.get("dribs");
+        int numDribs = list.size();
+        
+        for (int i = 0; i < numDribs; i++)
+        {
+            DBObject doc = (DBObject) list.get(i);
+            if (Integer.valueOf(doc.get("_id").toString()) == m.getMessageID())
+            {
+               doc.put("dribLike",  m.getLikeCount());
+               dribTopics.update(topic, list);
+               dribTopics.save(topic);
+            }
+        }               
 
         return true;
     }

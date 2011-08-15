@@ -98,7 +98,6 @@ public class GetDribsBean implements MessageListener {
         } catch (JMSException jmse) {
             logger.info("JMS exception: " + jmse.getMessage());
         }
-
     }
 
     public ArrayList<Drib> getDribs(double latitude, double longitude, int results, int subjectID) {
@@ -124,99 +123,99 @@ public class GetDribsBean implements MessageListener {
 
     }
 
-    public ArrayList<Drib> testDribList() {
-
-        ArrayList<Drib> testList = new ArrayList<Drib>();
-
-        Drib a = new Drib();
-        a.setText("All the fires are out");
-        a.setLatitude(108000);
-        a.setLongitude(108000);
-        a.setLikeCount(5);
-        a.setTime(System.currentTimeMillis() - 300000);
-        a.setMessageID(30);
-        a.setSubject(new DribSubject());
-        a.getSubject().setName("No Fire");
-        a.getSubject().setLatitude(108000);
-        a.getSubject().setLongitude(108000);
-        a.getSubject().setNumPosts(3);
-        a.getSubject().setSubjectID(25);
-        a.getSubject().setPopularity(100);
-        a.getSubject().setTime(System.currentTimeMillis()-300000);
-
-        Drib b = new Drib();
-        b.setText("Its cold now");
-        b.setLatitude(108000);
-        b.setLongitude(108000);
-        b.setLikeCount(5);
-        b.setTime(System.currentTimeMillis());
-        b.setMessageID(40);
-        b.setSubject(new DribSubject());
-        b.getSubject().setName("No Fire");
-        b.getSubject().setLatitude(108000);
-        b.getSubject().setLongitude(108000);
-        b.getSubject().setNumPosts(3);
-        b.getSubject().setSubjectID(25);
-        b.getSubject().setPopularity(100);
-        b.getSubject().setTime(System.currentTimeMillis());
-
-        Drib c = new Drib();
-        c.setText("Hi Chad");
-        c.setLatitude(108000);
-        c.setLongitude(108000);
-        c.setLikeCount(5);
-        c.setTime(System.currentTimeMillis() - 150000);
-        c.setMessageID(50);
-        c.setSubject(new DribSubject());
-        c.getSubject().setName("No Fire");
-        c.getSubject().setLatitude(108000);
-        c.getSubject().setLongitude(108000);
-        c.getSubject().setNumPosts(3);
-        c.getSubject().setSubjectID(25);
-        c.getSubject().setPopularity(100);
-        c.getSubject().setTime(System.currentTimeMillis()-150000);
-
-        Drib d = new Drib();
-        d.setText("Hi Ash");
-        d.setLatitude(108000);
-        d.setLongitude(108000);
-        d.setLikeCount(5);
-        d.setTime(System.currentTimeMillis() - 150000);
-        d.setMessageID(51);
-        d.setSubject(new DribSubject());
-        d.getSubject().setName("No Fire");
-        d.getSubject().setLatitude(108000);
-        d.getSubject().setLongitude(108000);
-        d.getSubject().setNumPosts(3);
-        d.getSubject().setSubjectID(45);
-        d.getSubject().setPopularity(100);
-        d.getSubject().setTime(System.currentTimeMillis()-150000);
-
-        Drib e = new Drib();
-        e.setText("Hi Dribble");
-        e.setLatitude(108000);
-        e.setLongitude(108000);
-        e.setLikeCount(5);
-        e.setTime(System.currentTimeMillis() - 150000);
-        e.setMessageID(52);
-        e.setSubject(new DribSubject());
-        e.getSubject().setName("No Fire");
-        e.getSubject().setLatitude(108000);
-        e.getSubject().setLongitude(108000);
-        e.getSubject().setNumPosts(3);
-        e.getSubject().setSubjectID(46);
-        e.getSubject().setPopularity(100);
-        e.getSubject().setTime(System.currentTimeMillis()-150000);
-
-        testList.add(a);
-        testList.add(b);
-        testList.add(c);
-        testList.add(d);
-        testList.add(e);
-
-        return testList;
-
-    }
+//    public ArrayList<Drib> testDribList() {
+//
+//        ArrayList<Drib> testList = new ArrayList<Drib>();
+//
+//        Drib a = new Drib();
+//        a.setText("All the fires are out");
+//        a.setLatitude(108000);
+//        a.setLongitude(108000);
+//        a.setLikeCount(5);
+//        a.setTime(System.currentTimeMillis() - 300000);
+//        a.setMessageID(30);
+//        a.setSubject(new DribSubject());
+//        a.getSubject().setName("No Fire");
+//        a.getSubject().setLatitude(108000);
+//        a.getSubject().setLongitude(108000);
+//        a.getSubject().setNumPosts(3);
+//        a.getSubject().setSubjectID(25);
+//        a.getSubject().setPopularity(100);
+//        a.getSubject().setTime(System.currentTimeMillis()-300000);
+//
+//        Drib b = new Drib();
+//        b.setText("Its cold now");
+//        b.setLatitude(108000);
+//        b.setLongitude(108000);
+//        b.setLikeCount(5);
+//        b.setTime(System.currentTimeMillis());
+//        b.setMessageID(40);
+//        b.setSubject(new DribSubject());
+//        b.getSubject().setName("No Fire");
+//        b.getSubject().setLatitude(108000);
+//        b.getSubject().setLongitude(108000);
+//        b.getSubject().setNumPosts(3);
+//        b.getSubject().setSubjectID(25);
+//        b.getSubject().setPopularity(100);
+//        b.getSubject().setTime(System.currentTimeMillis());
+//
+//        Drib c = new Drib();
+//        c.setText("Hi Chad");
+//        c.setLatitude(108000);
+//        c.setLongitude(108000);
+//        c.setLikeCount(5);
+//        c.setTime(System.currentTimeMillis() - 150000);
+//        c.setMessageID(50);
+//        c.setSubject(new DribSubject());
+//        c.getSubject().setName("No Fire");
+//        c.getSubject().setLatitude(108000);
+//        c.getSubject().setLongitude(108000);
+//        c.getSubject().setNumPosts(3);
+//        c.getSubject().setSubjectID(25);
+//        c.getSubject().setPopularity(100);
+//        c.getSubject().setTime(System.currentTimeMillis()-150000);
+//
+//        Drib d = new Drib();
+//        d.setText("Hi Ash");
+//        d.setLatitude(108000);
+//        d.setLongitude(108000);
+//        d.setLikeCount(5);
+//        d.setTime(System.currentTimeMillis() - 150000);
+//        d.setMessageID(51);
+//        d.setSubject(new DribSubject());
+//        d.getSubject().setName("No Fire");
+//        d.getSubject().setLatitude(108000);
+//        d.getSubject().setLongitude(108000);
+//        d.getSubject().setNumPosts(3);
+//        d.getSubject().setSubjectID(45);
+//        d.getSubject().setPopularity(100);
+//        d.getSubject().setTime(System.currentTimeMillis()-150000);
+//
+//        Drib e = new Drib();
+//        e.setText("Hi Dribble");
+//        e.setLatitude(108000);
+//        e.setLongitude(108000);
+//        e.setLikeCount(5);
+//        e.setTime(System.currentTimeMillis() - 150000);
+//        e.setMessageID(52);
+//        e.setSubject(new DribSubject());
+//        e.getSubject().setName("No Fire");
+//        e.getSubject().setLatitude(108000);
+//        e.getSubject().setLongitude(108000);
+//        e.getSubject().setNumPosts(3);
+//        e.getSubject().setSubjectID(46);
+//        e.getSubject().setPopularity(100);
+//        e.getSubject().setTime(System.currentTimeMillis()-150000);
+//
+//        testList.add(a);
+//        testList.add(b);
+//        testList.add(c);
+//        testList.add(d);
+//        testList.add(e);
+//
+//        return testList;
+//
+//    }
 
     @Override
     protected void finalize() throws Throwable {

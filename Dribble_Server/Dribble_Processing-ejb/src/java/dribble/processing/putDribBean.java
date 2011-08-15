@@ -92,32 +92,33 @@ public class putDribBean implements MessageListener {
     public void updateDrib(Drib drib) {
         logger.info("Update Drib: " + drib.getText());
 
-        int dribID = drib.getMessageID();
-        DribSubject subject = drib.getSubject();
+        //int dribID = drib.getMessageID();
+        //DribSubject subject = drib.getSubject();
 
-        //Get the drib with corresponding ID from the dataset
-        Drib existingDrib = dataset.getDrib(subject.getSubjectID(), dribID);
+        ////Get the drib with corresponding ID from the dataset
+        //Drib existingDrib = dataset.getDrib(subject.getSubjectID(), dribID);
 
-        if (existingDrib != null) {
+        //if (existingDrib != null) {
 
             //Combine the existing like count with the -1, 0 or +1 update
-            int likeCount = existingDrib.getLikeCount() + drib.getLikeCount();
-            existingDrib.setLikeCount(likeCount);
+           // int likeCount = existingDrib.getLikeCount() + drib.getLikeCount();
+            //existingDrib.setLikeCount(likeCount);
 
             //Update the existing drib in the dataset
-            boolean result = dataset.updateDrib(existingDrib);
+            //boolean result = dataset.updateDrib(existingDrib);
+            boolean result = dataset.updateDrib(drib);
 
             if (result == true) {
                 logger.info("===== Drib updated in dataset =====");
             }
 
-        } else {
-            boolean result = dataset.addDrib(drib);
+//        } else {
+//            boolean result = dataset.addDrib(drib);
+//
+//            if (result == true) {
+//                logger.info("===== Drib added to dataset =====");
+//            }
 
-            if (result == true) {
-                logger.info("===== Drib added to dataset =====");
-            }
-
-        }
+        //}
     }
 }
