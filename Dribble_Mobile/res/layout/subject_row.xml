@@ -1,10 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TextView
+<RelativeLayout
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	android:layout_width="fill_parent"
+	android:layout_height="?android:attr/listPreferredItemHeight">
+	<TextView
+	android:layout_width="fill_parent"
 	android:layout_height="wrap_content"
+	android:id="@+id/subjectText"
 	android:padding="10dp"
 	android:textSize="16sp"
 	android:gravity="left"
-	android:drawableLeft="@drawable/drib_icon_2_smallest" >
-</TextView>
+	android:drawableLeft="@drawable/drib_icon_2_smallest" />
+	<TextView
+	android:id="@+id/subjectInfo"
+	android:layout_width="wrap_content"
+	android:layout_height="wrap_content"
+	android:layout_below="@id/subjectText"
+	android:layout_alignParentLeft="@id/subjectText"
+	android:textSize="12sp" />
+</RelativeLayout>

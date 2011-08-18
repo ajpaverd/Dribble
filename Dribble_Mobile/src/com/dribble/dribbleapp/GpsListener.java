@@ -1,5 +1,8 @@
 package com.dribble.dribbleapp;
 
+import java.util.Calendar;
+import java.util.List;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -14,29 +17,31 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 /* 
-	Location listener class, should update to use method described in 
-	http://android-developers.blogspot.com/2011/06/deep-dive-into-location.html
-	and http://blog.radioactiveyak.com/2011/06/deep-dive-into-location-part-2-being.html
-*/
-public class GpsListener extends Activity implements LocationListener, GpsStatus.Listener {
+ Location listener class, should update to use method described in 
+ http://android-developers.blogspot.com/2011/06/deep-dive-into-location.html
+ and http://blog.radioactiveyak.com/2011/06/deep-dive-into-location-part-2-being.html
+ */
+public class GpsListener extends Activity implements LocationListener,
+		GpsStatus.Listener
+{
 
 	static String provider;
-    static LocationManager locationManager;
+	static LocationManager locationManager;
 	static Criteria criteria = new Criteria();
 	// minimum time between updates (milliseconds)
-	static int minTime = 6000;
+	static final int minTime = 60000;
 	// minimum distance required between updates (meters)
-	static int minDistance = 2;
-    Context mContext;
-    
+	static final int minDistance = 50;
+	Context mContext;
+	
 	public GpsListener(Context mContext)
 	{
 		this.mContext = mContext;
 		Log.i("Thread Running", "Location listening thread");
-        locationManager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
+		locationManager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
 		locationManager.addGpsStatusListener(this);
-		// Define the criteria how to select the location provider -> use default
-		// Defualt criteria - find best provider based on accuracy
+
+		// Ignoring GPS Preference for now
 		if (DribbleSharedPrefs.getUseGPS(mContext))
 		{
 			provider = locationManager.GPS_PROVIDER;
@@ -46,75 +51,84 @@ public class GpsListener extends Activity implements LocationListener, GpsStatus
 			provider = locationManager.NETWORK_PROVIDER;
 		}
 		locationManager.requestLocationUpdates(provider, minTime, minDistance, this);
-}
-	
+	}
+
+	// Get best location based on accuracy and time, otherwise just most recent
 	public static Location getLocation()
 	{
-		Location location = locationManager.getLastKnownLocation(provider);
-	    return location;
+		Location bestResult = null;
+		long bestTime = Long.MAX_VALUE;
+		float bestAccuracy = Float.MAX_VALUE;
+		
+		List<String> matchingProviders = locationManager.getAllProviders();
+		for (String provider : matchingProviders)
+		{
+			Location location = locationManager.getLastKnownLocation(provider);
+			if (location != null)
+			{
+				float accuracy = location.getAccuracy();
+				long time = System.currentTimeMillis() - location.getTime();
+
+				if ((time > minTime && accuracy < bestAccuracy))
+				{
+					bestResult = location;
+					bestAccuracy = accuracy;
+					bestTime = time;
+				}
+				else if (time < minTime && bestAccuracy == Float.MAX_VALUE && time > bestTime)
+				{
+					bestResult = location;
+					bestTime = time;
+				}
+			}
+		}
+		return bestResult;
 	}
-	
-	// get longitude in millidegress
-	public static double getLongitude()
+
+	public void onLocationChanged(Location location)
 	{
-		Location location = locationManager.getLastKnownLocation(provider);
-		if (location!=null)
-			//return (int)(location.getLongitude() * 1E6);
-			return location.getLongitude();
-		else
-			return 0;
-	}
-	
-	// get latitude in millidegress
-	public static double getLatitude()
-	{
-		Location location = locationManager.getLastKnownLocation(provider);
-		if (location!=null)
-			//return (int)(location.getLatitude() * 1E6);
-		    return location.getLatitude();
-		else
-			return 0;
-	}
-	
-	public void onLocationChanged(Location location) {
-		Log.i("Location change", "" + location.getLatitude() * 1E6 + " : " + location.getLongitude() * 1E6);
+		Log.i("Location change",
+				"" + location.getLatitude() + " : " + location.getLongitude());
 	}
 
 	public void onProviderDisabled(String provider)
 	{
-		
-		 if (DribbleSharedPrefs.getUseGPS(mContext))
-		 {
-			 provider = locationManager.GPS_PROVIDER;
-		 }
-		 else
-		 {
+		if (DribbleSharedPrefs.getUseGPS(mContext))
+		{
+			provider = locationManager.GPS_PROVIDER;
+		}
+		else
+		{
 			// find new best provider
-			 provider = locationManager.NETWORK_PROVIDER;
-		 }
-		locationManager.requestLocationUpdates(provider, minTime, minDistance, this);
+			provider = locationManager.NETWORK_PROVIDER;
+		}
+		locationManager.requestLocationUpdates(provider, minTime, minDistance,
+				this);
 	}
 
 	public void onProviderEnabled(String provider)
 	{
 		// find new best provider
-		 if (DribbleSharedPrefs.getUseGPS(mContext))
-		 {
-			 provider = locationManager.GPS_PROVIDER;
-		 }
-		 else
-		 {
-			 provider = locationManager.NETWORK_PROVIDER;
-		 }
-		
-		locationManager.requestLocationUpdates(provider, minTime, minDistance, this);
+		if (DribbleSharedPrefs.getUseGPS(mContext))
+		{
+			provider = locationManager.GPS_PROVIDER;
+		}
+		else
+		{
+			provider = locationManager.NETWORK_PROVIDER;
+		}
+
+		locationManager.requestLocationUpdates(provider, minTime, minDistance,
+				this);
 	}
 
-	public void onStatusChanged(String provider, int status, Bundle extras) {
+	public void onStatusChanged(String provider, int status, Bundle extras)
+	{
 
 	}
 
-	public void onGpsStatusChanged(int event) {
-		
-	}		 
+	public void onGpsStatusChanged(int event)
+	{
+
+	}
 }

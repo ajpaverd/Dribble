@@ -4,35 +4,45 @@
 
 package com.dribble.dribbleapp;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
+import com.dribble.common.Drib;
 import com.dribble.common.DribSubject;
 
 import com.dribble.dribbleapp.R;
 import com.google.android.maps.GeoPoint;
+import com.google.android.maps.MyLocationOverlay;
 import com.google.android.maps.OverlayItem;
 
 import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.app.TabActivity;
+import android.content.Context;
+import android.content.Intent;
+import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TabHost;
+import android.widget.TextView;
 
 public class SubjectActivity extends ListActivity {
 
 	private static final String TAG = "TagActivity";
 	
 	// Store static selected subject and name
-	public static int SubjectID = -1; // Default subject ID
-	public static String SubjectName = "No Messages";
 	public static DribSubject CurrentDribSubject = null;
+	private static Location myLoc;
 	
 	private ProgressDialog pd;
 	private Handler mHandler = new Handler();
@@ -56,6 +66,9 @@ public class SubjectActivity extends ListActivity {
 		pd.setCancelable(true);
 		pd.show();
 		
+		// Get current location
+	    myLoc = GpsListener.getLocation();
+		
 		final int results = DribbleSharedPrefs.getNumDribTopics(this);
 
 		// Create thread to fetch subjects
@@ -78,12 +91,13 @@ public class SubjectActivity extends ListActivity {
 					Log.i(TAG, "Received List of Topics");
 					mHandler.post(mUpdateResults);
 					
-					//mHandler.post(mAddOverlays);	don't add all subjects to map anymore
+					mHandler.post(mAddOverlays);
 				}
-//				else
-//				{
-//					Displays default "no subjects" message
-//				}
+				else
+				{
+					CurrentDribSubject = null;
+				}
+				//If no topics, displays default "no topics available" message
 			}
 		};
 		
@@ -96,12 +110,15 @@ public class SubjectActivity extends ListActivity {
 		public void run()
 		{
 			OverlayItem overlayitem;
-			MapsActivity.Itemizedoverlay.clearOverlays();
-			for(DribSubject subject : dribTopAr)
-			{			
-				GeoPoint point = new GeoPoint((int)(subject.getLatitude()),(int)(subject.getLongitude()));
-			    overlayitem = new OverlayItem(point, "Drib Topic", subject.getName());
-			    MapsActivity.Itemizedoverlay.addOverlay(overlayitem);
+			if (MapsActivity.Itemizedoverlay != null)
+			{
+				MapsActivity.Itemizedoverlay.clearOverlays();
+				for(DribSubject subject : dribTopAr)
+				{			
+					GeoPoint point = new GeoPoint((int)(subject.getLatitude()),(int)(subject.getLongitude()));
+				    overlayitem = new OverlayItem(point, "Drib Topic", subject.getName());
+				    MapsActivity.Itemizedoverlay.addOverlay(overlayitem);
+				}
 			}
 		}
 	};
@@ -118,7 +135,7 @@ public class SubjectActivity extends ListActivity {
 	private void updateResultsInUi()
 	{
 		// Set list view
-	  setListAdapter(new ArrayAdapter<String>(this, R.layout.subject_row, topicNames));
+	  setListAdapter(new SubjectAdapter(getApplicationContext(), R.layout.subject_row, dribTopAr));
 	  
 	  // dismiss dialog
 	  pd.dismiss();
@@ -134,9 +151,7 @@ public class SubjectActivity extends ListActivity {
 	    	Log.i(TAG, "List Item Clicked");
 	    	DribSubject selectedTopic = ((DribSubject)(dribTopAr.toArray())[position]);
 	    	
-	    	SubjectID = selectedTopic.getSubjectID();
 	    	CurrentDribSubject = selectedTopic;
-	    	SubjectName = selectedTopic.getName();
 	    	TabActivity tabActivity = (TabActivity)getParent();
 	    	TabHost tabHost = tabActivity.getTabHost();
 	    	tabHost.setCurrentTab(1);
@@ -148,5 +163,92 @@ public class SubjectActivity extends ListActivity {
 	{
 	    super.onResume();
 			refreshContent();
+	}
+	
+	// Class to hold custom list view information
+	//
+	private static class ViewHolder 
+	{
+		TextView message;
+		TextView info;
+	}
+	
+	// Show elapsed time since post
+	private String getElapsed(long millis) 
+	{
+		long time = millis / 1000;
+		//String seconds = Integer.toString((int) (time % 60));
+		String minutes = Integer.toString((int) ((time % 3600) / 60));
+		int tempHours = (int) (time / 3600);
+		String days = Integer.toString(tempHours / 24);
+		String hours = Integer.toString(tempHours%24);
+
+		minutes += "min ";
+		if (hours.equals("0")) {
+			hours = "";
+		} else {
+			hours += "hrs ";
+		}
+		if (days.equals("0")) {
+			days = "";
+		} else {
+			days += "days ";
+		}
+
+		return days + hours + minutes;
+	}
+	
+	// Custom list view implementation
+	//
+	private class SubjectAdapter extends ArrayAdapter<DribSubject> {
+
+		private ArrayList<DribSubject> items;
+
+		// Set list items
+		public SubjectAdapter(Context context, int textViewResourceId, ArrayList<DribSubject> items)
+		{
+			super(context, textViewResourceId, items);
+			this.items = items;
+		}
+
+		// Override default list view
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent) 
+		{
+			final ViewHolder holder;
+			if (convertView == null) 
+			{
+				LayoutInflater mInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+				convertView = mInflater.inflate(R.layout.subject_row, null);
+
+				holder = new ViewHolder();
+				holder.message = (TextView) convertView.findViewById(R.id.subjectText);
+				holder.info = (TextView) convertView.findViewById(R.id.subjectInfo);
+				convertView.setTag(holder);
+			} 
+			else 
+			{
+				holder = (ViewHolder) convertView.getTag();
+			}
+
+			final DribSubject subject = items.get(position);
+
+			if (subject != null)
+			{
+				holder.message.setText(subject.getName());
+				
+				Location subjectLoc = new Location("Subject Location");
+				subjectLoc.setLatitude(subject.getLatitude());
+				subjectLoc.setLongitude(subject.getLongitude());
+				
+				// Get distance in km
+				double distance = myLoc.distanceTo(subjectLoc)/1000;
+				DecimalFormat df = new DecimalFormat("#.##"); 
+				
+				// Set info text
+				holder.info.setText(df.format(distance) + " km " + "("+ getElapsed(System.currentTimeMillis() - subject.getTime()) + "ago)" ); // + "\nDRank: " + drib.getPopularity());
+			}
+			return convertView; // return custom view
+		}
 	}
 }

@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<RelativeLayout
+<ScrollView
+	xmlns:android="http://schemas.android.com/apk/res/android"
 	android:layout_width="fill_parent"
-	android:layout_height="wrap_content"
-	xmlns:android="http://schemas.android.com/apk/res/android">
+	android:layout_height="fill_parent">
+	<RelativeLayout
+		android:layout_width="fill_parent"
+		android:layout_height="fill_parent">	
 	<EditText
 		android:id="@+id/topicInput"
 		android:layout_width="fill_parent"
@@ -10,22 +13,29 @@
 		android:inputType="textShortMessage"
 		android:maxLength="20"
 		android:hint="Topic" />
-	<EditText
-		android:id="@+id/dribInput"
-		android:layout_width="fill_parent"
-		android:layout_height="wrap_content"
-		android:gravity="top"
-		android:focusable="true"
-		android:inputType="textShortMessage|textAutoCorrect|textMultiLine"
-		android:imeOptions="actionSend|flagNoEnterAction"
-		android:lines="4"
-		android:maxLength="144"
-		android:hint="Drib"
-		android:layout_below="@id/topicInput" />
 	<Button
 		android:id="@+id/submit"
-		android:layout_width="fill_parent"
-		android:layout_height="wrap_content"
-		android:layout_below="@id/dribInput"
+		android:layout_width="wrap_content"
+		android:layout_height="fill_parent"
+		android:layout_below="@id/topicInput"
+		android:layout_alignParentRight="true"
+		android:lines="5"
+		android:width="80dp"
 		android:text="Submit" />
-</RelativeLayout>
+	<EditText
+		android:id="@+id/dribInput"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_below="@id/topicInput"
+		android:inputType="textShortMessage|textMultiLine"
+		android:imeOptions="actionSend|flagNoEnterAction"
+		android:layout_alignParentLeft="true"
+		android:layout_toLeftOf="@id/submit"
+		android:lines="4"
+		android:gravity="top"
+		android:maxLength="144"
+		android:hint="Drib"/>
+	</RelativeLayout>
+</ScrollView>
+
+

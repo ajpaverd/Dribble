@@ -2,10 +2,14 @@
 <RelativeLayout
   xmlns:android="http://schemas.android.com/apk/res/android"
   android:layout_width="fill_parent"
-  android:layout_height="fill_parent">
+  android:layout_height="fill_parent"
+  android:background="@drawable/widget_bg_normal">
   <ImageView android:id="@+id/dribble_icon"
 	  android:layout_height="wrap_content"
 	  android:layout_width="wrap_content"
+	  android:layout_centerHorizontal="true"
+	  android:paddingLeft="20dp"
+	  android:paddingTop="25dp"
 	  android:src="@drawable/drib_icon_2_small"
 	  android:clickable="true"
 	  android:layout_alignParentLeft="true"/>
@@ -14,5 +18,7 @@
 	  android:layout_width="fill_parent"
 	  android:layout_toRightOf="@id/dribble_icon"
 	  android:text="Please Wait"
+	  android:paddingTop="25dp"
+	  android:textColor="@android:color/black"
 	  android:textSize="15dip"/>
 </RelativeLayout>
