@@ -110,7 +110,8 @@ public class getDribSubjectsBean implements MessageListener {
         logger.info("Retrieving DribSubjects from dataset");
         
         // TODO get rid of hardcoded radius!
-        ArrayList<DribSubject> subjectList = dataset.getDribSubjects(latitude, longitude, 125000);
+        // Radius in km
+        ArrayList<DribSubject> subjectList = dataset.getDribSubjects(latitude, longitude, 5);
         //ArrayList<DribSubject> subjectList = testSubjectList();
 
         logger.info("Calculating popularity scores");
@@ -124,46 +125,46 @@ public class getDribSubjectsBean implements MessageListener {
         return subjectList;
     }
 
-    private ArrayList<DribSubject> testSubjectList() {
-
-        ArrayList<DribSubject> testList = new ArrayList<DribSubject>();
-
-        DribSubject a = new DribSubject();
-        a.setName("DribSubject A");
-        a.setNumViews(2);
-        a.setNumPosts(2);
-        a.setLatitude(108000);
-        a.setLongitude(108000);
-        a.setTime(System.currentTimeMillis()-300000);
-        a.setSubjectID(25);
-
-
-        DribSubject b = new DribSubject();
-        b.setName("DribSubject B");
-        b.setNumViews(2);
-        b.setNumPosts(2);
-        b.setLatitude(108000);
-        b.setLongitude(108000);
-        b.setTime(System.currentTimeMillis()-60000);
-        b.setSubjectID(26);
-
-
-        DribSubject c = new DribSubject();
-        c.setName("DribSubject C");
-        c.setNumViews(2);
-        c.setNumPosts(2);
-        c.setLatitude(108000);
-        c.setLongitude(108000);
-        c.setTime(System.currentTimeMillis()-300000);
-        c.setSubjectID(27);
-
-        testList.add(a);
-        testList.add(b);
-        testList.add(c);
-
-        return testList;
-
-    }
+//    private ArrayList<DribSubject> testSubjectList() {
+//
+//        ArrayList<DribSubject> testList = new ArrayList<DribSubject>();
+//
+//        DribSubject a = new DribSubject();
+//        a.setName("DribSubject A");
+//        a.setNumViews(2);
+//        a.setNumPosts(2);
+//        a.setLatitude(108000);
+//        a.setLongitude(108000);
+//        a.setTime(System.currentTimeMillis()-300000);
+//        a.setSubjectID(25);
+//
+//
+//        DribSubject b = new DribSubject();
+//        b.setName("DribSubject B");
+//        b.setNumViews(2);
+//        b.setNumPosts(2);
+//        b.setLatitude(108000);
+//        b.setLongitude(108000);
+//        b.setTime(System.currentTimeMillis()-60000);
+//        b.setSubjectID(26);
+//
+//
+//        DribSubject c = new DribSubject();
+//        c.setName("DribSubject C");
+//        c.setNumViews(2);
+//        c.setNumPosts(2);
+//        c.setLatitude(108000);
+//        c.setLongitude(108000);
+//        c.setTime(System.currentTimeMillis()-300000);
+//        c.setSubjectID(27);
+//
+//        testList.add(a);
+//        testList.add(b);
+//        testList.add(c);
+//
+//        return testList;
+//
+//    }
 
     @Override
     protected void finalize() throws Throwable {

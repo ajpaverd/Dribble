@@ -58,10 +58,11 @@ public class MongoDBCommunicator implements Dataset
         logger.info("Getting all the DribTopics...");
         ArrayList<DribSubject> DribList = new ArrayList<DribSubject>();
 
-        QueryBuilder query = new QueryBuilder();
         // Set criteria to get topics within certain radius from location
         // NB: needs 'loc' to be indexed before use
-        DBObject criteria = query.start("loc").near(longitude, latitude).get();
+        double earthRadius = 6378; // km - needed to convert radius in 'near' command from radians to km
+        QueryBuilder query = new QueryBuilder();
+        DBObject criteria = query.start("loc").near(longitude, latitude, radius/earthRadius).get();
 
         // Fetch first topics matching criteria
         DBCursor cur = dribTopics.find(criteria);
@@ -97,7 +98,7 @@ public class MongoDBCommunicator implements Dataset
     public boolean addDrib(Drib m)
     {
         logger.info("Adding a Drib to the database...");
-        
+
         int subjectID = m.getSubject().getSubjectID();
 
         // Find if their is an existing topic (_id)
@@ -152,44 +153,26 @@ public class MongoDBCommunicator implements Dataset
         drib.put("currentTime", m.getTime());
         drib.put("drib", m.getText());
 
-        // If new topic insert single drib into embedded array in topic
-        if (isNewTopic)
-        {
-            ArrayList list = new ArrayList();
-            list.add(drib);
-            topic.put("dribs", list);
-            dribTopics.save(topic);
-        }
-        else
-        {
-            BasicDBObject addDrib = new BasicDBObject().append("$push", 
-                    new BasicDBObject().append("dribs", drib));
-            try
-            {
-                dribTopics.update(topic, addDrib);
-            }
-            catch (MongoException me)
-            {
-                logger.severe(String.format("Unable to update Drib with ID {0}:", m.getMessageID()) + me.getMessage());
-            }
-        }
-
-        // Update topic posts
-        BasicDBObject viewedTopic = new BasicDBObject().append("$inc", 
+        // Add drib to array, and increase post count
+        BasicDBObject addDrib = new BasicDBObject().append("$push",
+                new BasicDBObject().append("dribs", drib)).append("$inc",
                 new BasicDBObject().append("posts", 1));
+        
+        // Does upsert, ie. insert array if new topic, add to array if existing
         try
         {
-            dribTopics.update(topic, viewedTopic);
+            dribTopics.update(topic, addDrib, true, false);
         }
         catch (MongoException me)
         {
-            logger.severe(String.format("Unable to update Drib with ID {0}:", m.getMessageID()) + me.getMessage());
+            logger.severe(String.format("Unable to add Drib with ID {0}:", m.getMessageID()) + me.getMessage());
         }
 
         return true;
     }
 
     // Get a list of dribs for a topic
+    // TODO: not limiting by location or radius here
     @Override
     public ArrayList<Drib> getDribs(int subjectID, double latitude, double longitude, long radius)
     {
@@ -197,7 +180,6 @@ public class MongoDBCommunicator implements Dataset
         ArrayList<Drib> dribs = new ArrayList<Drib>();
 
         QueryBuilder query = new QueryBuilder();
-        // Set criteria to get topics within certain radius from location
         DBObject criteria = query.start("_id").is(Integer.valueOf(subjectID)).get();
 
         // Fetch first topic matching criteria
@@ -205,9 +187,8 @@ public class MongoDBCommunicator implements Dataset
 
         // Update topic views and current time
         BasicDBObject viewedTopic = new BasicDBObject().append("$inc",
-                new BasicDBObject().append("views", 1)).append("$set", 
+                new BasicDBObject().append("views", 1)).append("$set",
                 new BasicDBObject().append("currentTime", System.currentTimeMillis()));
-
         try
         {
             dribTopics.update(topic, viewedTopic);
@@ -235,7 +216,7 @@ public class MongoDBCommunicator implements Dataset
             drib.setText(doc.get("drib").toString());
             drib.setTime(Long.valueOf(doc.get("currentTime").toString()));
             drib.setPopularity(Integer.valueOf(doc.get("dribPopularity").toString()));
-            
+
             // TODO get rid of eventually - each drib shouldn't contain whole subject
             //-------------------------------------------------------------------
             DribSubject subject = new DribSubject();
@@ -249,12 +230,12 @@ public class MongoDBCommunicator implements Dataset
 
         return dribs;
     }
-    
-       @Override
+
+    @Override
     public boolean deleteOldDribSubjects(long qualifyingTime)
     {
         logger.info("Deleting old DribSubjects...");
-         
+
         BasicDBObject removeCriteria = new BasicDBObject();
         removeCriteria.put("currentTime", new BasicDBObject("$lt", qualifyingTime));
 
@@ -275,9 +256,9 @@ public class MongoDBCommunicator implements Dataset
     public boolean deleteOldDribs(long qualifyingTime)
     {
         logger.info("Deleting old Dribs...");
-         
+
         BasicDBObject removeCriteria = new BasicDBObject();
-        removeCriteria.put("currentTime", 
+        removeCriteria.put("currentTime",
                 new BasicDBObject("$lt", qualifyingTime));
 
         try
@@ -292,7 +273,6 @@ public class MongoDBCommunicator implements Dataset
 
         return true;
     }
-    
 
     // Haven't tested, not used
     @Override
@@ -321,27 +301,27 @@ public class MongoDBCommunicator implements Dataset
 
     @Override
     public boolean updateDrib(Drib m)
-    {        
+    {
         QueryBuilder query = new QueryBuilder();
         // Set criteria to get topics within certain radius from location
         DBObject topicCriteria = query.start("_id").is(Integer.valueOf(m.getSubject().getSubjectID())).get();
 
         // Fetch first topic matching criteria
         DBObject topic = dribTopics.findOne(topicCriteria);
-        
+
         BasicDBList list = (BasicDBList) topic.get("dribs");
         int numDribs = list.size();
-        
+
         for (int i = 0; i < numDribs; i++)
         {
             DBObject doc = (DBObject) list.get(i);
             if (Integer.valueOf(doc.get("_id").toString()) == m.getMessageID())
             {
-               doc.put("dribLike",  m.getLikeCount());
-               dribTopics.update(topic, list);
-               dribTopics.save(topic);
+                doc.put("dribLike", m.getLikeCount());
+                dribTopics.update(topic, list);
+                dribTopics.save(topic);
             }
-        }               
+        }
 
         return true;
     }
