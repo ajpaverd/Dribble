@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <RelativeLayout
 	android:layout_width="fill_parent"
 	android:layout_height="wrap_content"
@@ -13,19 +12,32 @@
 		android:gravity="center"
 		android:textSize="18sp"
 		android:text="No Messages" />
+	<EditText
+		android:id="@+id/replyDrib"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:inputType="textShortMessage|textMultiLine"
+		android:imeOptions="actionSend|flagNoEnterAction"
+		android:gravity="top"
+		android:maxLines="4"
+		android:maxLength="144"
+		android:width = "230dp"
+		android:layout_alignParentBottom="true"
+		android:layout_alignParentLeft="true"
+		android:hint="Drib"/>
 	<Button
 		android:id="@+id/buttonReply"
-		android:layout_width="fill_parent"
+		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:text="Reply"
 		android:clickable="true"
-		android:layout_alignParentBottom="true"/>
-		
+		android:layout_alignParentBottom="true"
+		android:layout_alignParentRight="true"
+		android:layout_toRightOf="@id/replyDrib"/>
 	<ListView
 		android:id="@+id/android:list"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:layout_below="@id/topicNameForMessages"
 		android:layout_above="@id/buttonReply" />
-
 </RelativeLayout>

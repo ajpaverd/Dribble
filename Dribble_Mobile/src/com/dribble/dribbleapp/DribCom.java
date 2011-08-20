@@ -25,10 +25,11 @@ import com.dribble.common.Drib;
 import com.dribble.common.DribList;
 import com.dribble.common.DribSubject;
 import com.dribble.common.DribSubjectList;
-import com.dribble.dribbleapp.Utilities.HttpUtils;
+import com.dribble.dribbleapp.utilities.HttpUtils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.location.Location;
 import android.util.Log;
 
 // Communications class
@@ -93,8 +94,9 @@ public class DribCom {
 		// request url
 		urlToSendRequest =  "http://"+targetDomain+"/Dribble_Communications-war/resources/GetDribSubjects";
 		
-		HttpGet httpGet = new HttpGet(urlToSendRequest + "?latitude=" + GpsListener.getLatitude() + "&longitude=" +
-				GpsListener.getLongitude() + "&results=" + results);
+		Location loc = GpsListener.getLocation();
+		HttpGet httpGet = new HttpGet(urlToSendRequest + "?latitude=" + loc.getLatitude() + "&longitude=" +
+				loc.getLongitude() + "&results=" + results);
 		DribSubjectList subjectList =  (DribSubjectList)XMLStreamToClass(httpGet, DribSubjectList.class);
 		if (subjectList != null)
 			return subjectList.list;
@@ -110,7 +112,8 @@ public class DribCom {
        
 		urlToSendRequest = "http://"+targetDomain+"/Dribble_Communications-war/resources/GetDribs";
 			
-		HttpGet httpGet = new HttpGet(urlToSendRequest+ "?latitude=" + GpsListener.getLatitude() + "&longitude=" + GpsListener.getLongitude() +
+		Location loc = GpsListener.getLocation();
+		HttpGet httpGet = new HttpGet(urlToSendRequest+ "?latitude=" + loc.getLatitude() + "&longitude=" + loc.getLongitude() +
 				"&results=" + results +"&subjectID=" + SubjectID);
 		DribList dribList =  (DribList)XMLStreamToClass(httpGet, DribList.class);
 		return dribList.list;

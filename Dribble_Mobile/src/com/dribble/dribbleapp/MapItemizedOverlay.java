@@ -17,7 +17,6 @@ import com.google.android.maps.OverlayItem;
 import com.readystatesoftware.mapviewballoons.BalloonItemizedOverlay;
 
 // Class to add overlay items to Google map
-//public class MapItemizedOverlay extends ItemizedOverlay<OverlayItem> {
 	public class MapItemizedOverlay extends BalloonItemizedOverlay<OverlayItem>{
 
 	private static ArrayList<OverlayItem> mOverlays = new ArrayList<OverlayItem>();
@@ -29,12 +28,6 @@ import com.readystatesoftware.mapviewballoons.BalloonItemizedOverlay;
 		super(boundCenterBottom(defaultMarker), mapView);
 		mContext = mapView.getContext();
 	}
-
-//	public MapItemizedOverlay(Drawable defaultMarker, Context context) 
-//	{
-//		super(boundCenterBottom(defaultMarker));
-//		mContext = context;
-//	}
 
 	public void addOverlay(OverlayItem overlay) 
 	{
@@ -59,18 +52,6 @@ import com.readystatesoftware.mapviewballoons.BalloonItemizedOverlay;
 	{
 		return mOverlays.size();
 	}
-
-//	// Show title of overlay on tap
-//	@Override
-//	public boolean onTap(int index) 
-//	{
-//		OverlayItem item = mOverlays.get(index);
-//		AlertDialog.Builder dialog = new AlertDialog.Builder(mContext);
-//		dialog.setTitle(item.getTitle());
-//		dialog.setMessage(item.getSnippet());
-//		dialog.show();
-//		return true;
-//	}
 	
 	@Override
 	protected boolean onBalloonTap(int index, OverlayItem item) {

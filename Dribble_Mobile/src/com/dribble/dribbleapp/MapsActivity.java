@@ -30,7 +30,7 @@ public class MapsActivity extends MapActivity
 	MapController mapController;
 	MapView mapView;
 	private static final String TAG = "MapsActivity";
-	public static MapItemizedOverlay Itemizedoverlay = null;
+	public static MapItemizedOverlay Itemizedoverlay;
 
 	@Override
 	protected boolean isRouteDisplayed()
@@ -50,29 +50,9 @@ public class MapsActivity extends MapActivity
 		// GpsListener.getLongitude());
 		// mapController.animateTo(geopoint);
 		// }
-	}
-
-	public void onCreate(Bundle savedInstanceState)
-	{
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.map);
-
-		// set view and map controls
-		mapView = (MapView) findViewById(R.id.mapview);
-		mapView.setBuiltInZoomControls(true);
-
 		// Get overlay items
 		List<Overlay> mapOverlays = mapView.getOverlays();
-		Drawable drawable = this.getResources().getDrawable(R.drawable.drib_icon_pushpin);
 		
-		// Itemizedoverlay = new MapItemizedOverlay(drawable, this);
-		//if (Itemizedoverlay == null)
-		{
-			Itemizedoverlay = new MapItemizedOverlay(drawable, mapView);
-			// Set balloon height above icon
-			Itemizedoverlay.setBalloonBottomOffset(40);
-		}
-
 		myLocOverlay = new MyLocationOverlay(this, mapView);
 		// myLocOverlay.enableMyLocation();
 		mapOverlays.add(myLocOverlay);
@@ -106,5 +86,25 @@ public class MapsActivity extends MapActivity
 
 		mapOverlays.add(Itemizedoverlay);
 		Log.i(TAG, "Add Itemized Overlay onto Map");
+	}
+
+	public void onCreate(Bundle savedInstanceState)
+	{
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.map);
+
+		// set view and map controls
+		mapView = (MapView) findViewById(R.id.mapview);
+		mapView.setBuiltInZoomControls(true);
+
+		Drawable drawable = this.getResources().getDrawable(R.drawable.drib_icon_pushpin);
+		
+		// Itemizedoverlay = new MapItemizedOverlay(drawable, this);
+		if (Itemizedoverlay == null)
+		{
+			Itemizedoverlay = new MapItemizedOverlay(drawable, mapView);
+			// Set balloon height above icon
+			Itemizedoverlay.setBalloonBottomOffset(30);
+		}
 	}
 }

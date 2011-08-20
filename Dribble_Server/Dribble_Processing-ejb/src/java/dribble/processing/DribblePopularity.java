@@ -42,8 +42,8 @@ public abstract class DribblePopularity {
 
             // TODO When using mongoDB geonear function returns distance between current location and found location
             //
-            //Location difference in kilometers (assuming 8000 microDegrees = 1 km)
-            deltaLocation = Math.sqrt(Math.pow(deltaLatitude, 2) + Math.pow(deltaLongitude, 2))/8000.0;
+            //Location difference in kilometers
+            deltaLocation = Math.sqrt(Math.pow(deltaLatitude, 2) + Math.pow(deltaLongitude, 2));
 
             //Time difference in 5 minute multiples
             deltaTime = ((System.currentTimeMillis() - current.getTime()) / (300000.0));
@@ -83,8 +83,8 @@ public abstract class DribblePopularity {
             deltaLatitude = latitude - current.getLatitude();
             deltaLongitude = longitude - current.getLongitude();
 
-            //Location difference in kilometers (assuming 8000 microDegrees = 1 km)
-            deltaLocation = Math.sqrt(Math.pow(deltaLatitude, 2) + Math.pow(deltaLongitude, 2))/8000.0;
+            //Location difference in kilometers
+            deltaLocation = Math.sqrt(Math.pow(deltaLatitude, 2) + Math.pow(deltaLongitude, 2));
 
             //Time difference in 5 minute multiples
             deltaTime = ((System.currentTimeMillis() - current.getTime()) / (300000.0));

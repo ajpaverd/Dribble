@@ -13,6 +13,7 @@ import com.dribble.dribbleapp.R;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.TabActivity;
+import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -26,17 +27,18 @@ import android.widget.Toast;
 public class CreateDribActivity extends Activity
 {
 	private static final String TAG = "CreateDribActivity";
-	public static boolean newMessage = false;
 	private static DribSubject dribSubject;
 	// private static ProgressDialog pd;
 	private static Handler mHandler = new Handler();
 
+	public CreateDribActivity()
+	{
+	}
+	
 	public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
 		Log.i(TAG, "Tab Loaded");
-		// default to creating new drib
-		newMessage = true;
 		// Reuse same view for new/replied messages
 		setContentView(R.layout.input_drib);
 	}
@@ -46,14 +48,6 @@ public class CreateDribActivity extends Activity
 	public void refreshContent()
 	{
 		final EditText dribTopic = (EditText) findViewById(R.id.topicInput);
-
-		// Set and hide Drib Topic if replying to existing topic
-		//
-		if (newMessage == false)
-		{
-			dribSubject = SubjectActivity.CurrentDribSubject;
-			dribTopic.setVisibility(EditText.GONE);
-		}
 
 		// Submit button event
 		Button buttonSubmit = (Button) findViewById(R.id.submit);
@@ -65,53 +59,72 @@ public class CreateDribActivity extends Activity
 
 				// Get topic and name from view
 				String dribTopicName = dribTopic.getText().toString();
-				EditText dribMessage = (EditText) findViewById(R.id.dribInput);
-				String dribText = dribMessage.getText().toString();
 
 				// Make sure all inputs are filled in
-				if ((dribTopicName.equals("") && newMessage) || dribText.equals(""))
+				if (dribTopicName.equals(""))
 				{
 					// Show error message
 					new AlertDialog.Builder(CreateDribActivity.this)
 							.setTitle("Error")
-							.setMessage("Inputs Can't be Empty")
+							.setMessage("Topic cannot be empty")
 							.setPositiveButton("OK", null).show();
 				}
 				else
 				{
-					// Data is ok
-
 					// Create Topic for new Drib
-					if (newMessage)
-						dribSubject = new DribSubject(dribTopicName, GpsListener.getLatitude(), GpsListener.getLongitude());
+					Location loc = GpsListener.getLocation();
+					dribSubject = new DribSubject(dribTopicName, loc.getLatitude(), loc.getLongitude());
 
-					// Create new drib
-					final Drib newDrib = new Drib(dribSubject, dribText, GpsListener.getLatitude(), GpsListener.getLongitude());
-					Log.i(TAG, "Submit new message");
-
-					// Ignoring progress dialog for now, might look better
-					// without it - Chad
-					// pd = new ProgressDialog(v.getContext());
-					// pd.setMessage("Sending Drib...");
-					// pd.setIndeterminate(true);
-					// pd.setCancelable(true);
-					// pd.show();
-
-					// Create a new Thread and send Drib
-					Thread sendDrib = new Thread()
-					{
-						public void run()
-						{
-							// send drib
-							DribCom.sendDrib(newDrib);
-							// Call this method once action is complete
-							mHandler.post(mUpdateResults);
-						}
-					};
-					sendDrib.start();
+					EditText dribMessage = (EditText) findViewById(R.id.dribInput);
+					String dribText = dribMessage.getText().toString();
+					
+					// Send drib for a subject
+					sendDrib(dribSubject, dribText);
 				}
 			}
 		});
+	}
+	
+	public void sendDrib(DribSubject subject, String message)
+	{		
+		if (message.equals(""))
+		{
+			// Show error message
+			new AlertDialog.Builder(CreateDribActivity.this)
+					.setTitle("Error")
+					.setMessage("Drib cannot be empty")
+					.setPositiveButton("OK", null).show();
+		}
+		else
+		{
+			// Data is ok
+
+			// Create new drib
+			Location loc = GpsListener.getLocation();
+			final Drib newDrib = new Drib(subject, message, loc.getLatitude(), loc.getLongitude());
+			Log.i(TAG, "Submit new message");
+
+			// Ignoring progress dialog for now, might look better
+			// without it - Chad
+			// pd = new ProgressDialog(v.getContext());
+			// pd.setMessage("Sending Drib...");
+			// pd.setIndeterminate(true);
+			// pd.setCancelable(true);
+			// pd.show();
+
+			// Create a new Thread and send Drib
+			Thread sendDrib = new Thread()
+			{
+				public void run()
+				{
+					// send drib
+					DribCom.sendDrib(newDrib);
+					// Call this method once action is complete
+					mHandler.post(mUpdateResults);
+				}
+			};
+			sendDrib.start();
+		}
 	}
 
 	// Create runnable for posting
@@ -130,18 +143,14 @@ public class CreateDribActivity extends Activity
 		// pd.dismiss();
 
 		Log.i(TAG, "Message Successfully Submitted");
-		// Create toast (popup) to show send complete
-		Toast success = Toast.makeText(getApplicationContext(), "Message sent successfully", Toast.LENGTH_SHORT);
-		success.show();
 
 		// Set tab to first tab (subjects)
 		TabActivity tabActivity = (TabActivity) getParent();
-		if (tabActivity == null)
+		if (tabActivity != null)
 		{
-			this.finish();
-		}
-		else
-		{
+			// Create toast (popup) to show send complete
+			Toast success = Toast.makeText(this, "Message sent successfully", Toast.LENGTH_SHORT);
+			success.show();
 			TabHost tabHost = tabActivity.getTabHost();
 			tabHost.setCurrentTab(0);
 		}
@@ -151,12 +160,6 @@ public class CreateDribActivity extends Activity
 	public void onResume()
 	{
 		super.onResume();
-
-		// If no parent, assume message is a reply
-		if ((TabActivity) getParent() == null)
-		{
-			newMessage = false;
-		}
 		refreshContent();
 	}
 
@@ -165,12 +168,8 @@ public class CreateDribActivity extends Activity
 	{
 		super.onPause();
 
-		// Reset default to new message
-		newMessage = true;
-
 		// Show hidden items and clear text
 		EditText et = (EditText) findViewById(R.id.topicInput);
-		et.setVisibility(EditText.VISIBLE);
 		et.setText("");
 		EditText drib = (EditText) findViewById(R.id.dribInput);
 		drib.setText("");
