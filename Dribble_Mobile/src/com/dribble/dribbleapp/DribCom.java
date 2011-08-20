@@ -25,7 +25,7 @@ import com.dribble.common.Drib;
 import com.dribble.common.DribList;
 import com.dribble.common.DribSubject;
 import com.dribble.common.DribSubjectList;
-import com.dribble.dribbleapp.utilities.HttpUtils;
+import com.dribble.dribbleapp.Utilities.HttpUtils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
