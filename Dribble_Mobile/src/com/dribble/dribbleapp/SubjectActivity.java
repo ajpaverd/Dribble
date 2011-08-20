@@ -47,7 +47,6 @@ public class SubjectActivity extends ListActivity {
 	private ProgressDialog pd;
 	private Handler mHandler = new Handler();
 	private ArrayList<DribSubject> dribTopAr;
-	private ArrayList<String> topicNames = new ArrayList<String>();
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) 
@@ -80,14 +79,8 @@ public class SubjectActivity extends ListActivity {
 				dribTopAr= DribCom.getTopics(results);
 				// If returned topics
 				//
-				if (dribTopAr != null)
-				{
-					topicNames.clear();
-					for(DribSubject subject : dribTopAr)
-					{
-						topicNames.add(subject.getName());
-					}
-				
+				if (dribTopAr != null && dribTopAr.size() != 0)
+				{				
 					Log.i(TAG, "Received List of Topics");
 					mHandler.post(mUpdateResults);
 					
@@ -95,12 +88,14 @@ public class SubjectActivity extends ListActivity {
 				}
 				else
 				{
+					//If no topics, displays default "no topics available" message
+					pd.dismiss();
 					CurrentDribSubject = null;
+					mHandler.post(mUpdateResults);
 				}
-				//If no topics, displays default "no topics available" message
 			}
 		};
-		
+
 		// start Thread
 		getDribSubjects.start();
 	}

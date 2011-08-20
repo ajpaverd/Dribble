@@ -13,6 +13,8 @@ import com.dribble.dribbleapp.R;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.TabActivity;
+import android.content.Context;
+import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
@@ -30,16 +32,22 @@ public class CreateDribActivity extends Activity
 	private static DribSubject dribSubject;
 	// private static ProgressDialog pd;
 	private static Handler mHandler = new Handler();
-
+	private Context context;
+	
 	public CreateDribActivity()
 	{
+	}
+
+	public CreateDribActivity(Context context)
+	{
+		this.context = context;
 	}
 	
 	public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
 		Log.i(TAG, "Tab Loaded");
-		// Reuse same view for new/replied messages
+
 		setContentView(R.layout.input_drib);
 	}
 
@@ -143,14 +151,18 @@ public class CreateDribActivity extends Activity
 		// pd.dismiss();
 
 		Log.i(TAG, "Message Successfully Submitted");
+		
+		// Create toast (popup) to show send complete
+		Toast success = Toast.makeText(context, "Message sent successfully", Toast.LENGTH_SHORT);
+		success.show();
+		
+		context.sendBroadcast(new Intent("com.dribble.dribbleapp.SENT_DRIB"));
 
 		// Set tab to first tab (subjects)
 		TabActivity tabActivity = (TabActivity) getParent();
 		if (tabActivity != null)
 		{
-			// Create toast (popup) to show send complete
-			Toast success = Toast.makeText(this, "Message sent successfully", Toast.LENGTH_SHORT);
-			success.show();
+			
 			TabHost tabHost = tabActivity.getTabHost();
 			tabHost.setCurrentTab(0);
 		}
@@ -160,6 +172,7 @@ public class CreateDribActivity extends Activity
 	public void onResume()
 	{
 		super.onResume();
+		context = this;
 		refreshContent();
 	}
 

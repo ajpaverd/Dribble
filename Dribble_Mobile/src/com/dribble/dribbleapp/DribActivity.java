@@ -9,13 +9,16 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 import com.dribble.common.Drib;
+import com.dribble.common.DribSubject;
 
 import com.dribble.dribbleapp.R;
 
 import android.app.ListActivity;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
@@ -24,28 +27,42 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.AdapterView.OnItemClickListener;
 
-public class DribActivity extends ListActivity {
-
+public class DribActivity extends ListActivity
+{
 	private static final String TAG = "DribActivity";
 	
 	private static ProgressDialog pd;
 	private static ArrayList<Drib> messageList;
 	private static int subjectID;
 	private static String subjectName;
-	
+
 	private static Location myLoc;
 
 	private Handler mHandler = new Handler();
 
+	// Refresh content when send drib broadcast is received
+	private BroadcastReceiver broadcastReceiver = new BroadcastReceiver()
+	{
+		@Override
+		public void onReceive(Context context, Intent intent)
+		{
+			// Refresh content after drib has been sent
+			refreshContent();
+		}
+	};
+
 	@Override
-	public void onCreate(Bundle savedInstanceState) 
+	public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
 		Log.i(TAG, "Tab Loaded");
@@ -57,24 +74,29 @@ public class DribActivity extends ListActivity {
 		EditText replyEditText = (EditText) findViewById(R.id.replyDrib);
 		buttonReply.setEnabled(false);
 		replyEditText.setEnabled(false);
-		
-		buttonReply.setOnClickListener(new OnClickListener() 
+
+		buttonReply.setOnClickListener(new OnClickListener()
 		{
-			public void onClick(View v) 
+			public void onClick(View v)
 			{
 				// Send reply drib
 				//
 				EditText replyEditText = (EditText) findViewById(R.id.replyDrib);
 				String replyText = replyEditText.getText().toString();
 				
-				CreateDribActivity createDrib = new CreateDribActivity();
+				// Re-use the create activity methos to send reply
+				CreateDribActivity createDrib = new CreateDribActivity(getApplicationContext());
 				createDrib.sendDrib(SubjectActivity.CurrentDribSubject, replyText);
 				replyEditText.setText("");
+				
+				// Hide soft keyboard
+				InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+				inputManager.hideSoftInputFromWindow(replyEditText.getWindowToken(), 0);
 			}
 		});
 	}
 
-	private void refreshContent() 
+	private void refreshContent()
 	{
 		// Show progress dialog
 		pd = new ProgressDialog(this);
@@ -82,17 +104,18 @@ public class DribActivity extends ListActivity {
 		pd.setIndeterminate(true);
 		pd.setCancelable(true);
 		pd.show();
-		
+
 		// Get current location
-	    myLoc = GpsListener.getLocation();
-		
+		myLoc = GpsListener.getLocation();
+
 		final int results = DribbleSharedPrefs.getNumDribTopics(this);
 
 		Thread getDribs = new Thread()
 		{
-			public void run() 
+			public void run()
 			{
-				// Get selected subjectID and name and return list of associated messages
+				// Get selected subjectID and name and return list of associated
+				// messages
 				//
 				subjectID = SubjectActivity.CurrentDribSubject.getSubjectID();
 				subjectName = SubjectActivity.CurrentDribSubject.getName();
@@ -107,9 +130,9 @@ public class DribActivity extends ListActivity {
 
 	// Create runnable for posting
 	//
-	final Runnable mUpdateResults = new Runnable() 
+	final Runnable mUpdateResults = new Runnable()
 	{
-		public void run() 
+		public void run()
 		{
 			// Update results in main (UI) Thread
 			//
@@ -117,48 +140,87 @@ public class DribActivity extends ListActivity {
 		}
 	};
 
-	private void updateResultsInUi() 
+	private void updateResultsInUi()
 	{
-		TextView messageText = (TextView) findViewById(R.id.topicNameForMessages);
-		if (messageList.isEmpty()) 
+		setListAdapter(new DribAdapter(getApplicationContext(), R.layout.message_row, messageList));
+		
+		ListView lv = getListView();
+		lv.setTextFilterEnabled(true);
+		  
+		lv.setOnItemClickListener(new OnItemClickListener() 
 		{
-			messageText.setText("Topics");
-		} else 
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) 
+			 {	
+				// Log.i(TAG, "List Item Clicked");
+			    //Drib drib = ((Drib)(messageList.toArray())[position]);
+				Intent maps = new Intent(DribActivity.this, MapsActivity.class);
+				DribActivity.this.startActivity(maps);
+			}
+		});
+		
+		TextView messageText = (TextView) findViewById(R.id.topicNameForMessages);
+		if ( messageList == null || messageList.isEmpty())
+		{
+			lv.clearChoices();
+			messageText.setText("No Messages");	
+		}
+		else
 		{
 			// Get Topic Name from TabActivity Tab
-			messageText.setText(subjectName);
-		}
+			messageText.setText(subjectName);	
 
-		setListAdapter(new DribAdapter(getApplicationContext(), R.layout.message_row, messageList));
+			// dismiss progress dialog
+			//
+			pd.dismiss();
+		}	
 
 		Log.i(TAG, "Topic Messages Added To Display");
-		
-		// dismiss progress dialog
-		//
-		pd.dismiss();
 	}
 
 	@Override
-	public void onResume() 
+	public void onPause()
+	{
+		super.onPause();
+		unregisterReceiver(broadcastReceiver);
+	}
+
+	@Override
+	public void onResume()
 	{
 		super.onResume();
-		
+
+		IntentFilter filter = new IntentFilter();
+		filter.addAction("com.dribble.dribbleapp.SENT_DRIB");
+		registerReceiver(broadcastReceiver, filter);
+
 		// If a subject is selected, re-enable buttons
 		//
-		if (SubjectActivity.CurrentDribSubject != null) 
+		if (SubjectActivity.CurrentDribSubject != null)
 		{
 			refreshContent();
-			
+
 			Button buttonReply = (Button) findViewById(R.id.buttonReply);
 			EditText replyEditText = (EditText) findViewById(R.id.replyDrib);
 			buttonReply.setEnabled(true);
 			replyEditText.setEnabled(true);
 		}
+		else
+		{
+			messageList = new ArrayList<Drib>();
+			subjectName = null;
+			updateResultsInUi();
+		}
+	}
+
+	@Override
+	protected void onDestroy()
+	{
+		unregisterReceiver(broadcastReceiver);
 	}
 
 	// Class to hold custom list view information
 	//
-	private static class ViewHolder 
+	private static class ViewHolder
 	{
 		TextView message;
 		TextView info;
@@ -167,24 +229,30 @@ public class DribActivity extends ListActivity {
 	}
 
 	// Show elapsed time since post
-	private String getElapsed(long millis) 
+	private String getElapsed(long millis)
 	{
 		long time = millis / 1000;
-		//String seconds = Integer.toString((int) (time % 60));
+		// String seconds = Integer.toString((int) (time % 60));
 		String minutes = Integer.toString((int) ((time % 3600) / 60));
 		int tempHours = (int) (time / 3600);
 		String days = Integer.toString(tempHours / 24);
-		String hours = Integer.toString(tempHours%24);
+		String hours = Integer.toString(tempHours % 24);
 
 		minutes += "min ";
-		if (hours.equals("0")) {
+		if (hours.equals("0"))
+		{
 			hours = "";
-		} else {
+		}
+		else
+		{
 			hours += "hrs ";
 		}
-		if (days.equals("0")) {
+		if (days.equals("0"))
+		{
 			days = "";
-		} else {
+		}
+		else
+		{
 			days += "days ";
 		}
 
@@ -193,7 +261,8 @@ public class DribActivity extends ListActivity {
 
 	// Custom list view implementation
 	//
-	private class DribAdapter extends ArrayAdapter<Drib> {
+	private class DribAdapter extends ArrayAdapter<Drib>
+	{
 
 		private ArrayList<Drib> items;
 
@@ -206,10 +275,10 @@ public class DribActivity extends ListActivity {
 
 		// Override default list view
 		@Override
-		public View getView(int position, View convertView, ViewGroup parent) 
+		public View getView(int position, View convertView, ViewGroup parent)
 		{
 			final ViewHolder holder;
-			if (convertView == null) 
+			if (convertView == null)
 			{
 				LayoutInflater mInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 				convertView = mInflater.inflate(R.layout.message_row, null);
@@ -221,8 +290,8 @@ public class DribActivity extends ListActivity {
 				holder.dislike = (ImageButton) convertView.findViewById(R.id.buttondislike);
 
 				convertView.setTag(holder);
-			} 
-			else 
+			}
+			else
 			{
 				holder = (ViewHolder) convertView.getTag();
 			}
@@ -232,18 +301,9 @@ public class DribActivity extends ListActivity {
 			// Set drib like count
 			if (drib != null)
 			{
-				convertView.setOnClickListener(new OnClickListener()
+				holder.like.setOnClickListener(new OnClickListener()
 				{
-					public void onClick(View v) 
-					{
-						Intent maps = new Intent(DribActivity.this, MapsActivity.class);
-						DribActivity.this.startActivity(maps);
-					}
-				});
-
-				holder.like.setOnClickListener(new OnClickListener() 
-				{
-					public void onClick(View v) 
+					public void onClick(View v)
 					{
 						// Increase like count
 						drib.setLikeCount(drib.getLikeCount() + 1);
@@ -262,17 +322,17 @@ public class DribActivity extends ListActivity {
 				});
 
 				// set drib dislike
-				holder.dislike.setOnClickListener(new OnClickListener() 
+				holder.dislike.setOnClickListener(new OnClickListener()
 				{
-					public void onClick(View v) 
+					public void onClick(View v)
 					{
-						// increase dislike
+						 //increase dislike
 						drib.setLikeCount(drib.getLikeCount() - 1);
-						new Thread(new Runnable() 
+						new Thread(new Runnable()
 						{
-							public void run() 
+							public void run()
 							{
-								// send displike
+								// send dislike
 								DribCom.sendDrib(drib);
 							}
 						}).start();
@@ -282,20 +342,21 @@ public class DribActivity extends ListActivity {
 				});
 
 				holder.message.setText(drib.getText());
-				
+
 				Location dribLoc = new Location("Drib Location");
 				dribLoc.setLatitude(drib.getLatitude());
 				dribLoc.setLongitude(drib.getLongitude());
-				
+
 				// Get distance in km
-				double distance = myLoc.distanceTo(dribLoc)/1000;
-				DecimalFormat df = new DecimalFormat("#.##"); 
-				
+				double distance = myLoc.distanceTo(dribLoc) / 1000;
+				DecimalFormat df = new DecimalFormat("#.##");
+
 				// Set info text
-				holder.info.setText(df.format(distance) + " km " + "("+ getElapsed(System.currentTimeMillis() - drib.getCurrentTime()) + "ago)" ); // + "\nDRank: " + drib.getPopularity());
+				holder.info.setText(df.format(distance) + " km " + "(" + getElapsed(System.currentTimeMillis() - drib.getCurrentTime()) + "ago)"); 
+				
 			}
+			
 			return convertView; // return custom view
 		}
 	}
-
 }
