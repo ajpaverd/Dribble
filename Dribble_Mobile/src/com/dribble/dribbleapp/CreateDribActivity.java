@@ -21,6 +21,7 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TabHost;
@@ -150,6 +151,11 @@ public class CreateDribActivity extends Activity
 		// dismiss progress dialog
 		// pd.dismiss();
 
+		EditText dribMessage = (EditText) findViewById(R.id.dribInput);
+		// Hide soft keyboard
+		InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+		inputManager.hideSoftInputFromWindow(dribMessage.getWindowToken(), 0);
+		
 		Log.i(TAG, "Message Successfully Submitted");
 		
 		// Create toast (popup) to show send complete

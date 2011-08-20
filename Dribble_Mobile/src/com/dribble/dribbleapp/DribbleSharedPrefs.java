@@ -8,11 +8,12 @@ import android.content.SharedPreferences.Editor;
 public class DribbleSharedPrefs {
     public final static String PREFS_NAME = "dribble_prefs";
  
-    public static boolean getUseGPS(Context context) {
-        SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, 0);
-        return prefs.getBoolean(context.getString(R.string.pref_key_use_gps),
-                false);
-    }
+    // Taken out 20/08/2011 - Chad
+//    public static boolean getUseGPS(Context context) {
+//        SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, 0);
+//        return prefs.getBoolean(context.getString(R.string.pref_key_use_gps),
+//                false);
+//    }
     
     public static int getNumDribTopics(Context context) {
         SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, 0);

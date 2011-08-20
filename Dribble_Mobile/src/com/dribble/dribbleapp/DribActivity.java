@@ -22,6 +22,7 @@ import android.content.IntentFilter;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -144,9 +145,7 @@ public class DribActivity extends ListActivity
 	{
 		setListAdapter(new DribAdapter(getApplicationContext(), R.layout.message_row, messageList));
 		
-		ListView lv = getListView();
-		lv.setTextFilterEnabled(true);
-		  
+		ListView lv = getListView();		  
 		lv.setOnItemClickListener(new OnItemClickListener() 
 		{
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) 
@@ -188,6 +187,11 @@ public class DribActivity extends ListActivity
 	public void onResume()
 	{
 		super.onResume();
+		
+		// disable reply button by default if no messages
+		//
+		Button buttonReply = (Button) findViewById(R.id.buttonReply);
+		EditText replyEditText = (EditText) findViewById(R.id.replyDrib);
 
 		IntentFilter filter = new IntentFilter();
 		filter.addAction("com.dribble.dribbleapp.SENT_DRIB");
@@ -199,15 +203,19 @@ public class DribActivity extends ListActivity
 		{
 			refreshContent();
 
-			Button buttonReply = (Button) findViewById(R.id.buttonReply);
-			EditText replyEditText = (EditText) findViewById(R.id.replyDrib);
 			buttonReply.setEnabled(true);
 			replyEditText.setEnabled(true);
+			replyEditText.setInputType(InputType.TYPE_TEXT_FLAG_MULTI_LINE);
 		}
 		else
 		{
 			messageList = new ArrayList<Drib>();
 			subjectName = null;
+			
+			buttonReply.setEnabled(false);
+			replyEditText.setInputType(InputType.TYPE_NULL);
+			replyEditText.setEnabled(false);
+			
 			updateResultsInUi();
 		}
 	}

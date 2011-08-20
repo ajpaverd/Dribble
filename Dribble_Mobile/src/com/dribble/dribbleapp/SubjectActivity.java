@@ -110,7 +110,7 @@ public class SubjectActivity extends ListActivity {
 				MapsActivity.Itemizedoverlay.clearOverlays();
 				for(DribSubject subject : dribTopAr)
 				{			
-					GeoPoint point = new GeoPoint((int)(subject.getLatitude()),(int)(subject.getLongitude()));
+					GeoPoint point = new GeoPoint((int)(subject.getLatitude() * 1E6),(int)(subject.getLongitude() * 1E6));
 				    overlayitem = new OverlayItem(point, "Drib Topic", subject.getName());
 				    MapsActivity.Itemizedoverlay.addOverlay(overlayitem);
 				}
