@@ -41,15 +41,19 @@ public class GpsListener extends Activity implements LocationListener,
 		locationManager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
 		locationManager.addGpsStatusListener(this);
 
-		// Ignoring GPS Preference for now
-		if (DribbleSharedPrefs.getUseGPS(mContext))
-		{
+		//if (DribbleSharedPrefs.getUseGPS(mContext))
+		//{
 			provider = locationManager.GPS_PROVIDER;
-		}
-		else
-		{
-			provider = locationManager.NETWORK_PROVIDER;
-		}
+		//}
+//		else
+//		{
+//			provider = locationManager.NETWORK_PROVIDER;
+//		}
+		
+		Criteria criteria = new Criteria();
+		//provider = locationManager.getBestProvider(criteria, false);
+		locationManager.getLastKnownLocation(provider);
+		
 		locationManager.requestLocationUpdates(provider, minTime, minDistance, this);
 	}
 
@@ -82,6 +86,13 @@ public class GpsListener extends Activity implements LocationListener,
 				}
 			}
 		}
+		
+		if (bestResult == null)
+		{
+			Criteria criteria = new Criteria();
+			return locationManager.getLastKnownLocation(locationManager.getBestProvider(criteria, false));
+		}
+		
 		return bestResult;
 	}
 
@@ -93,33 +104,31 @@ public class GpsListener extends Activity implements LocationListener,
 
 	public void onProviderDisabled(String provider)
 	{
-		if (DribbleSharedPrefs.getUseGPS(mContext))
-		{
-			provider = locationManager.GPS_PROVIDER;
-		}
-		else
-		{
-			// find new best provider
-			provider = locationManager.NETWORK_PROVIDER;
-		}
-		locationManager.requestLocationUpdates(provider, minTime, minDistance,
-				this);
+//		if (DribbleSharedPrefs.getUseGPS(mContext))
+//		{
+//			provider = locationManager.GPS_PROVIDER;
+//		}
+//		else
+//		{
+//			// find new best provider
+//			provider = locationManager.NETWORK_PROVIDER;
+//		}
+//		locationManager.requestLocationUpdates(provider, minTime, minDistance, this);
 	}
 
 	public void onProviderEnabled(String provider)
 	{
-		// find new best provider
-		if (DribbleSharedPrefs.getUseGPS(mContext))
-		{
-			provider = locationManager.GPS_PROVIDER;
-		}
-		else
-		{
-			provider = locationManager.NETWORK_PROVIDER;
-		}
-
-		locationManager.requestLocationUpdates(provider, minTime, minDistance,
-				this);
+//		// find new best provider
+//		if (DribbleSharedPrefs.getUseGPS(mContext))
+//		{
+//			provider = locationManager.GPS_PROVIDER;
+//		}
+//		else
+//		{
+//			provider = locationManager.NETWORK_PROVIDER;
+//		}
+//
+//		locationManager.requestLocationUpdates(provider, minTime, minDistance, this);
 	}
 
 	public void onStatusChanged(String provider, int status, Bundle extras)

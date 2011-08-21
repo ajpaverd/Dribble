@@ -48,7 +48,6 @@ public class SubjectActivity extends ListActivity {
 	private ProgressDialog pd;
 	private Handler mHandler = new Handler();
 	private ArrayList<DribSubject> dribTopAr;
-	private ArrayList<String> topicNames = new ArrayList<String>();
 	
 	//Declare the telephony manager to get users IMEI
 	private TelephonyManager telephonyManager;
@@ -87,14 +86,8 @@ public class SubjectActivity extends ListActivity {
 				dribTopAr= DribCom.getTopics(results);
 				// If returned topics
 				//
-				if (dribTopAr != null)
-				{
-					topicNames.clear();
-					for(DribSubject subject : dribTopAr)
-					{
-						topicNames.add(subject.getName());
-					}
-				
+				if (dribTopAr != null && dribTopAr.size() != 0)
+				{				
 					Log.i(TAG, "Received List of Topics");
 					mHandler.post(mUpdateResults);
 					
@@ -102,12 +95,14 @@ public class SubjectActivity extends ListActivity {
 				}
 				else
 				{
+					//If no topics, displays default "no topics available" message
+					pd.dismiss();
 					CurrentDribSubject = null;
+					mHandler.post(mUpdateResults);
 				}
-				//If no topics, displays default "no topics available" message
 			}
 		};
-		
+
 		// start Thread
 		getDribSubjects.start();
 	}
@@ -122,7 +117,7 @@ public class SubjectActivity extends ListActivity {
 				MapsActivity.Itemizedoverlay.clearOverlays();
 				for(DribSubject subject : dribTopAr)
 				{			
-					GeoPoint point = new GeoPoint((int)(subject.getLatitude()),(int)(subject.getLongitude()));
+					GeoPoint point = new GeoPoint((int)(subject.getLatitude() * 1E6),(int)(subject.getLongitude() * 1E6));
 				    overlayitem = new OverlayItem(point, "Drib Topic", subject.getName());
 				    MapsActivity.Itemizedoverlay.addOverlay(overlayitem);
 				}

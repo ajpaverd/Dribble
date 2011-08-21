@@ -24,7 +24,7 @@
 		android:width = "230dp"
 		android:layout_alignParentBottom="true"
 		android:layout_alignParentLeft="true"
-		android:hint="Drib"/>
+		android:hint="Type to reply..."/>
 	<Button
 		android:id="@+id/buttonReply"
 		android:layout_width="wrap_content"

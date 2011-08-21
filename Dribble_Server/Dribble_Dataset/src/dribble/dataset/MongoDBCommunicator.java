@@ -60,9 +60,12 @@ public class MongoDBCommunicator implements Dataset
 
         // Set criteria to get topics within certain radius from location
         // NB: needs 'loc' to be indexed before use
-        double earthRadius = 6378; // km - needed to convert radius in 'near' command from radians to km
+        double earthRadius = 6378; // km 
+        // needed to convert radius in 'near' command from radians to km
+        double radRadius = radius / (earthRadius * Math.PI / 180);
+        
         QueryBuilder query = new QueryBuilder();
-        DBObject criteria = query.start("loc").near(longitude, latitude, radius/earthRadius).get();
+        DBObject criteria = query.start("loc").near(longitude, latitude, radRadius).get();
 
         // Fetch first topics matching criteria
         DBCursor cur = dribTopics.find(criteria);
@@ -77,8 +80,8 @@ public class MongoDBCommunicator implements Dataset
             DribSubject topic = new DribSubject();
 
             BasicDBObject loc = (BasicDBObject) doc.get("loc");
-            topic.setLatitude(loc.getInt("lat"));
-            topic.setLongitude(loc.getInt("long"));
+            topic.setLatitude(loc.getDouble("lat"));
+            topic.setLongitude(loc.getDouble("long"));
 
             topic.setSubjectID(Integer.valueOf(doc.get("_id").toString()));
             topic.setName(doc.get("name").toString());
@@ -209,8 +212,8 @@ public class MongoDBCommunicator implements Dataset
             Drib drib = new Drib();
 
             BasicDBObject loc = (BasicDBObject) doc.get("loc");
-            drib.setLatitude(loc.getInt("lat"));
-            drib.setLongitude(loc.getInt("long"));
+            drib.setLatitude(loc.getDouble("lat"));
+            drib.setLongitude(loc.getDouble("long"));
 
             drib.setLikeCount(Integer.valueOf(doc.get("dribLike").toString()));
             drib.setMessageID(Integer.valueOf(doc.get("_id").toString()));
