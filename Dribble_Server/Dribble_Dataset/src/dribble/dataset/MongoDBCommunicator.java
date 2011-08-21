@@ -99,6 +99,7 @@ public class MongoDBCommunicator implements Dataset
     {
         logger.info("Adding a Drib to the database...");
 
+        //Get Drib Subject ID
         int subjectID = m.getSubject().getSubjectID();
 
         // Find if their is an existing topic (_id)

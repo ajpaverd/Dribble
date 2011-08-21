@@ -23,6 +23,7 @@ import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -49,12 +50,18 @@ public class SubjectActivity extends ListActivity {
 	private ArrayList<DribSubject> dribTopAr;
 	private ArrayList<String> topicNames = new ArrayList<String>();
 	
+	//Declare the telephony manager to get users IMEI
+	private TelephonyManager telephonyManager;
+	private String imei;
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) 
 	{
 		  super.onCreate(savedInstanceState);
 		  setContentView(R.layout.subjects);
 		  Log.i(TAG, "Tab Loaded");		  
+		  telephonyManager = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
+		 imei =  telephonyManager.getDeviceId();
 	}
     
 	private void refreshContent()
