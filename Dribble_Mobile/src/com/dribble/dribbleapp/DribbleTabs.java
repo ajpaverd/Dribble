@@ -126,7 +126,8 @@ public class DribbleTabs extends TabActivity
 				res.getDrawable(R.drawable.ic_tab_new)).setContent(intent);
 		tabHost.addTab(spec);
 		Log.i(TAG, "Add Create Drib Tab");
-
+		
+		
 		tabHost.setCurrentTab(0);
 		Log.i(TAG, "Set Default Tab");
 	}
