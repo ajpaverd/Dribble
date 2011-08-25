@@ -7,20 +7,15 @@ package com.dribble.dribbleapp;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
-import com.dribble.common.Drib;
-import com.dribble.common.DribSubject;
-
-import com.dribble.dribbleapp.R;
-import com.google.android.maps.GeoPoint;
-import com.google.android.maps.MyLocationOverlay;
-import com.google.android.maps.OverlayItem;
-
 import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.app.TabActivity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.telephony.TelephonyManager;
@@ -28,41 +23,63 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
-import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TabHost;
 import android.widget.TextView;
 
+import com.dribble.common.DribSubject;
+import com.google.android.maps.GeoPoint;
+import com.google.android.maps.OverlayItem;
+
 public class SubjectActivity extends ListActivity {
 
-	private static final String TAG = "TagActivity";
-	
+	private static final String TAG = "SubjectActivity";
+
 	// Store static selected subject and name
 	public static DribSubject CurrentDribSubject = null;
-	private static Location myLoc;
-	
+	private Location myLoc;
+
 	private ProgressDialog pd;
 	private Handler mHandler = new Handler();
 	private ArrayList<DribSubject> dribTopAr;
-	
+
 	//Declare the telephony manager to get users IMEI
 	private TelephonyManager telephonyManager;
 	private String imei;
-	
+
+	//To change from static to non-static
+	private GpsListener gpsListener;
+	private DribCom dribCom;
+
+	//For receiving geographic measurements
+	private GeographicMeasurementsReceiver geographicMeasurementsReceiver;
+	private Context context;
+	private double primitiveLatitude = 22.00;
+	private double primitiveLongitude = -28.0754;
+
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) 
 	{
-		  super.onCreate(savedInstanceState);
-		  setContentView(R.layout.subjects);
-		  Log.i(TAG, "Tab Loaded");		  
-		  telephonyManager = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
-		 imei =  telephonyManager.getDeviceId();
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.subjects);
+		Log.i(TAG, "Tab Loaded");		  
+
+		//Register broadcast receiver
+		geographicMeasurementsReceiver = new GeographicMeasurementsReceiver();
+		this.registerReceiver(geographicMeasurementsReceiver, 
+				new IntentFilter(DribbleMain.BROADCAST_GEOGRAPHIC_MEASUREMENTS));
+		//Registered Receiver
+
+		//Get IMEI Measurements for Like/Dislike
+		telephonyManager = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
+		imei =  telephonyManager.getDeviceId();
+
 	}
-    
+
 	private void refreshContent()
 	{
 		// show progress dialog
@@ -71,10 +88,20 @@ public class SubjectActivity extends ListActivity {
 		pd.setIndeterminate(true);
 		pd.setCancelable(true);
 		pd.show();
-		
-		// Get current location
-	    myLoc = GpsListener.getLocation();
-		
+
+		Log.i(TAG,"Getting current Location");
+
+		// Get current location TO DO (if Network provider)
+		String provider = LocationManager.GPS_PROVIDER;
+		myLoc = new Location(provider);
+
+		myLoc.setLatitude(primitiveLatitude);
+		myLoc.setLongitude(primitiveLongitude);
+
+		Log.i(TAG,"Latitude "+myLoc.getLatitude());
+		Log.i(TAG,"Longitude "+myLoc.getLongitude());
+
+		//Log.i(TAG,"Current Location is "+myLoc.getLatitude());
 		final int results = DribbleSharedPrefs.getNumDribTopics(this);
 
 		// Create thread to fetch subjects
@@ -83,22 +110,35 @@ public class SubjectActivity extends ListActivity {
 		{
 			public void run()
 			{
-				dribTopAr= DribCom.getTopics(results);
-				// If returned topics
-				//
-				if (dribTopAr != null && dribTopAr.size() != 0)
-				{				
-					Log.i(TAG, "Received List of Topics");
-					mHandler.post(mUpdateResults);
-					
-					mHandler.post(mAddOverlays);
-				}
-				else
+				Log.i(TAG,"Current Network Data Type is: "+telephonyManager.getNetworkType());
+				if(telephonyManager.getNetworkType()!=0)
 				{
-					//If no topics, displays default "no topics available" message
-					pd.dismiss();
-					CurrentDribSubject = null;
-					mHandler.post(mUpdateResults);
+					try{
+						dribTopAr = dribCom.getTopics(results);
+
+
+
+						if (dribTopAr != null && dribTopAr.size() != 0)
+						{				
+							Log.i(TAG, "Received List of Topics");
+							mHandler.post(mUpdateResults);
+
+							mHandler.post(mAddOverlays);
+						}
+						else
+						{
+							//If no topics, displays default "no topics available" message
+							pd.dismiss();
+							CurrentDribSubject = null;
+							mHandler.post(mUpdateResults);
+						}
+
+					}catch(NullPointerException npe)
+					{
+						Log.e(TAG, "The message is: "+npe.getMessage());
+						//If no topics, displays default "no topics available" message
+						pd.dismiss();
+					}
 				}
 			}
 		};
@@ -106,7 +146,7 @@ public class SubjectActivity extends ListActivity {
 		// start Thread
 		getDribSubjects.start();
 	}
-	
+
 	// Create thread for adding all topics to map
 	final Runnable mAddOverlays = new Runnable() {
 		public void run()
@@ -118,13 +158,13 @@ public class SubjectActivity extends ListActivity {
 				for(DribSubject subject : dribTopAr)
 				{			
 					GeoPoint point = new GeoPoint((int)(subject.getLatitude() * 1E6),(int)(subject.getLongitude() * 1E6));
-				    overlayitem = new OverlayItem(point, "Drib Topic", subject.getName());
-				    MapsActivity.Itemizedoverlay.addOverlay(overlayitem);
+					overlayitem = new OverlayItem(point, "Drib Topic", subject.getName());
+					MapsActivity.Itemizedoverlay.addOverlay(overlayitem);
 				}
 			}
 		}
 	};
-	
+
 	// Create runnable for posting
 	final Runnable mUpdateResults = new Runnable() 
 	{
@@ -133,40 +173,41 @@ public class SubjectActivity extends ListActivity {
 			updateResultsInUi();
 		}
 	};
-	
+
 	private void updateResultsInUi()
 	{
 		// Set list view
-	  setListAdapter(new SubjectAdapter(getApplicationContext(), R.layout.subject_row, dribTopAr));
-	  
-	  // dismiss dialog
-	  pd.dismiss();
-	  
-	  Log.i(TAG, "List Adapter Set");
-	  ListView lv = getListView();
-	  lv.setTextFilterEnabled(true);
-	  
-	  lv.setOnItemClickListener(new OnItemClickListener() 
-	  {
-	    public void onItemClick(AdapterView<?> parent, View view, int position, long id) 
-	    {		    	
-	    	Log.i(TAG, "List Item Clicked");
-	    	DribSubject selectedTopic = ((DribSubject)(dribTopAr.toArray())[position]);
-	    	
-	    	CurrentDribSubject = selectedTopic;
-	    	TabActivity tabActivity = (TabActivity)getParent();
-	    	TabHost tabHost = tabActivity.getTabHost();
-	    	tabHost.setCurrentTab(1);
-	    }
-	   });
-}
+		setListAdapter(new SubjectAdapter(getApplicationContext(), R.layout.subject_row, dribTopAr));
+
+		// dismiss dialog
+		pd.dismiss();
+
+		Log.i(TAG, "List Adapter Set");
+		ListView lv = getListView();
+		lv.setTextFilterEnabled(true);
+
+		lv.setOnItemClickListener(new OnItemClickListener() 
+		{
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) 
+			{		    	
+				Log.i(TAG, "List Item Clicked");
+				DribSubject selectedTopic = ((DribSubject)(dribTopAr.toArray())[position]);
+
+				CurrentDribSubject = selectedTopic;
+				TabActivity tabActivity = (TabActivity)getParent();
+				TabHost tabHost = tabActivity.getTabHost();
+				tabHost.setCurrentTab(1);
+			}
+		});
+	}
 	@Override
 	public void onResume() 
 	{
-	    super.onResume();
-			refreshContent();
+		super.onResume();
+		Log.i(TAG,"Resume was called");
+		refreshContent();
 	}
-	
+
 	// Class to hold custom list view information
 	//
 	private static class ViewHolder 
@@ -174,7 +215,7 @@ public class SubjectActivity extends ListActivity {
 		TextView message;
 		TextView info;
 	}
-	
+
 	// Show elapsed time since post
 	private String getElapsed(long millis) 
 	{
@@ -199,7 +240,7 @@ public class SubjectActivity extends ListActivity {
 
 		return days + hours + minutes;
 	}
-	
+
 	// Custom list view implementation
 	//
 	private class SubjectAdapter extends ArrayAdapter<DribSubject> {
@@ -238,19 +279,54 @@ public class SubjectActivity extends ListActivity {
 			if (subject != null)
 			{
 				holder.message.setText(subject.getName());
-				
+
 				Location subjectLoc = new Location("Subject Location");
 				subjectLoc.setLatitude(subject.getLatitude());
 				subjectLoc.setLongitude(subject.getLongitude());
-				
+
 				// Get distance in km
 				double distance = myLoc.distanceTo(subjectLoc)/1000;
 				DecimalFormat df = new DecimalFormat("#.##"); 
-				
+
 				// Set info text
 				holder.info.setText(df.format(distance) + " km " + "("+ getElapsed(System.currentTimeMillis() - subject.getTime()) + "ago)" ); // + "\nDRank: " + drib.getPopularity());
 			}
 			return convertView; // return custom view
 		}
 	}
+
+
+	@Override
+	public void onPause(){
+		super.onPause();
+		//pd.dismiss();
+	}
+
+	@Override
+	public void onDestroy(){
+		super.onDestroy();
+		pd.dismiss();
+	}
+
+	private class GeographicMeasurementsReceiver extends BroadcastReceiver
+	{
+
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			primitiveLatitude = intent.getDoubleExtra("myLatitude", 22.800);
+			primitiveLongitude = intent.getDoubleExtra("myLongitude", -28.074);
+
+			//update the latitudes and longitudes respectively
+			myLoc.setLatitude(primitiveLatitude);
+			myLoc.setLongitude(primitiveLongitude);
+
+		}
+
+	}
+
+	//	   @Override
+	//	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+	//		   checkLocationProviders();
+	//	super.onActivityResult(requestCode, resultCode, data);
+	//	}
 }

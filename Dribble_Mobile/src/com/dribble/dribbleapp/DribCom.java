@@ -27,9 +27,13 @@ import com.dribble.common.DribSubject;
 import com.dribble.common.DribSubjectList;
 import com.dribble.dribbleapp.Utilities.HttpUtils;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.location.Location;
+import android.location.LocationManager;
 import android.util.Log;
 
 // Communications class
@@ -41,6 +45,22 @@ public class DribCom {
 	private static final String targetDomain = "10.0.2.2:8080";
 	private static final String TAG = "DribCom";
 	private static final Serializer serializer = new Persister();
+	
+	//prevent non-static call
+	private GpsListener gpsListener;
+	
+	//For receiving geographic measurements
+		private GeographicMeasurementsReceiver geographicMeasurementsReceiver;
+		private Context context;
+		private double latitude;
+		private double longitude;
+	
+	public DribCom(Context context){
+		//Register broadcast receiver
+				geographicMeasurementsReceiver = new GeographicMeasurementsReceiver();
+				context.registerReceiver(geographicMeasurementsReceiver, 
+						new IntentFilter(DribbleMain.BROADCAST_GEOGRAPHIC_MEASUREMENTS));
+	}
 	
 	// Converts/casts XML streams to defined classes
 	private static Object XMLStreamToClass (HttpGet httpGet, Class<?> clss)
@@ -87,16 +107,17 @@ public class DribCom {
 	}
 	
 	//GET - list of topics
-	public static ArrayList<DribSubject> getTopics(int results) 
+	public ArrayList<DribSubject> getTopics(int results) 
 	{   
 		Log.i(TAG, "Attempt: Retrieve List of Topics");
 		
 		// request url
 		urlToSendRequest =  "http://"+targetDomain+"/Dribble_Communications-war/resources/GetDribSubjects";
 		
-		Location loc = GpsListener.getLocation();
-		HttpGet httpGet = new HttpGet(urlToSendRequest + "?latitude=" + loc.getLatitude() + "&longitude=" +
-				loc.getLongitude() + "&results=" + results);
+		
+		
+		HttpGet httpGet = new HttpGet(urlToSendRequest + "?latitude=" + latitude + "&longitude=" +
+				longitude + "&results=" + results);
 		DribSubjectList subjectList =  (DribSubjectList)XMLStreamToClass(httpGet, DribSubjectList.class);
 		if (subjectList != null)
 			return subjectList.list;
@@ -105,15 +126,15 @@ public class DribCom {
 	}
 
 	//GET - messages for a topic 
-	public static ArrayList<Drib> getMessages(int SubjectID, int results) 
+	public ArrayList<Drib> getMessages(int SubjectID, int results) 
 	{
 		Log.i(TAG, "Application Server Communication");
 		Log.i(TAG, "Attempt: Retrieve all messages for selected topic");
        
 		urlToSendRequest = "http://"+targetDomain+"/Dribble_Communications-war/resources/GetDribs";
 			
-		Location loc = GpsListener.getLocation();
-		HttpGet httpGet = new HttpGet(urlToSendRequest+ "?latitude=" + loc.getLatitude() + "&longitude=" + loc.getLongitude() +
+		
+		HttpGet httpGet = new HttpGet(urlToSendRequest+ "?latitude=" + latitude + "&longitude=" + longitude +
 				"&results=" + results +"&subjectID=" + SubjectID);
 		DribList dribList =  (DribList)XMLStreamToClass(httpGet, DribList.class);
 		return dribList.list;
@@ -157,6 +178,18 @@ public class DribCom {
 		{  
 			Log.e(TAG, "IO Exception: " + e2.getMessage()); 
 		}
+	}
+	
+	private class GeographicMeasurementsReceiver extends BroadcastReceiver
+	{
+
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			latitude = intent.getDoubleExtra("myLatitude", 22.800);
+			longitude = intent.getDoubleExtra("myLongitude", -28.074);
+
+		}
+
 	}
 }
 	

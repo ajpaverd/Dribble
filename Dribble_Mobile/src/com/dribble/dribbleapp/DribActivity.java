@@ -46,11 +46,17 @@ public class DribActivity extends ListActivity
 	private static ArrayList<Drib> messageList;
 	private static int subjectID;
 	private static String subjectName;
-
-	private static Location myLoc;
+	
+	
+	//To change from static to non-static
+	private GpsListener gpsListener;
+	private DribCom dribCom;
+	
+	private Location myLoc;
 
 	private Handler mHandler = new Handler();
-
+	
+	//Has this been implemented??
 	// Refresh content when send drib broadcast is received
 	private BroadcastReceiver broadcastReceiver = new BroadcastReceiver()
 	{
@@ -107,7 +113,7 @@ public class DribActivity extends ListActivity
 		pd.show();
 
 		// Get current location
-		myLoc = GpsListener.getLocation();
+		myLoc = gpsListener.getLocation();
 
 		final int results = DribbleSharedPrefs.getNumDribTopics(this);
 
@@ -120,7 +126,7 @@ public class DribActivity extends ListActivity
 				//
 				subjectID = SubjectActivity.CurrentDribSubject.getSubjectID();
 				subjectName = SubjectActivity.CurrentDribSubject.getName();
-				messageList = DribCom.getMessages(subjectID, results);
+				messageList = dribCom.getMessages(subjectID, results);
 				Log.i(TAG, "Tab Loaded HERE");
 
 				mHandler.post(mUpdateResults);
@@ -223,7 +229,7 @@ public class DribActivity extends ListActivity
 	@Override
 	protected void onDestroy()
 	{
-		unregisterReceiver(broadcastReceiver);
+		super.onDestroy();
 	}
 
 	// Class to hold custom list view information

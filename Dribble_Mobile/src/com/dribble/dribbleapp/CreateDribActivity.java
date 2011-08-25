@@ -34,6 +34,8 @@ public class CreateDribActivity extends Activity
 	// private static ProgressDialog pd;
 	private static Handler mHandler = new Handler();
 	private Context context;
+	//Preventing static call
+	private GpsListener gpsListener;
 	
 	public CreateDribActivity()
 	{
@@ -81,7 +83,7 @@ public class CreateDribActivity extends Activity
 				else
 				{
 					// Create Topic for new Drib
-					Location loc = GpsListener.getLocation();
+					Location loc = gpsListener.getLocation();
 					dribSubject = new DribSubject(dribTopicName, loc.getLatitude(), loc.getLongitude());
 
 					EditText dribMessage = (EditText) findViewById(R.id.dribInput);
@@ -109,7 +111,7 @@ public class CreateDribActivity extends Activity
 			// Data is ok
 
 			// Create new drib
-			Location loc = GpsListener.getLocation();
+			Location loc = gpsListener.getLocation();
 			final Drib newDrib = new Drib(subject, message, loc.getLatitude(), loc.getLongitude());
 			Log.i(TAG, "Submit new message");
 

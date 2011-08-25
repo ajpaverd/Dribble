@@ -32,14 +32,9 @@
 	</natures>
 	<linkedResources>
 		<link>
-			<name>android-mapviewballoons</name>
+			<name>android-mapviewballoons_src</name>
 			<type>2</type>
-			<location>D:/DribbleComp/Dribble/Dribble_Mobile/libs/android-mapviewballoons</location>
-		</link>
-		<link>
-			<name>mapview_balloons_src</name>
-			<type>2</type>
-			<location>D:/DribbleComp/Dribble/Dribble_Mobile/libs/android-mapviewballoons/src</location>
+			<locationURI>_android_android_mapviewballoons_9ae9cbc7/src</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>
