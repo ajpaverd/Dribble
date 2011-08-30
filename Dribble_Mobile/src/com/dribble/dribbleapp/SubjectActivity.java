@@ -83,7 +83,6 @@ public class SubjectActivity extends ListActivity {
 				{				
 					Log.i(TAG, "Received List of Topics");
 					mHandler.post(mUpdateResults);
-					
 					mHandler.post(mAddOverlays);
 				}
 				else
@@ -91,7 +90,7 @@ public class SubjectActivity extends ListActivity {
 					//If no topics, displays default "no topics available" message
 					pd.dismiss();
 					CurrentDribSubject = null;
-					mHandler.post(mUpdateResults);
+					//mHandler.post(mUpdateResults);
 				}
 			}
 		};

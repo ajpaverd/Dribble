@@ -3,6 +3,6 @@
      <item android:state_pressed="true"
            android:drawable="@drawable/thumbsupselect" /> <!-- pressed -->
      <item android:state_enabled="false"
-     		android:drawable="@drawable/thumbsuplargeg"/>          
-     <item android:drawable="@drawable/thumbsuplarge" /> <!-- default -->
+     		android:drawable="@drawable/thumbsupg"/>          
+     <item android:drawable="@drawable/thumbsup" /> <!-- default -->
 </selector>

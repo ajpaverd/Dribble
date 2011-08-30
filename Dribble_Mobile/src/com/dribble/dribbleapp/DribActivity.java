@@ -220,18 +220,14 @@ public class DribActivity extends ListActivity
 		}
 	}
 
-	@Override
-	protected void onDestroy()
-	{
-		unregisterReceiver(broadcastReceiver);
-	}
-
 	// Class to hold custom list view information
 	//
 	private static class ViewHolder
 	{
 		TextView message;
-		TextView info;
+		TextView time_created;
+		TextView distance;
+		TextView likeCount;
 		ImageButton like;
 		ImageButton dislike;
 	}
@@ -245,26 +241,22 @@ public class DribActivity extends ListActivity
 		int tempHours = (int) (time / 3600);
 		String days = Integer.toString(tempHours / 24);
 		String hours = Integer.toString(tempHours % 24);
+		String sent ="";
 
-		minutes += "min ";
-		if (hours.equals("0"))
+		if (!days.equals("0"))
 		{
-			hours = "";
+			sent = days + " day(s)";
 		}
-		else
+		else if (!hours.equals("0"))
 		{
-			hours += "hrs ";
+			sent = hours + " hour(s)";
 		}
-		if (days.equals("0"))
+		else if (!minutes.equals("0"))
 		{
-			days = "";
-		}
-		else
-		{
-			days += "days ";
+			sent = minutes + " min";
 		}
 
-		return days + hours + minutes;
+		return sent + " ago";
 	}
 
 	// Custom list view implementation
@@ -293,7 +285,9 @@ public class DribActivity extends ListActivity
 
 				holder = new ViewHolder();
 				holder.message = (TextView) convertView.findViewById(R.id.textmsg);
-				holder.info = (TextView) convertView.findViewById(R.id.info);
+				holder.time_created = (TextView) convertView.findViewById(R.id.time_created);
+				holder.distance = (TextView) convertView.findViewById(R.id.distance);
+				//holder.likeCount = (TextView) convertView.findViewById(R.id.like_count);
 				holder.like = (ImageButton) convertView.findViewById(R.id.buttonlike);
 				holder.dislike = (ImageButton) convertView.findViewById(R.id.buttondislike);
 
@@ -350,6 +344,7 @@ public class DribActivity extends ListActivity
 				});
 
 				holder.message.setText(drib.getText());
+				//holder.likeCount.setText(String.valueOf(drib.getLikeCount()));
 
 				Location dribLoc = new Location("Drib Location");
 				dribLoc.setLatitude(drib.getLatitude());
@@ -360,8 +355,8 @@ public class DribActivity extends ListActivity
 				DecimalFormat df = new DecimalFormat("#.##");
 
 				// Set info text
-				holder.info.setText(df.format(distance) + " km " + "(" + getElapsed(System.currentTimeMillis() - drib.getCurrentTime()) + "ago)"); 
-				
+				holder.time_created.setText(getElapsed(System.currentTimeMillis() - drib.getCurrentTime()));
+				holder.distance.setText(df.format(distance) + "km");
 			}
 			
 			return convertView; // return custom view

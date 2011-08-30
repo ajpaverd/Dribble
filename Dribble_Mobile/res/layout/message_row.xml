@@ -3,34 +3,72 @@
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	android:layout_width="fill_parent"
 	android:layout_height="?android:attr/listPreferredItemHeight">
+<!-- 	 <ImageView -->
+<!--         android:id="@+id/icon" -->
+        
+<!--         android:layout_width="wrap_content" -->
+<!--         android:layout_height="wrap_content" -->
+        
+<!--         android:layout_alignParentTop="true" -->
+<!--         android:layout_alignParentBottom="true" -->
+<!--         android:layout_margin="5dp" -->
+       
+<!--         android:src="@drawable/drib_icon_2_smallest" /> -->
 	<TextView
 		android:id="@+id/textmsg"
+		
 		android:layout_width="wrap_content"
 		android:layout_height="fill_parent"
-		android:padding="5dip"
-		android:drawableLeft="@drawable/drib_icon_2_smallest"/>
+		android:paddingTop="6dp"
+		android:layout_alignParentLeft="true"
+		android:layout_alignParentTop="true"/>
 	<TextView
-		android:id="@+id/info"
+		android:id="@+id/time_created"
+		
 		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
+		android:layout_height="fill_parent"
+		
 		android:layout_below="@id/textmsg"
 		android:layout_alignLeft="@id/textmsg"
+		
 		android:textSize="12sp" />
 	<ImageButton
 		android:id="@+id/buttondislike"
+		
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
+		
 		android:src="@drawable/icon_dislike"
 		android:background="@id/android:empty"
+		
 		android:layout_alignParentRight="true"
-		android:layout_alignBottom="@id/info" />
+		android:layout_alignParentBottom="true"/>
 	<ImageButton
 		android:id="@+id/buttonlike"
+		
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
+		
 		android:src="@drawable/icon_like"
 		android:background="@id/android:empty"
-		android:layout_toLeftOf="@id/buttondislike"
-		android:layout_alignTop="@id/buttondislike" />
-
+		
+		android:layout_toLeftOf="@id/buttondislike"/>
+	<TextView
+		android:id="@+id/distance"
+		
+		android:layout_width="wrap_content"
+		android:layout_height="fill_parent"
+		android:paddingRight="10dp"
+		android:layout_toLeftOf="@id/buttonlike"
+		
+		android:textSize="18sp" />
+<!-- 	<TextView -->
+<!-- 		android:id="@+id/like_count" -->
+		
+<!-- 		android:layout_width="wrap_content" -->
+<!-- 		android:layout_height="wrap_content" -->
+		
+<!-- 		android:paddingRight="5dp" -->
+<!-- 		android:layout_alignParentRight="true" -->
+<!-- 		android:textSize="12sp" /> -->
 </RelativeLayout>

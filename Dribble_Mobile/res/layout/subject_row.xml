@@ -3,19 +3,32 @@
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	android:layout_width="fill_parent"
 	android:layout_height="?android:attr/listPreferredItemHeight">
+	<ImageView
+     android:id="@+id/icon"
+     
+     android:layout_width="wrap_content"
+     android:layout_height="fill_parent"
+     
+     android:layout_alignParentTop="true"
+     android:layout_alignParentBottom="true"
+     android:layout_margin="5dp"
+    
+     android:src="@drawable/drib_icon_2_small" />
 	<TextView
+    android:id="@+id/subjectText"
 	android:layout_width="fill_parent"
 	android:layout_height="wrap_content"
-	android:id="@+id/subjectText"
-	android:padding="10dp"
+	
+    android:paddingTop="6dp"
 	android:textSize="16sp"
-	android:gravity="left"
-	android:drawableLeft="@drawable/drib_icon_2_smallest" />
+	android:layout_toRightOf="@id/icon" />
 	<TextView
 	android:id="@+id/subjectInfo"
 	android:layout_width="wrap_content"
 	android:layout_height="wrap_content"
 	android:layout_below="@id/subjectText"
+	android:layout_toRightOf="@id/icon"
 	android:layout_alignParentLeft="@id/subjectText"
+	android:layout_alignParentBottom="true"
 	android:textSize="12sp" />
 </RelativeLayout>

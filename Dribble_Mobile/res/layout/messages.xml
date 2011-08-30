@@ -39,5 +39,8 @@
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:layout_below="@id/topicNameForMessages"
-		android:layout_above="@id/buttonReply" />
+		android:layout_above="@id/buttonReply" 
+		android:fadeScrollbars="true"
+		android:paddingTop="5dp"
+		android:paddingBottom="5dp"/>
 </RelativeLayout>

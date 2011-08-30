@@ -89,6 +89,10 @@ public class CreateDribActivity extends Activity
 					
 					// Send drib for a subject
 					sendDrib(dribSubject, dribText);
+					
+					// Hide soft keyboard
+					InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+					inputManager.hideSoftInputFromWindow(dribMessage.getWindowToken(), 0);
 				}
 			}
 		});
@@ -151,11 +155,6 @@ public class CreateDribActivity extends Activity
 		// dismiss progress dialog
 		// pd.dismiss();
 
-		EditText dribMessage = (EditText) findViewById(R.id.dribInput);
-		// Hide soft keyboard
-		InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-		inputManager.hideSoftInputFromWindow(dribMessage.getWindowToken(), 0);
-		
 		Log.i(TAG, "Message Successfully Submitted");
 		
 		// Create toast (popup) to show send complete

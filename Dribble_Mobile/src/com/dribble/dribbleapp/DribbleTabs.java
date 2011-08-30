@@ -91,6 +91,12 @@ public class DribbleTabs extends TabActivity
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		// Start location listening
+		new GpsListener(this);
+		
+		Intent tutorial = new Intent(DribbleTabs.this, DribbleMain.class );
+		DribbleTabs.this.startActivity(tutorial);
 
 		Log.i(TAG, "Tabs Loaded");
 		setContentView(R.layout.tabs);

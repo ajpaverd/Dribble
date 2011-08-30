@@ -18,7 +18,7 @@ import android.util.Log;
 		
 		private static final String TAG = "Splash";
 		// Splash screen display length (milliseconds)
-	    private static final int SPLASH_DISPLAY_LENGTH = 1500;
+	    private static final int SPLASH_DISPLAY_LENGTH = 1000;
 
 	     @Override
 	     public void onCreate(Bundle icicle) 
@@ -34,7 +34,7 @@ import android.util.Log;
 	               public void run() 
 	               {
 	                    /* Create an Intent that will start the Menu-Activity. */
-	                    Intent mainIntent = new Intent(Splash.this,DribbleMain.class);
+	                    Intent mainIntent = new Intent(Splash.this,DribbleTabs.class);
 	                    Log.i(TAG, "Start Dribble Activity");
 	                    Splash.this.startActivity(mainIntent);
 	                   

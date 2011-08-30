@@ -37,8 +37,8 @@ public class DribCom {
 
 	private static String urlToSendRequest;
 	// 10.0.2.2 resolves to localhost in emulator
-	//
-	private static final String targetDomain = "10.0.2.2:8080";
+	// 50.18.104.62 for EC2 server
+	private static final String targetDomain = "wheres.dyndns.org:8080";
 	private static final String TAG = "DribCom";
 	private static final Serializer serializer = new Persister();
 	
@@ -57,13 +57,19 @@ public class DribCom {
 			try 
 			{
 				InputStream res = response.getEntity().getContent();
-//				BufferedReader r = new BufferedReader(new InputStreamReader(res));
-//				StringBuilder total = new StringBuilder();
-//				String line;
-//				while ((line = r.readLine()) != null) {
-//				    total.append(line);
-//				}
-//				Log.d(clss.getSimpleName(), total.toString());
+				
+//				// Debug - print result to screen
+//				// Comment out otherwise
+////				//--------------
+				BufferedReader r = new BufferedReader(new InputStreamReader(res));
+				StringBuilder total = new StringBuilder();
+				String line;
+				while ((line = r.readLine()) != null) {
+				    total.append(line);
+				}
+				Log.d(clss.getSimpleName(), total.toString());
+//				// ------------------
+				
 				obj = serializer.read(clss, res);
 				Log.d(clss.getSimpleName(), clss.toString());
 				return obj;

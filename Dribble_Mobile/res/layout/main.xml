@@ -35,9 +35,9 @@
 	<!--		android:layout_below="@id/username"-->
 	<!--		android:layout_width="fill_parent"></EditText>-->
 	<Button
-		android:id="@+id/buttonEnter"
+		android:id="@+id/buttonOK"
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
-		android:text="Enter"
+		android:text="OK"
 		android:layout_alignParentBottom="true" />
 </RelativeLayout>
