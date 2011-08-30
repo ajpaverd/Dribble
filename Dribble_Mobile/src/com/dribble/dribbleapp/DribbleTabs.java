@@ -113,11 +113,11 @@ public class DribbleTabs extends TabActivity
 		tabHost.addTab(spec);
 		Log.i(TAG, "Add Near Me Tab");
 
-		intent = new Intent().setClass(this, DribActivity.class);
-		spec = tabHost.newTabSpec("msg").setIndicator("Dribs",
-				res.getDrawable(R.drawable.ic_tab_dribs)).setContent(intent);
-		tabHost.addTab(spec);
-		Log.i(TAG, "Add Dribs Tab");
+//		intent = new Intent().setClass(this, DribActivity.class);
+//		spec = tabHost.newTabSpec("msg").setIndicator("Dribs",
+//				res.getDrawable(R.drawable.ic_tab_dribs)).setContent(intent);
+//		tabHost.addTab(spec);
+//		Log.i(TAG, "Add Dribs Tab");
 		
 		// Create an Intent to launch an Activity for the tab (to be reused)
 		intent = new Intent().setClass(this, MapsActivity.class);
@@ -132,7 +132,8 @@ public class DribbleTabs extends TabActivity
 				res.getDrawable(R.drawable.ic_tab_new)).setContent(intent);
 		tabHost.addTab(spec);
 		Log.i(TAG, "Add Create Drib Tab");
-
+		
+		
 		tabHost.setCurrentTab(0);
 		Log.i(TAG, "Set Default Tab");
 	}

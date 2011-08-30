@@ -1,4 +1,4 @@
-package com.dribble.dribbleapp.utilities;
+package com.dribble.dribbleapp.Utilities;
 
 import org.apache.http.HttpVersion;
 import org.apache.http.conn.ClientConnectionManager;
