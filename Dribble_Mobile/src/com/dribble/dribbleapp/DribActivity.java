@@ -89,11 +89,7 @@ public class DribActivity extends ListActivity
 		// Get current location TO DO (if Network provider)
 		String provider = LocationManager.GPS_PROVIDER;
 		myLoc = new Location(provider);
-		//Register broadcast receiver
-		geographicMeasurementsReceiver = new GeographicMeasurementsReceiver(myLoc);
-		this.registerReceiver(geographicMeasurementsReceiver, 
-				new IntentFilter(Splash.BROADCAST_GEOGRAPHIC_MEASUREMENTS));
-		//Registered Receiver
+		
 
 		//initialise new dribcom object
 		dribCom = new DribCom(this);
@@ -210,14 +206,18 @@ public class DribActivity extends ListActivity
 	{
 		super.onPause();
 		unregisterReceiver(broadcastReceiver);
-		//unregisterReceiver(geographicMeasurementsReceiver);
+		unregisterReceiver(geographicMeasurementsReceiver);
 	}
 
 	@Override
 	public void onResume()
 	{
 		super.onResume();
-
+		//Register broadcast receiver
+				geographicMeasurementsReceiver = new GeographicMeasurementsReceiver(myLoc);
+				this.registerReceiver(geographicMeasurementsReceiver, 
+						new IntentFilter(DashboardActivity.BROADCAST_GEOGRAPHIC_MEASUREMENTS));
+				//Registered Receiver
 		// disable reply button by default if no messages
 		//
 		Button buttonReply = (Button) findViewById(R.id.buttonReply);

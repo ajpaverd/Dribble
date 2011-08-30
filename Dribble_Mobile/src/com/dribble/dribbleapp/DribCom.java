@@ -29,7 +29,7 @@ import com.dribble.common.Drib;
 import com.dribble.common.DribList;
 import com.dribble.common.DribSubject;
 import com.dribble.common.DribSubjectList;
-import com.dribble.dribbleapp.Utilities.HttpUtils;
+import com.dribble.dribbleapp.utilities.HttpUtils;
 
 // Communications class
 public class DribCom {
@@ -60,7 +60,7 @@ public class DribCom {
 		//Register broadcast receiver
 				geographicMeasurementsReceiver = new GeographicMeasurementsReceiver(currentLocation);
 				context.registerReceiver(geographicMeasurementsReceiver, 
-						new IntentFilter(Splash.BROADCAST_GEOGRAPHIC_MEASUREMENTS));
+						new IntentFilter(DashboardActivity.BROADCAST_GEOGRAPHIC_MEASUREMENTS));
 	}
 	
 	// Converts/casts XML streams to defined classes
@@ -82,13 +82,13 @@ public class DribCom {
 //				// Debug - print result to screen
 //				// Comment out otherwise
 ////				//--------------
-				BufferedReader r = new BufferedReader(new InputStreamReader(res));
-				StringBuilder total = new StringBuilder();
-				String line;
-				while ((line = r.readLine()) != null) {
-				    total.append(line);
-				}
-				Log.d(clss.getSimpleName(), total.toString());
+//				BufferedReader r = new BufferedReader(new InputStreamReader(res));
+//				StringBuilder total = new StringBuilder();
+//				String line;
+//				while ((line = r.readLine()) != null) {
+//				    total.append(line);
+//				}
+//				Log.d(clss.getSimpleName(), total.toString());
 //				// ------------------
 				
 				obj = serializer.read(clss, res);

@@ -14,7 +14,7 @@ public class BroadcastGpsTask extends TimerTask{
 	public static final String TAG  = "BroadcastGpsTask";
 	//Create an intent to broadcast the measurements
 	private Intent broadcastMeasurements = new Intent(
-			Splash.BROADCAST_GEOGRAPHIC_MEASUREMENTS);
+			DashboardActivity.BROADCAST_GEOGRAPHIC_MEASUREMENTS);
 	
 	public BroadcastGpsTask(Context context, Bundle locationBundle)
 	{

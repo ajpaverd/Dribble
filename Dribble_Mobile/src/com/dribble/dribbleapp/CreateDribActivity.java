@@ -65,10 +65,7 @@ public class CreateDribActivity extends Activity
 		// Get current location TO DO (if Network provider)
 		String provider = LocationManager.GPS_PROVIDER;
 		myLoc = new Location(provider);
-		//Register broadcast receiver
-		geographicMeasurementsReceiver = new GeographicMeasurementsReceiver(myLoc);
-		this.registerReceiver(geographicMeasurementsReceiver, 
-				new IntentFilter(Splash.BROADCAST_GEOGRAPHIC_MEASUREMENTS));
+		
 		//Registered Receiver
 	}
 
@@ -207,6 +204,10 @@ public class CreateDribActivity extends Activity
 	public void onResume()
 	{
 		super.onResume();
+		//Register broadcast receiver
+				geographicMeasurementsReceiver = new GeographicMeasurementsReceiver(myLoc);
+				this.registerReceiver(geographicMeasurementsReceiver, 
+						new IntentFilter(DashboardActivity.BROADCAST_GEOGRAPHIC_MEASUREMENTS));
 		context = this;
 		refreshContent();
 	}
@@ -215,7 +216,7 @@ public class CreateDribActivity extends Activity
 	public void onPause()
 	{
 		super.onPause();
-
+		unregisterReceiver(geographicMeasurementsReceiver);
 		// Show hidden items and clear text
 		EditText et = (EditText) findViewById(R.id.topicInput);
 		et.setText("");

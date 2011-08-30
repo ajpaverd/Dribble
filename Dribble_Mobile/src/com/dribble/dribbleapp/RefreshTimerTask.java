@@ -34,7 +34,7 @@ public class RefreshTimerTask extends TimerTask {
 				Log.i(TAG,"Retrieving Topics in thread");
 				if(SubjectActivity.dribTopAr!=null){
 					Log.i(TAG,"Refresfing drib topic array");
-					//SubjectActivity.dribTopAr =null;
+					SubjectActivity.dribTopAr =null;
 				}
 				SubjectActivity.dribTopAr = dribCom.getTopics(10);
 
