@@ -86,9 +86,15 @@ public class DribActivity extends ListActivity
 		setContentView(R.layout.messages);
 
 		//Create Location Object
-		// Get current location TO DO (if Network provider)
-		String provider = LocationManager.GPS_PROVIDER;
-		myLoc = new Location(provider);
+		LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+		if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER))
+		{
+			myLoc = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+		}
+		else if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER))
+		{
+			myLoc = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+		}
 		//Register broadcast receiver
 		geographicMeasurementsReceiver = new GeographicMeasurementsReceiver(myLoc);
 		this.registerReceiver(geographicMeasurementsReceiver, 
@@ -119,7 +125,7 @@ public class DribActivity extends ListActivity
 
 				// Re-use the create activity methos to send reply
 				CreateDribActivity createDrib = new CreateDribActivity(getApplicationContext());
-				createDrib.sendDrib(SubjectActivity.CurrentDribSubject, replyText);
+				createDrib.sendDrib(SubjectActivity.CurrentDribSubject, replyText, myLoc.getLatitude(), myLoc.getLongitude());
 				replyEditText.setText("");
 
 				// Hide soft keyboard
@@ -149,7 +155,7 @@ public class DribActivity extends ListActivity
 				//
 				subjectID = SubjectActivity.CurrentDribSubject.getSubjectID();
 				subjectName = SubjectActivity.CurrentDribSubject.getName();
-				messageList = dribCom.getMessages(subjectID, results);
+				messageList = dribCom.getMessages(subjectID, myLoc);
 				Log.i(TAG, "Tab Loaded HERE");
 
 				mHandler.post(mUpdateResults);
@@ -210,7 +216,7 @@ public class DribActivity extends ListActivity
 	{
 		super.onPause();
 		unregisterReceiver(broadcastReceiver);
-		//unregisterReceiver(geographicMeasurementsReceiver);
+		unregisterReceiver(geographicMeasurementsReceiver);
 	}
 
 	@Override
@@ -340,14 +346,14 @@ public class DribActivity extends ListActivity
 			final Drib drib = items.get(position);
 			//Check the id of the Drib. If it has been liked/dislike, disable onClickListener
 			//and set the enabled to true for both
-			boolean votedPreviously = checkLikeDislikeId(String.valueOf(drib.getMessageID()));
+			//boolean votedPreviously = checkLikeDislikeId(String.valueOf(drib.getMessageID()));
 
 			// Set drib like count
 			if (drib != null)
 			{
 
-				if(!votedPreviously)
-				{
+				//if(!votedPreviously)
+				//{
 					holder.like.setOnClickListener(new OnClickListener()
 					{
 						public void onClick(View v)
@@ -413,8 +419,8 @@ public class DribActivity extends ListActivity
 				//holder.likeCount.setText(String.valueOf(drib.getLikeCount()));
 
 				Location dribLoc = new Location("Drib Location");
-				dribLoc.setLatitude(drib.getLatitude());
-				dribLoc.setLongitude(drib.getLongitude());
+				dribLoc.setLatitude(drib.getLatitude()/1E6);
+				dribLoc.setLongitude(drib.getLongitude()/1E6);
 
 				// Get distance in km
 				double distance = myLoc.distanceTo(dribLoc) / 1000;
@@ -423,7 +429,7 @@ public class DribActivity extends ListActivity
 				// Set info text
 				holder.time_created.setText(getElapsed(System.currentTimeMillis() - drib.getCurrentTime()));
 				holder.distance.setText(df.format(distance) + "km");
-			}
+			//}
 
 			return convertView; // return custom view
 		}

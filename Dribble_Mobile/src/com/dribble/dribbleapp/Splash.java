@@ -53,7 +53,6 @@ import android.widget.Toast;
 	          
 	        //Create the location manager
 	  		locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-	  		//				locationManager.addGpsStatusListener(GpsListener.class);
 
 	  		//check if location providers are available
 	  		checkLocationProviders();
@@ -98,12 +97,12 @@ import android.widget.Toast;
 	 		//String provider = Settings.Secure.getString(getContentResolver(),Settings.Secure.LOCATION_PROVIDERS_ALLOWED);
 	 		if(locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
 
-	 			Toast toast = Toast.makeText(Splash.this, "GPS provider Enabled: ",Toast.LENGTH_LONG);
+	 			Toast toast = Toast.makeText(Splash.this, "GPS provider: Enabled ",Toast.LENGTH_LONG);
 	 			toast.show();
 
 	 		}else if(locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)){
 
-	 			Toast toast = Toast.makeText(Splash.this, "Network provider Enabled: ",Toast.LENGTH_LONG);
+	 			Toast toast = Toast.makeText(Splash.this, "Network provider: Enabled ",Toast.LENGTH_LONG);
 	 			toast.show();
 
 	 		}

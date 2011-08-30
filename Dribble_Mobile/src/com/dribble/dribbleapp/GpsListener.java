@@ -26,10 +26,8 @@ import android.widget.Toast;
  http://android-developers.blogspot.com/2011/06/deep-dive-into-location.html
  and http://blog.radioactiveyak.com/2011/06/deep-dive-into-location-part-2-being.html
  */
-public class GpsListener implements LocationListener,
-		GpsStatus.Listener
+public class GpsListener implements LocationListener
 {
-	
 	static String provider;
 	public LocationManager locationManager;
 	private Location loc;
@@ -64,6 +62,23 @@ public class GpsListener implements LocationListener,
 		}
 
 	}
+	
+	@Override
+	public void onProviderEnabled (String string)
+	{
+	}
+	
+	@Override
+	public void onProviderDisabled (String string)
+	{	
+	}
+	
+	@Override
+	public void onStatusChanged(String string, int integer, Bundle bundle)
+	{
+	
+	}
+	
 
 
 	// Get best location based on accuracy and time, otherwise just most recent
@@ -135,6 +150,8 @@ public class GpsListener implements LocationListener,
 		Log.i("Location change",
 				"" + location.getLatitude() + " : " + location.getLongitude());
 		
+		currentLocation = location;
+		
 		if (location!=null)
 		{
 			//update the bundle with latitude and longitude measurements
@@ -143,41 +160,12 @@ public class GpsListener implements LocationListener,
 			
 		}
 	}
-	@Override
-	public void onProviderDisabled(String provider)
-	{
-//		if (DribbleSharedPrefs.getUseGPS(mContext))
-//		{
-//			provider = locationManager.GPS_PROVIDER;
-//		}
-//		else
-//		{
-//			// find new best provider
-//			provider = locationManager.NETWORK_PROVIDER;
-//		}
-//		locationManager.requestLocationUpdates(provider, minTime, minDistance, this);
-	}
-	@Override
-	public void onProviderEnabled(String provider)
-	{
-//		// find new best provider
-//		if (DribbleSharedPrefs.getUseGPS(mContext))
-//		{
-//			provider = locationManager.GPS_PROVIDER;
-//		}
-//		else
-//		{
-//			provider = locationManager.NETWORK_PROVIDER;
-//		}
-//
-//		locationManager.requestLocationUpdates(provider, minTime, minDistance, this);
-	}
 	
 	public boolean enableGPSLocation() {
 
 		if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
 			locationManager.requestLocationUpdates(
-					LocationManager.GPS_PROVIDER, 0, 2, this);
+					LocationManager.GPS_PROVIDER, 300000, 100, this);
 			Log.i(TAG,"GPS Location activated");
 			return true;
 		}
@@ -189,7 +177,7 @@ public class GpsListener implements LocationListener,
 
 		if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
 			locationManager.requestLocationUpdates(
-					LocationManager.NETWORK_PROVIDER, 0, 0, this);
+					LocationManager.NETWORK_PROVIDER, 60000, 20, this);
 			Log.i(TAG,"Network Location activated");
 			return true;
 		}
@@ -197,14 +185,4 @@ public class GpsListener implements LocationListener,
 
 	}
 	
-	@Override
-	public void onStatusChanged(String provider, int status, Bundle extras)
-	{
-
-	}
-	@Override
-	public void onGpsStatusChanged(int event)
-	{
-
-	}
 }

@@ -63,10 +63,7 @@ public class SubjectActivity extends ListActivity {
 	public GeographicMeasurementsReceiver geographicMeasurementsReceiver;
 	public Bundle geographicMeasurementsBundle;
 		
-	
 	private Context context;
-	private double primitiveLatitude = 22.00;
-	private double primitiveLongitude = -28.0754;
 	
 	//To create a drill-down view
 	private Intent dribsListIntent;
@@ -83,10 +80,6 @@ public class SubjectActivity extends ListActivity {
 		// Get current location TODO (if Network provider)
 		String provider = LocationManager.GPS_PROVIDER;
 		myLoc = new Location(provider);
-		//Register broadcast receiver
-		geographicMeasurementsReceiver = new GeographicMeasurementsReceiver(myLoc);
-		this.registerReceiver(geographicMeasurementsReceiver, 
-				new IntentFilter(Splash.BROADCAST_GEOGRAPHIC_MEASUREMENTS));
 		
 		//Create a new communication object
 		dribCom = new DribCom(this);
@@ -140,9 +133,6 @@ public class SubjectActivity extends ListActivity {
 		
 		Log.i(TAG,"Latitude "+myLoc.getLatitude());
 		Log.i(TAG,"Longitude "+myLoc.getLongitude());
-		
-		//Log.i(TAG,"Current Location is "+myLoc.getLatitude());
-		final int results = DribbleSharedPrefs.getNumDribTopics(this);
 
 		// Create thread to fetch subjects
 		//
@@ -159,10 +149,9 @@ public class SubjectActivity extends ListActivity {
 						//To prevent calling data again
 						if(dribTopAr == null){
 						
-						dribTopAr = dribCom.getTopics(results);
+							dribTopAr = dribCom.getTopics(GpsListener.currentLocation);
 						
 						}
-
 
 						if (dribTopAr != null && dribTopAr.size() != 0)
 						{				
@@ -244,9 +233,6 @@ public class SubjectActivity extends ListActivity {
 				
 				dribsListIntent = new Intent(SubjectActivity.this, DribActivity.class);
 				startActivity(dribsListIntent);
-				//TabActivity tabActivity = (TabActivity)getParent();
-				//TabHost tabHost = tabActivity.getTabHost();
-				//tabHost.setCurrentTab(1);
 			}
 		});
 	}
@@ -255,6 +241,12 @@ public class SubjectActivity extends ListActivity {
 	{
 		super.onResume();
 		Log.i(TAG,"Resume was called");
+		
+		//Register broadcast receiver
+		geographicMeasurementsReceiver = new GeographicMeasurementsReceiver(myLoc);
+		this.registerReceiver(geographicMeasurementsReceiver, 
+				new IntentFilter(Splash.BROADCAST_GEOGRAPHIC_MEASUREMENTS));
+		
 		refreshContent();
 	}
 
@@ -331,8 +323,8 @@ public class SubjectActivity extends ListActivity {
 				holder.message.setText(subject.getName());
 
 				Location subjectLoc = new Location("Subject Location");
-				subjectLoc.setLatitude(subject.getLatitude());
-				subjectLoc.setLongitude(subject.getLongitude());
+				subjectLoc.setLatitude(subject.getLatitude()/1E6);
+				subjectLoc.setLongitude(subject.getLongitude()/1E6);
 
 				// Get distance in km
 				double distance = myLoc.distanceTo(subjectLoc)/1000;
@@ -345,25 +337,21 @@ public class SubjectActivity extends ListActivity {
 		}
 	}
 
-
 	@Override
 	public void onPause(){
 		super.onPause();
-		
-		pd.dismiss();
+		if (pd != null)
+			pd.dismiss();
+
+		unregisterReceiver(geographicMeasurementsReceiver);
 	}
 
 	@Override
 	public void onDestroy(){
 		super.onDestroy();
-		pd.dismiss();
+		
+		if (pd != null)
+			pd.dismiss();
 	}
 
-	
-
-	//	   @Override
-	//	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-	//		   checkLocationProviders();
-	//	super.onActivityResult(requestCode, resultCode, data);
-	//	}
 }

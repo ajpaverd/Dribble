@@ -3,11 +3,6 @@
   xmlns:android="http://schemas.android.com/apk/res/android">
    <PreferenceCategory
         android:title="Dribble Settings">
-        <CheckBoxPreference
-            android:summary="@string/pref_summary_use_gps"
-            android:persistent="true"
-            android:title="@string/pref_title_use_gps"
-            android:key="@string/pref_key_use_gps" />
         <EditTextPreference
         	android:persistent="true"
         	android:numeric="integer"

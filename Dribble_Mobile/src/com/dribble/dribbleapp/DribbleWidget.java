@@ -60,7 +60,7 @@ public class DribbleService extends IntentService
 		updateViews.setOnClickPendingIntent(R.id.dribble_icon, pi);
 		int results = DribbleSharedPrefs.getNumDribTopics(getApplicationContext());
 		//changed from static
-		ArrayList<DribSubject> dribTopAr= dribCom.getTopics(results);
+		ArrayList<DribSubject> dribTopAr= dribCom.getTopics(GpsListener.currentLocation);
 		DribSubject ds = ((DribSubject)(dribTopAr.toArray())[0]);
 		updateViews.setTextViewText(R.id.drib_widget, "Top Subject: " + ds.getName());
 		return updateViews;

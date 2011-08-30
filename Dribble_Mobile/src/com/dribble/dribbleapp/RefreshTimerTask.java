@@ -26,7 +26,6 @@ public class RefreshTimerTask extends TimerTask {
 
 	@Override
 	public void run() {
-		// TODO Auto-generated method stub
 		//Log.i(TAG,"Current Network Data Type is: "+telephonyManager.getNetworkType());
 		//if(telephonyManager.getNetworkType()!=0)
 		//{
@@ -34,9 +33,8 @@ public class RefreshTimerTask extends TimerTask {
 				Log.i(TAG,"Retrieving Topics in thread");
 				if(SubjectActivity.dribTopAr!=null){
 					Log.i(TAG,"Refresfing drib topic array");
-					//SubjectActivity.dribTopAr =null;
 				}
-				SubjectActivity.dribTopAr = dribCom.getTopics(10);
+				SubjectActivity.dribTopAr = dribCom.getTopics(GpsListener.currentLocation);
 
 			}catch(NullPointerException npe)
 			{

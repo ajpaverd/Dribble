@@ -30,22 +30,22 @@
         <Button android:id="@+id/dashboard_button_nearme"
             style="@style/DashboardButton"
             android:text="@string/activity_nearme"
-            android:drawableTop="@drawable/dashboard_button_add" />
+            android:drawableTop="@drawable/drib_icon_2" />
  
         <Button android:id="@+id/dashboard_button_createDrib"
             style="@style/DashboardButton"
             android:text="@string/activity_createDrib"
-            android:drawableTop="@drawable/dashboard_button_add" />
+            android:drawableTop="@drawable/drib_icon_2" />
  
         <Button android:id="@+id/dashboard_button_map"
             style="@style/DashboardButton"
             android:text="@string/activity_map"
-            android:drawableTop="@drawable/dashboard_button_add" />
+            android:drawableTop="@drawable/drib_icon_2" />
  
         <Button android:id="@+id/dashboard_button_help"
             style="@style/DashboardButton"
             android:text="@string/activity_help"
-            android:drawableTop="@drawable/dashboard_button_add" />    
+            android:drawableTop="@drawable/drib_icon_2" />    
  
     </com.dribble.dribbleapp.DashboardLayout>
  

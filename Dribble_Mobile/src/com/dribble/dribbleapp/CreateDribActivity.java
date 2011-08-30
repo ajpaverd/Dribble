@@ -62,9 +62,15 @@ public class CreateDribActivity extends Activity
 		setContentView(R.layout.input_drib);
 
 		//Create Location Object
-		// Get current location TO DO (if Network provider)
-		String provider = LocationManager.GPS_PROVIDER;
-		myLoc = new Location(provider);
+		LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+		if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER))
+		{
+			myLoc = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+		}
+		else if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER))
+		{
+			myLoc = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+		}
 		//Register broadcast receiver
 		geographicMeasurementsReceiver = new GeographicMeasurementsReceiver(myLoc);
 		this.registerReceiver(geographicMeasurementsReceiver, 
@@ -100,14 +106,16 @@ public class CreateDribActivity extends Activity
 				}
 				else
 				{
+					double latitude = myLoc.getLatitude();
+					double longitude = myLoc.getLongitude();
 					// Create Topic for new Drib
-					dribSubject = new DribSubject(dribTopicName, myLoc.getLatitude(), myLoc.getLongitude());
+					dribSubject = new DribSubject(dribTopicName, (int)(latitude*1E6), (int)(longitude*1E6));
 
 					EditText dribMessage = (EditText) findViewById(R.id.dribInput);
 					String dribText = dribMessage.getText().toString();
 
 					// Send drib for a subject
-					sendDrib(dribSubject, dribText);
+					sendDrib(dribSubject, dribText, latitude, longitude);
 					
 					// Hide soft keyboard
 					InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -117,7 +125,7 @@ public class CreateDribActivity extends Activity
 		});
 	}
 
-	public void sendDrib(DribSubject subject, String message)
+	public void sendDrib(DribSubject subject, String message, double latitude, double longitude  )
 	{		
 		if (message.equals(""))
 		{
@@ -132,18 +140,10 @@ public class CreateDribActivity extends Activity
 			// Data is ok
 
 			// Create new drib
-			Log.i(TAG,"New Drib Latitude "+myLoc.getLatitude());
-			Log.i(TAG,"New Drib Longitude "+myLoc.getLongitude());
-			final Drib newDrib = new Drib(subject, message,myLoc.getLatitude(), myLoc.getLongitude());
+			Log.i(TAG,"New Drib Latitude " + latitude);
+			Log.i(TAG,"New Drib Longitude " + longitude);
+			final Drib newDrib = new Drib(subject, message, (int)(latitude *1E6), (int)(longitude * 1E6));
 			Log.i(TAG, "Submit new message");
-
-			// Ignoring progress dialog for now, might look better
-			// without it - Chad
-			// pd = new ProgressDialog(v.getContext());
-			// pd.setMessage("Sending Drib...");
-			// pd.setIndeterminate(true);
-			// pd.setCancelable(true);
-			// pd.show();
 
 			// Create a new Thread and send Drib
 			Thread sendDrib = new Thread()
@@ -172,9 +172,6 @@ public class CreateDribActivity extends Activity
 
 	private void updateResultsInUi()
 	{
-		// dismiss progress dialog
-		// pd.dismiss();
-
 		EditText dribMessage = (EditText) findViewById(R.id.dribInput);
 		// Hide soft keyboard
 		InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -192,15 +189,6 @@ public class CreateDribActivity extends Activity
 		Intent dashboard = new Intent(this, DashboardActivity.class);
 		dashboard.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
 		startActivity(dashboard);
-		
-		// Set tab to first tab (subjects)
-//		TabActivity tabActivity = (TabActivity) getParent();
-//		if (tabActivity != null)
-//		{
-//
-//			TabHost tabHost = tabActivity.getTabHost();
-//			tabHost.setCurrentTab(0);
-//		}
 	}
 
 	@Override
@@ -222,6 +210,6 @@ public class CreateDribActivity extends Activity
 		EditText drib = (EditText) findViewById(R.id.dribInput);
 		drib.setText("");
 		
-		//unregisterReceiver(geographicMeasurementsReceiver);
+		unregisterReceiver(geographicMeasurementsReceiver);
 	}
 }

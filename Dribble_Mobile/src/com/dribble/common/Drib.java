@@ -19,9 +19,9 @@ import android.util.Log;
 		@Element
 	    private String text;
 		@Element
-	    private double latitude;
+	    private int latitude;
 		@Element
-	    private double longitude;
+	    private int longitude;
 		@Element
 	    private int messageID;
 		@Element
@@ -42,7 +42,7 @@ import android.util.Log;
 	    }
 	    
 	    //Set the message constructor
-	    public Drib(DribSubject subject, String text, double latitude, double longitude)
+	    public Drib(DribSubject subject, String text, int latitude, int longitude)
 	    {
 	        // Set fields directly (recommended by Google)
 	    	//http://developer.android.com/guide/practices/design/performance.html
@@ -72,22 +72,22 @@ import android.util.Log;
 	        return text;
 	    }
 	    //Set and get the latitude coordinates of the message
-	    public void setLatitude(double latitude)
+	    public void setLatitude(int latitude)
 	    {
 	        this.latitude = latitude;
 	    }
 
-	    public double getLatitude()
+	    public int getLatitude()
 	    {
 	        return latitude;
 	    }
 	    //Set and get the longitude coordinates of the message
-	    public void setLongitude(double longitude)
+	    public void setLongitude(int longitude)
 	    {
 	        this.longitude = longitude;
 	    }
 
-	    public double getLongitude()
+	    public int getLongitude()
 	    {
 	        return this.longitude;
 	    }

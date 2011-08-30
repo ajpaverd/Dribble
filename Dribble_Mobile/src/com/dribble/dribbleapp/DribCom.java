@@ -29,10 +29,10 @@ import com.dribble.common.Drib;
 import com.dribble.common.DribList;
 import com.dribble.common.DribSubject;
 import com.dribble.common.DribSubjectList;
-import com.dribble.dribbleapp.Utilities.HttpUtils;
+import com.dribble.dribbleapp.utilities.HttpUtils;
 
 // Communications class
-public class DribCom {
+public class DribCom{
 
 	private static String urlToSendRequest;
 	// 10.0.2.2 resolves to localhost in emulator
@@ -41,26 +41,10 @@ public class DribCom {
 	private static final String TAG = "DribCom";
 	private static final Serializer serializer = new Persister();
 	
-	//prevent non-static call
-	private GpsListener gpsListener;
-	
-	//For receiving geographic measurements
-		private GeographicMeasurementsReceiver geographicMeasurementsReceiver;
 		private Context context;
-		private int latitude;
-		private int longitude;
-		public Location currentLocation;
-		
-		private String provider;
 	
 	public DribCom(Context context){
-		// Get current location TO DO (if Network provider)
-				provider = LocationManager.GPS_PROVIDER;
-				currentLocation = new Location(provider);
-		//Register broadcast receiver
-				geographicMeasurementsReceiver = new GeographicMeasurementsReceiver(currentLocation);
-				context.registerReceiver(geographicMeasurementsReceiver, 
-						new IntentFilter(Splash.BROADCAST_GEOGRAPHIC_MEASUREMENTS));
+		this.context = context;
 	}
 	
 	// Converts/casts XML streams to defined classes
@@ -82,13 +66,13 @@ public class DribCom {
 //				// Debug - print result to screen
 //				// Comment out otherwise
 ////				//--------------
-				BufferedReader r = new BufferedReader(new InputStreamReader(res));
-				StringBuilder total = new StringBuilder();
-				String line;
-				while ((line = r.readLine()) != null) {
-				    total.append(line);
-				}
-				Log.d(clss.getSimpleName(), total.toString());
+//				BufferedReader r = new BufferedReader(new InputStreamReader(res));
+//				StringBuilder total = new StringBuilder();
+//				String line;
+//				while ((line = r.readLine()) != null) {
+//				    total.append(line);
+//				}
+//				Log.d(clss.getSimpleName(), total.toString());
 //				// ------------------
 				
 				obj = serializer.read(clss, res);
@@ -114,7 +98,7 @@ public class DribCom {
 	}
 	
 	//GET - list of topics
-	public ArrayList<DribSubject> getTopics(int results) 
+	public ArrayList<DribSubject> getTopics(Location location) 
 	{   
 		
 		Log.i(TAG, "Attempt: Retrieve List of Topics");
@@ -122,11 +106,9 @@ public class DribCom {
 		// request url
 		urlToSendRequest =  "http://"+targetDomain+"/Dribble_Communications-war/resources/GetDribSubjects";
 		
-		latitude = (int) ((int)currentLocation.getLatitude()*1E6);
-		longitude  = (int) ((int)currentLocation.getLongitude()*1E6);
 		try{
-		HttpGet httpGet = new HttpGet(urlToSendRequest + "?latitude=" + latitude + "&longitude=" +
-				longitude + "&results=" + results);
+		HttpGet httpGet = new HttpGet(urlToSendRequest + "?latitude=" + (int)(location.getLatitude()*1E6) + "&longitude=" +
+				(int)(location.getLongitude()*1E6) + "&results=" + DribbleSharedPrefs.getNumDribTopics(context));
 		DribSubjectList subjectList =  (DribSubjectList)XMLStreamToClass(httpGet, DribSubjectList.class);
 		
 		
@@ -141,16 +123,16 @@ public class DribCom {
 	}
 
 	//GET - messages for a topic 
-	public ArrayList<Drib> getMessages(int SubjectID, int results) 
+	public ArrayList<Drib> getMessages(int SubjectID, Location location) 
 	{
 		Log.i(TAG, "Application Server Communication");
 		Log.i(TAG, "Attempt: Retrieve all messages for selected topic");
        
 		urlToSendRequest = "http://"+targetDomain+"/Dribble_Communications-war/resources/GetDribs";
 			
-		
-		HttpGet httpGet = new HttpGet(urlToSendRequest+ "?latitude=" + latitude + "&longitude=" + longitude +
-				"&results=" + results +"&subjectID=" + SubjectID);
+		HttpGet httpGet = new HttpGet(urlToSendRequest+ "?latitude=" + (int)(location.getLatitude()*1E6) 
+				+ "&longitude=" + (int)(location.getLongitude()*1E6) +
+				"&results=" + DribbleSharedPrefs.getNumDribTopics(context) +"&subjectID=" + SubjectID);
 		DribList dribList =  (DribList)XMLStreamToClass(httpGet, DribList.class);
 		return dribList.list;
 	} 

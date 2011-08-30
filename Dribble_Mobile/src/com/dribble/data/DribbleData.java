@@ -78,7 +78,10 @@ public class DribbleData {
 		
 		@Override
 		public void onOpen(final SQLiteDatabase db) {
-			super.onOpen(db);
+			if (!db.isOpen() && !db.isDbLockedByOtherThreads() && !db.isDbLockedByCurrentThread())
+			{
+				super.onOpen(db);
+			}
 		}
 		
 		@Override
