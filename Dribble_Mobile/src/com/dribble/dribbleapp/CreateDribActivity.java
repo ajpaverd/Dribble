@@ -15,7 +15,9 @@ import android.app.AlertDialog;
 import android.app.TabActivity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -36,7 +38,13 @@ public class CreateDribActivity extends Activity
 	private Context context;
 	//Preventing static call
 	private GpsListener gpsListener;
+
+	//For receiving geographic measurements
+	public GeographicMeasurementsReceiver geographicMeasurementsReceiver;
+	public Bundle geographicMeasurementsBundle;
 	
+	public Location myLoc;
+
 	public CreateDribActivity()
 	{
 	}
@@ -45,13 +53,23 @@ public class CreateDribActivity extends Activity
 	{
 		this.context = context;
 	}
-	
+
 	public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
 		Log.i(TAG, "Tab Loaded");
 
 		setContentView(R.layout.input_drib);
+
+		//Create Location Object
+		// Get current location TO DO (if Network provider)
+		String provider = LocationManager.GPS_PROVIDER;
+		myLoc = new Location(provider);
+		//Register broadcast receiver
+		geographicMeasurementsReceiver = new GeographicMeasurementsReceiver(myLoc);
+		this.registerReceiver(geographicMeasurementsReceiver, 
+				new IntentFilter(Splash.BROADCAST_GEOGRAPHIC_MEASUREMENTS));
+		//Registered Receiver
 	}
 
 	// Refresh content for creating new dribs
@@ -76,43 +94,43 @@ public class CreateDribActivity extends Activity
 				{
 					// Show error message
 					new AlertDialog.Builder(CreateDribActivity.this)
-							.setTitle("Error")
-							.setMessage("Topic cannot be empty")
-							.setPositiveButton("OK", null).show();
+					.setTitle("Error")
+					.setMessage("Topic cannot be empty")
+					.setPositiveButton("OK", null).show();
 				}
 				else
 				{
 					// Create Topic for new Drib
-					Location loc = gpsListener.getLocation();
-					dribSubject = new DribSubject(dribTopicName, loc.getLatitude(), loc.getLongitude());
+					dribSubject = new DribSubject(dribTopicName, myLoc.getLatitude(), myLoc.getLongitude());
 
 					EditText dribMessage = (EditText) findViewById(R.id.dribInput);
 					String dribText = dribMessage.getText().toString();
-					
+
 					// Send drib for a subject
 					sendDrib(dribSubject, dribText);
 				}
 			}
 		});
 	}
-	
+
 	public void sendDrib(DribSubject subject, String message)
 	{		
 		if (message.equals(""))
 		{
 			// Show error message
 			new AlertDialog.Builder(CreateDribActivity.this)
-					.setTitle("Error")
-					.setMessage("Drib cannot be empty")
-					.setPositiveButton("OK", null).show();
+			.setTitle("Error")
+			.setMessage("Drib cannot be empty")
+			.setPositiveButton("OK", null).show();
 		}
 		else
 		{
 			// Data is ok
 
 			// Create new drib
-			Location loc = gpsListener.getLocation();
-			final Drib newDrib = new Drib(subject, message, loc.getLatitude(), loc.getLongitude());
+			Log.i(TAG,"New Drib Latitude "+myLoc.getLatitude());
+			Log.i(TAG,"New Drib Longitude "+myLoc.getLongitude());
+			final Drib newDrib = new Drib(subject, message,myLoc.getLatitude(), myLoc.getLongitude());
 			Log.i(TAG, "Submit new message");
 
 			// Ignoring progress dialog for now, might look better
@@ -157,23 +175,28 @@ public class CreateDribActivity extends Activity
 		// Hide soft keyboard
 		InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 		inputManager.hideSoftInputFromWindow(dribMessage.getWindowToken(), 0);
-		
+
 		Log.i(TAG, "Message Successfully Submitted");
-		
+
 		// Create toast (popup) to show send complete
 		Toast success = Toast.makeText(context, "Message sent successfully", Toast.LENGTH_SHORT);
 		success.show();
-		
+
 		context.sendBroadcast(new Intent("com.dribble.dribbleapp.SENT_DRIB"));
 
+		//TODO Return to dashboard screen
+		Intent dashboard = new Intent(this, DashboardActivity.class);
+		dashboard.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+		startActivity(dashboard);
+		
 		// Set tab to first tab (subjects)
-		TabActivity tabActivity = (TabActivity) getParent();
-		if (tabActivity != null)
-		{
-			
-			TabHost tabHost = tabActivity.getTabHost();
-			tabHost.setCurrentTab(0);
-		}
+//		TabActivity tabActivity = (TabActivity) getParent();
+//		if (tabActivity != null)
+//		{
+//
+//			TabHost tabHost = tabActivity.getTabHost();
+//			tabHost.setCurrentTab(0);
+//		}
 	}
 
 	@Override
@@ -194,5 +217,7 @@ public class CreateDribActivity extends Activity
 		et.setText("");
 		EditText drib = (EditText) findViewById(R.id.dribInput);
 		drib.setText("");
+		
+		//unregisterReceiver(geographicMeasurementsReceiver);
 	}
 }

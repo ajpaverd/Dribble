@@ -43,6 +43,7 @@ public class GpsListener implements LocationListener,
 	
 	//Declare bundle for Geographic Measurements
 	private Bundle gpsBundle;
+	private boolean gpsActivated = false;
 	
 	private static final String TAG = "GPSListener";
 	
@@ -52,51 +53,16 @@ public class GpsListener implements LocationListener,
 		//Call the gpsBundle into this class
 		this.gpsBundle = gpsBundle;
 		
-		Log.i("Thread Running", "Location listening thread");
+		Log.i("TAG", "GPS Listener Constructed");
 		locationManager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
-		locationManager.addGpsStatusListener(this);
 		
-//		checkLocationProviders();
+		
+		//Enable GPS location or Network Location
+		gpsActivated = enableGPSLocation();
+		if(!gpsActivated){
+			enableNetworkLocation();
+		}
 
-		//if (DribbleSharedPrefs.getUseGPS(mContext))
-		//{
-		
-//		if(locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER))
-//		{
-//			
-//			provider = LocationManager.GPS_PROVIDER;
-//			Log.i(TAG,"Provider is changed to GPS");
-//		}
-//		else
-//			if(locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER))
-//		{
-//			
-//			provider = LocationManager.NETWORK_PROVIDER;
-//			Log.i(TAG,"Provider is changed to Network");
-//		}
-//		else
-//			{
-//			Log.i(TAG,LocationManager.NETWORK_PROVIDER);
-//			Log.i(TAG,"Enabled/disabled = "+locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER));
-//				Log.i(TAG,"No Provider Available");
-//			}
-		
-		//Criteria criteria = new Criteria();
-		//provider = locationManager.getBestProvider(criteria, false);
-//		if(locationManager.getLastKnownLocation(provider)!=null)
-//		{
-//			Log.i(TAG,"Provider "+provider+" is enabled");
-//			loc = locationManager.getLastKnownLocation(provider);
-//		}
-//		else
-//		{
-//			Log.i(TAG,"No providers have been enabled");
-//			loc.setLatitude(-22.00);
-//			loc.setLongitude(23.00);
-//		}
-//		
-//		if(provider!=null)
-//		locationManager.requestLocationUpdates(provider, minTime, minDistance, this);
 	}
 
 
@@ -162,6 +128,7 @@ public class GpsListener implements LocationListener,
 //		return bestResult;
 	}
 	
+	@Override
 	public void onLocationChanged(Location location)
 	{
 		//TODO Get best location based on time and accuracy
@@ -176,7 +143,7 @@ public class GpsListener implements LocationListener,
 			
 		}
 	}
-
+	@Override
 	public void onProviderDisabled(String provider)
 	{
 //		if (DribbleSharedPrefs.getUseGPS(mContext))
@@ -190,7 +157,7 @@ public class GpsListener implements LocationListener,
 //		}
 //		locationManager.requestLocationUpdates(provider, minTime, minDistance, this);
 	}
-
+	@Override
 	public void onProviderEnabled(String provider)
 	{
 //		// find new best provider
@@ -206,31 +173,36 @@ public class GpsListener implements LocationListener,
 //		locationManager.requestLocationUpdates(provider, minTime, minDistance, this);
 	}
 	
-	public void enableGPSLocation() {
+	public boolean enableGPSLocation() {
 
 		if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
 			locationManager.requestLocationUpdates(
 					LocationManager.GPS_PROVIDER, 0, 2, this);
-		
+			Log.i(TAG,"GPS Location activated");
+			return true;
 		}
+		return false;
 
 	}
 
-	public void enableNetworkLocation() {
+	public boolean enableNetworkLocation() {
 
 		if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
 			locationManager.requestLocationUpdates(
 					LocationManager.NETWORK_PROVIDER, 0, 0, this);
+			Log.i(TAG,"Network Location activated");
+			return true;
 		}
+		return false;
 
 	}
 	
-	
+	@Override
 	public void onStatusChanged(String provider, int status, Bundle extras)
 	{
 
 	}
-
+	@Override
 	public void onGpsStatusChanged(int event)
 	{
 
