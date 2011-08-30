@@ -16,6 +16,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
 import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.InputType;
@@ -52,11 +53,16 @@ public class DribActivity extends ListActivity
 	private GpsListener gpsListener;
 	private DribCom dribCom;
 
-	private Location myLoc;
+	//For receiving geographic measurements
+	public GeographicMeasurementsReceiver geographicMeasurementsReceiver;
+	public Bundle geographicMeasurementsBundle;
+
+	public Location myLoc;
 
 	//Set up the database for likes and dislikes
 	private VotedUserData vud = new VotedUserData();
 	private DribbleData dd;
+
 
 	private Handler mHandler = new Handler();
 
@@ -78,6 +84,22 @@ public class DribActivity extends ListActivity
 		super.onCreate(savedInstanceState);
 		Log.i(TAG, "Tab Loaded");
 		setContentView(R.layout.messages);
+
+		//Create Location Object
+		// Get current location TO DO (if Network provider)
+		String provider = LocationManager.GPS_PROVIDER;
+		myLoc = new Location(provider);
+		//Register broadcast receiver
+		geographicMeasurementsReceiver = new GeographicMeasurementsReceiver(myLoc);
+		this.registerReceiver(geographicMeasurementsReceiver, 
+				new IntentFilter(Splash.BROADCAST_GEOGRAPHIC_MEASUREMENTS));
+		//Registered Receiver
+
+		//initialise new dribcom object
+		dribCom = new DribCom(this);
+		
+		//Initialise local database
+		dd = new DribbleData(DribActivity.this);
 
 		// disable reply button by default if no messages
 		//
@@ -115,9 +137,6 @@ public class DribActivity extends ListActivity
 		pd.setIndeterminate(true);
 		pd.setCancelable(true);
 		pd.show();
-
-		// Get current location
-		myLoc = gpsListener.getLocation();
 
 		final int results = DribbleSharedPrefs.getNumDribTopics(this);
 
@@ -191,6 +210,7 @@ public class DribActivity extends ListActivity
 	{
 		super.onPause();
 		unregisterReceiver(broadcastReceiver);
+		//unregisterReceiver(geographicMeasurementsReceiver);
 	}
 
 	@Override
@@ -234,6 +254,8 @@ public class DribActivity extends ListActivity
 	protected void onDestroy()
 	{
 		super.onDestroy();
+		if(pd!=null)
+			pd.dismiss();
 	}
 
 	// Class to hold custom list view information
@@ -409,8 +431,7 @@ public class DribActivity extends ListActivity
 
 			if (dribId!=null)
 			{
-				//Initialise database
-				dd = new DribbleData(DribActivity.this);
+				
 				//Initialise Cursor
 				Cursor dbCursor = dd.getDribId(dribId);
 
@@ -428,18 +449,18 @@ public class DribActivity extends ListActivity
 				}
 
 			}
-
-			if (dd != null) {
+			if(dd!=null){
+				Log.i(TAG,"Cleaning up database");
 				dd.cleanup();
 			}
+
 		}
 
 		//Checks if a user has like/disliked a drib
 		public boolean checkLikeDislikeId(String dribId){
-			ArrayList<VotedUserData> votedArray = new ArrayList<VotedUserData>();
+			//ArrayList<VotedUserData> votedArray = new ArrayList<VotedUserData>();
 
-			//Initialise database
-			dd = new DribbleData(DribActivity.this);
+			
 			//Initialise Cursor
 			Cursor dbCursor = dd.getDribId(dribId);
 
@@ -450,6 +471,7 @@ public class DribActivity extends ListActivity
 			{
 				return true;
 			}
+
 
 		}
 

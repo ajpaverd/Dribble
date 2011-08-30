@@ -7,11 +7,13 @@ package com.dribble.dribbleapp;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
+import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.app.TabActivity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.location.Location;
@@ -21,6 +23,9 @@ import android.os.Handler;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -44,7 +49,7 @@ public class SubjectActivity extends ListActivity {
 
 	private ProgressDialog pd;
 	private Handler mHandler = new Handler();
-	private ArrayList<DribSubject> dribTopAr;
+	public static ArrayList<DribSubject> dribTopAr;
 
 	//Declare the telephony manager to get users IMEI
 	private TelephonyManager telephonyManager;
@@ -55,10 +60,16 @@ public class SubjectActivity extends ListActivity {
 	private DribCom dribCom;
 
 	//For receiving geographic measurements
-	private GeographicMeasurementsReceiver geographicMeasurementsReceiver;
+	public GeographicMeasurementsReceiver geographicMeasurementsReceiver;
+	public Bundle geographicMeasurementsBundle;
+		
+	
 	private Context context;
 	private double primitiveLatitude = 22.00;
 	private double primitiveLongitude = -28.0754;
+	
+	//To create a drill-down view
+	private Intent dribsListIntent;
 
 
 	@Override
@@ -68,19 +79,54 @@ public class SubjectActivity extends ListActivity {
 		setContentView(R.layout.subjects);
 		Log.i(TAG, "Tab Loaded");		  
 
+		//Create Location Object
+		// Get current location TODO (if Network provider)
+		String provider = LocationManager.GPS_PROVIDER;
+		myLoc = new Location(provider);
 		//Register broadcast receiver
-		geographicMeasurementsReceiver = new GeographicMeasurementsReceiver();
+		geographicMeasurementsReceiver = new GeographicMeasurementsReceiver(myLoc);
 		this.registerReceiver(geographicMeasurementsReceiver, 
-				new IntentFilter(DribbleMain.BROADCAST_GEOGRAPHIC_MEASUREMENTS));
-		//Registered Receiver
+				new IntentFilter(Splash.BROADCAST_GEOGRAPHIC_MEASUREMENTS));
+		
+		//Create a new communication object
+		dribCom = new DribCom(this);
 
 		//Get IMEI Measurements for Like/Dislike
 		telephonyManager = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
 		imei =  telephonyManager.getDeviceId();
 
 	}
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) 
+	{		
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.subject_menu, menu);
+		
+		Intent prefsIntent = new Intent(this, DribblePreferencesActivity.class);
+		MenuItem preferences = menu.findItem(R.id.settings_option_item);
+		preferences.setIntent(prefsIntent);
+		
+		return true;
+	}
 
-	private void refreshContent()
+	// 
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item)
+	{
+		// Handle item selection
+		switch (item.getItemId()) 
+		{
+		case R.id.refresh_option_item:
+			refreshContent();
+			return true;
+		default:
+			return super.onOptionsItemSelected(item);
+		}
+	}
+
+
+	public void refreshContent()
 	{
 		// show progress dialog
 		pd = new ProgressDialog(this);
@@ -90,17 +136,11 @@ public class SubjectActivity extends ListActivity {
 		pd.show();
 
 		Log.i(TAG,"Getting current Location");
-
-		// Get current location TO DO (if Network provider)
-		String provider = LocationManager.GPS_PROVIDER;
-		myLoc = new Location(provider);
-
-		myLoc.setLatitude(primitiveLatitude);
-		myLoc.setLongitude(primitiveLongitude);
-
+		
+		
 		Log.i(TAG,"Latitude "+myLoc.getLatitude());
 		Log.i(TAG,"Longitude "+myLoc.getLongitude());
-
+		
 		//Log.i(TAG,"Current Location is "+myLoc.getLatitude());
 		final int results = DribbleSharedPrefs.getNumDribTopics(this);
 
@@ -114,8 +154,13 @@ public class SubjectActivity extends ListActivity {
 				if(telephonyManager.getNetworkType()!=0)
 				{
 					try{
+						Log.i(TAG,"Retrieving Topics");
+						//To prevent calling data again
+						if(dribTopAr == null){
+						
 						dribTopAr = dribCom.getTopics(results);
-
+						
+						}
 
 
 						if (dribTopAr != null && dribTopAr.size() != 0)
@@ -129,6 +174,7 @@ public class SubjectActivity extends ListActivity {
 						{
 							//If no topics, displays default "no topics available" message
 							pd.dismiss();
+							dribTopAr = new ArrayList<DribSubject>();
 							CurrentDribSubject = null;
 							mHandler.post(mUpdateResults);
 						}
@@ -194,9 +240,12 @@ public class SubjectActivity extends ListActivity {
 				DribSubject selectedTopic = ((DribSubject)(dribTopAr.toArray())[position]);
 
 				CurrentDribSubject = selectedTopic;
-				TabActivity tabActivity = (TabActivity)getParent();
-				TabHost tabHost = tabActivity.getTabHost();
-				tabHost.setCurrentTab(1);
+				
+				dribsListIntent = new Intent(SubjectActivity.this, DribActivity.class);
+				startActivity(dribsListIntent);
+				//TabActivity tabActivity = (TabActivity)getParent();
+				//TabHost tabHost = tabActivity.getTabHost();
+				//tabHost.setCurrentTab(1);
 			}
 		});
 	}
@@ -299,7 +348,8 @@ public class SubjectActivity extends ListActivity {
 	@Override
 	public void onPause(){
 		super.onPause();
-		//pd.dismiss();
+		
+		pd.dismiss();
 	}
 
 	@Override
@@ -308,21 +358,7 @@ public class SubjectActivity extends ListActivity {
 		pd.dismiss();
 	}
 
-	private class GeographicMeasurementsReceiver extends BroadcastReceiver
-	{
-
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			primitiveLatitude = intent.getDoubleExtra("myLatitude", 22.800);
-			primitiveLongitude = intent.getDoubleExtra("myLongitude", -28.074);
-
-			//update the latitudes and longitudes respectively
-			myLoc.setLatitude(primitiveLatitude);
-			myLoc.setLongitude(primitiveLongitude);
-
-		}
-
-	}
+	
 
 	//	   @Override
 	//	protected void onActivityResult(int requestCode, int resultCode, Intent data) {

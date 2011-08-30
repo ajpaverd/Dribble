@@ -14,7 +14,7 @@ import android.util.Log;
 public class DribbleData {
 
 	public static final String DB_NAME = "Dribble";
-	public static final String DB_TABLE_VOTEDDRIBID = "votedDribId";
+	public static final String DB_TABLE_VOTEDDRIBID = "votedDribIdTable";
 	public static final int DB_VERSION = 3;
 
 	private static final String CLASSNAME = DribbleData.class.getSimpleName();
@@ -54,24 +54,33 @@ public class DribbleData {
 
 	//Used to create, update and open the database
 	private static class DBOpenHelper extends SQLiteOpenHelper{
-		private static final String DB_CREATE = "CREATE TABEL "
+		private static final String DB_CREATE = "CREATE TABLE "
 				+DribbleData.DB_TABLE_VOTEDDRIBID
 				+ " (_dribId TEXT, _timeCreated);";
+		private SQLiteDatabase db;
 
 		public DBOpenHelper (final Context context, final String dbName, 
 				final int version){
 			super(context, DribbleData.DB_NAME, null, DribbleData.DB_VERSION);
+			Log.i(TAG,"Constructor called");
 		}
 
 		@Override
 		public void onCreate(final SQLiteDatabase db){
+			
 			try{
+				Log.i(TAG,"Table created: "+DBOpenHelper.DB_CREATE);
 				db.execSQL(DBOpenHelper.DB_CREATE);
 			}catch (SQLException e){
 
 			}
 		}
-
+		
+		@Override
+		public void onOpen(final SQLiteDatabase db) {
+			super.onOpen(db);
+		}
+		
 		@Override
 		public void onUpgrade (final SQLiteDatabase db, final int oldVersion,
 				final int newVersion){
@@ -91,7 +100,7 @@ public class DribbleData {
 	private void establishDB(){
 		if(this.db==null){
 			this.db = this.dbOpenHelper.getWritableDatabase();
-			Log.i(TAG,"New Database established...");
+			Log.i(TAG,"New Database established..."+ db.toString());
 			
 		}
 		

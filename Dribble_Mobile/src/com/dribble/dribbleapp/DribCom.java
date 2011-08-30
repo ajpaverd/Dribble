@@ -5,10 +5,8 @@
 
 package com.dribble.dribbleapp;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
 
@@ -21,20 +19,17 @@ import org.apache.http.entity.StringEntity;
 import org.simpleframework.xml.Serializer;
 import org.simpleframework.xml.core.Persister;
 
+import android.content.Context;
+import android.content.IntentFilter;
+import android.location.Location;
+import android.location.LocationManager;
+import android.util.Log;
+
 import com.dribble.common.Drib;
 import com.dribble.common.DribList;
 import com.dribble.common.DribSubject;
 import com.dribble.common.DribSubjectList;
 import com.dribble.dribbleapp.Utilities.HttpUtils;
-
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.SharedPreferences;
-import android.location.Location;
-import android.location.LocationManager;
-import android.util.Log;
 
 // Communications class
 public class DribCom {
@@ -42,7 +37,7 @@ public class DribCom {
 	private static String urlToSendRequest;
 	// 10.0.2.2 resolves to localhost in emulator
 	//
-	private static final String targetDomain = "10.0.2.2:8080";
+	private static final String targetDomain = "wheres.dyndns.org:8080";
 	private static final String TAG = "DribCom";
 	private static final Serializer serializer = new Persister();
 	
@@ -52,14 +47,20 @@ public class DribCom {
 	//For receiving geographic measurements
 		private GeographicMeasurementsReceiver geographicMeasurementsReceiver;
 		private Context context;
-		private double latitude;
-		private double longitude;
+		private int latitude;
+		private int longitude;
+		public Location currentLocation;
+		
+		private String provider;
 	
 	public DribCom(Context context){
+		// Get current location TO DO (if Network provider)
+				provider = LocationManager.GPS_PROVIDER;
+				currentLocation = new Location(provider);
 		//Register broadcast receiver
-				geographicMeasurementsReceiver = new GeographicMeasurementsReceiver();
+				geographicMeasurementsReceiver = new GeographicMeasurementsReceiver(currentLocation);
 				context.registerReceiver(geographicMeasurementsReceiver, 
-						new IntentFilter(DribbleMain.BROADCAST_GEOGRAPHIC_MEASUREMENTS));
+						new IntentFilter(Splash.BROADCAST_GEOGRAPHIC_MEASUREMENTS));
 	}
 	
 	// Converts/casts XML streams to defined classes
@@ -109,20 +110,28 @@ public class DribCom {
 	//GET - list of topics
 	public ArrayList<DribSubject> getTopics(int results) 
 	{   
+		
 		Log.i(TAG, "Attempt: Retrieve List of Topics");
 		
 		// request url
 		urlToSendRequest =  "http://"+targetDomain+"/Dribble_Communications-war/resources/GetDribSubjects";
 		
-		
-		
+		latitude = (int) ((int)currentLocation.getLatitude()*1E6);
+		longitude  = (int) ((int)currentLocation.getLongitude()*1E6);
+		try{
 		HttpGet httpGet = new HttpGet(urlToSendRequest + "?latitude=" + latitude + "&longitude=" +
 				longitude + "&results=" + results);
 		DribSubjectList subjectList =  (DribSubjectList)XMLStreamToClass(httpGet, DribSubjectList.class);
+		
+		
 		if (subjectList != null)
 			return subjectList.list;
 		else
 			return null;
+		}catch(NullPointerException npe){
+			Log.e(TAG,"Error: "+npe.getMessage());
+			return null;
+		}
 	}
 
 	//GET - messages for a topic 
@@ -180,16 +189,5 @@ public class DribCom {
 		}
 	}
 	
-	private class GeographicMeasurementsReceiver extends BroadcastReceiver
-	{
-
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			latitude = intent.getDoubleExtra("myLatitude", 22.800);
-			longitude = intent.getDoubleExtra("myLongitude", -28.074);
-
-		}
-
-	}
 }
 	
