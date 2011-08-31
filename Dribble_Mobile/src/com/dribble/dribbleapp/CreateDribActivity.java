@@ -62,6 +62,7 @@ public class CreateDribActivity extends Activity
 		setContentView(R.layout.input_drib);
 
 		//Create Location Object
+
 		LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
 		if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER))
 		{
@@ -72,9 +73,8 @@ public class CreateDribActivity extends Activity
 			myLoc = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
 		}
 		//Register broadcast receiver
-		geographicMeasurementsReceiver = new GeographicMeasurementsReceiver(myLoc);
-		this.registerReceiver(geographicMeasurementsReceiver, 
-				new IntentFilter(Splash.BROADCAST_GEOGRAPHIC_MEASUREMENTS));
+
+
 		//Registered Receiver
 	}
 
@@ -195,6 +195,10 @@ public class CreateDribActivity extends Activity
 	public void onResume()
 	{
 		super.onResume();
+		//Register broadcast receiver
+				geographicMeasurementsReceiver = new GeographicMeasurementsReceiver(myLoc);
+				this.registerReceiver(geographicMeasurementsReceiver, 
+						new IntentFilter(DashboardActivity.BROADCAST_GEOGRAPHIC_MEASUREMENTS));
 		context = this;
 		refreshContent();
 	}
@@ -203,7 +207,7 @@ public class CreateDribActivity extends Activity
 	public void onPause()
 	{
 		super.onPause();
-
+		unregisterReceiver(geographicMeasurementsReceiver);
 		// Show hidden items and clear text
 		EditText et = (EditText) findViewById(R.id.topicInput);
 		et.setText("");

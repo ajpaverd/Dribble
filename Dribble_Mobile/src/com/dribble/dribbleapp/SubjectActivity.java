@@ -80,6 +80,7 @@ public class SubjectActivity extends ListActivity {
 		// Get current location TODO (if Network provider)
 		String provider = LocationManager.GPS_PROVIDER;
 		myLoc = new Location(provider);
+
 		
 		//Create a new communication object
 		dribCom = new DribCom(this);
@@ -240,6 +241,10 @@ public class SubjectActivity extends ListActivity {
 	public void onResume() 
 	{
 		super.onResume();
+		//Register broadcast receiver
+				geographicMeasurementsReceiver = new GeographicMeasurementsReceiver(myLoc);
+				this.registerReceiver(geographicMeasurementsReceiver, 
+						new IntentFilter(DashboardActivity.BROADCAST_GEOGRAPHIC_MEASUREMENTS));
 		Log.i(TAG,"Resume was called");
 		
 		//Register broadcast receiver
@@ -340,18 +345,17 @@ public class SubjectActivity extends ListActivity {
 	@Override
 	public void onPause(){
 		super.onPause();
-		if (pd != null)
-			pd.dismiss();
-
+		if(pd!=null)
+		pd.dismiss();
 		unregisterReceiver(geographicMeasurementsReceiver);
 	}
 
 	@Override
 	public void onDestroy(){
 		super.onDestroy();
-		
-		if (pd != null)
-			pd.dismiss();
+
+		if(pd!=null)
+		pd.dismiss();
 	}
 
 }
