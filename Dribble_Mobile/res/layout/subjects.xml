@@ -4,15 +4,26 @@
 	android:layout_height="fill_parent"
 	android:orientation="vertical"
 	xmlns:android="http://schemas.android.com/apk/res/android">
+	<TextView
+		android:id="@+id/latestTopics"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:padding="2dp"
+		android:textStyle="bold"
+		android:gravity="center"
+		android:textSize="18sp"
+		android:text="Latest Topics"/>
 	<ListView
 		android:id="@+id/android:list"
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
+		android:layout_below="@id/latestTopics"
 		android:fadeScrollbars="true"/>
 	<TextView
 		android:id="@+id/android:empty"
 		android:layout_width="fill_parent"
 		android:layout_height="fill_parent"
 		android:padding="10dp"
-		android:text="No subjects available in your area" />
+		android:layout_below="@id/latestTopics"
+		android:text="No topics available near you" />
 </RelativeLayout>

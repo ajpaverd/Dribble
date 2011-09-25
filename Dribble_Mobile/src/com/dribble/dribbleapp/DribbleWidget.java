@@ -18,8 +18,6 @@ import android.widget.RemoteViews;
 // Creates a dribble widget for the homescreen
 public class DribbleWidget extends AppWidgetProvider 
 {
-	private DribCom dribCom;
-	
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		if (intent.getAction() == null) 
@@ -37,8 +35,8 @@ public class DribbleWidget extends AppWidgetProvider
 	{ 
 		context.startService(new Intent(context, DribbleService.class));
 	}
-//changed from static
-public class DribbleService extends IntentService 
+
+public static class DribbleService extends IntentService 
 { 
 	public DribbleService() 
 	{
@@ -59,8 +57,7 @@ public class DribbleService extends IntentService
 		PendingIntent pi = PendingIntent.getBroadcast(context, 0, i,0);
 		updateViews.setOnClickPendingIntent(R.id.dribble_icon, pi);
 		int results = DribbleSharedPrefs.getNumDribTopics(getApplicationContext());
-		//changed from static
-		ArrayList<DribSubject> dribTopAr= dribCom.getTopics(GpsListener.currentLocation);
+		ArrayList<DribSubject> dribTopAr= DribCom.getTopics(results);
 		DribSubject ds = ((DribSubject)(dribTopAr.toArray())[0]);
 		updateViews.setTextViewText(R.id.drib_widget, "Top Subject: " + ds.getName());
 		return updateViews;

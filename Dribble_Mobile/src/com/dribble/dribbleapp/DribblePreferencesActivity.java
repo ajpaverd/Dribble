@@ -15,5 +15,4 @@ public class DribblePreferencesActivity extends PreferenceActivity
 				DribbleSharedPrefs.PREFS_NAME);
 		addPreferencesFromResource(R.xml.prefs);
 	}
-
 }

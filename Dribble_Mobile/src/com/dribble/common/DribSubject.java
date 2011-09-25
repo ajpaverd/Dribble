@@ -16,9 +16,9 @@ public class DribSubject {
 	@Element
     private int subjectID;
 	@Element
-	private int latitude;
+	private double latitude;
 	@Element
-    private int longitude;
+    private double longitude;
 	@Element
     private int numViews;
 	@Element
@@ -35,7 +35,7 @@ public class DribSubject {
     {
     }
     
-    public DribSubject (String name, int latitude, int longitude)
+    public DribSubject (String name, double latitude, double longitude)
     {
     	Log.i(TAG, "New DribTopic Created");
 
@@ -72,17 +72,17 @@ public class DribSubject {
         return this.subjectID;
     }    
 
-    public void setLatitude(int latitude)
+    public void setLatitude(double latitude)
     {
         this.latitude = latitude;
     }
 
-    public int getLatitude()
+    public double getLatitude()
     {
         return latitude;
     }
 
-    public void setLongitude(int longitude)
+    public void setLongitude(double longitude)
     {
         this.longitude = longitude;
     }

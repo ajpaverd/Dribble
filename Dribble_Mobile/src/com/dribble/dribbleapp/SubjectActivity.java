@@ -7,120 +7,56 @@ package com.dribble.dribbleapp;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
-import android.app.AlertDialog;
+import com.dribble.common.Drib;
+import com.dribble.common.DribSubject;
+
+import com.dribble.dribbleapp.R;
+import com.google.android.maps.GeoPoint;
+import com.google.android.maps.MyLocationOverlay;
+import com.google.android.maps.OverlayItem;
+
 import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.app.TabActivity;
-import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.location.Location;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
-import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TabHost;
 import android.widget.TextView;
 
-import com.dribble.common.DribSubject;
-import com.google.android.maps.GeoPoint;
-import com.google.android.maps.OverlayItem;
-
 public class SubjectActivity extends ListActivity {
 
-	private static final String TAG = "SubjectActivity";
-
+	private static final String TAG = "TagActivity";
+	
 	// Store static selected subject and name
 	public static DribSubject CurrentDribSubject = null;
-	private Location myLoc;
-
+	private static Location myLoc;
+	
 	private ProgressDialog pd;
 	private Handler mHandler = new Handler();
-	public static ArrayList<DribSubject> dribTopAr;
-
-	//Declare the telephony manager to get users IMEI
-	private TelephonyManager telephonyManager;
-	private String imei;
-
-	//To change from static to non-static
-	private GpsListener gpsListener;
-	private DribCom dribCom;
-
-	//For receiving geographic measurements
-	public GeographicMeasurementsReceiver geographicMeasurementsReceiver;
-	public Bundle geographicMeasurementsBundle;
-		
-	private Context context;
+	private ArrayList<DribSubject> dribTopAr;
 	
-	//To create a drill-down view
-	private Intent dribsListIntent;
-
-
 	@Override
 	public void onCreate(Bundle savedInstanceState) 
 	{
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.subjects);
-		Log.i(TAG, "Tab Loaded");		  
-
-		//Create Location Object
-		// Get current location TODO (if Network provider)
-		String provider = LocationManager.GPS_PROVIDER;
-		myLoc = new Location(provider);
-
-		
-		//Create a new communication object
-		dribCom = new DribCom(this);
-
-		//Get IMEI Measurements for Like/Dislike
-		telephonyManager = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
-		imei =  telephonyManager.getDeviceId();
-
+		  super.onCreate(savedInstanceState);
+		  setContentView(R.layout.subjects);
+		  Log.i(TAG, "Tab Loaded");		  
 	}
-	
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) 
-	{		
-		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.subject_menu, menu);
-		
-		Intent prefsIntent = new Intent(this, DribblePreferencesActivity.class);
-		MenuItem preferences = menu.findItem(R.id.settings_option_item);
-		preferences.setIntent(prefsIntent);
-		
-		return true;
-	}
-
-	// 
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item)
-	{
-		// Handle item selection
-		switch (item.getItemId()) 
-		{
-		case R.id.refresh_option_item:
-			refreshContent();
-			return true;
-		default:
-			return super.onOptionsItemSelected(item);
-		}
-	}
-
-
-	public void refreshContent()
+    
+	private void refreshContent()
 	{
 		// show progress dialog
 		pd = new ProgressDialog(this);
@@ -128,12 +64,11 @@ public class SubjectActivity extends ListActivity {
 		pd.setIndeterminate(true);
 		pd.setCancelable(true);
 		pd.show();
-
-		Log.i(TAG,"Getting current Location");
 		
+		// Get current location
+	    myLoc = GpsListener.getLocation();
 		
-		Log.i(TAG,"Latitude "+myLoc.getLatitude());
-		Log.i(TAG,"Longitude "+myLoc.getLongitude());
+		final int results = DribbleSharedPrefs.getNumDribTopics(this);
 
 		// Create thread to fetch subjects
 		//
@@ -141,41 +76,21 @@ public class SubjectActivity extends ListActivity {
 		{
 			public void run()
 			{
-
-				Log.i(TAG,"Current Network Data Type is: "+telephonyManager.getNetworkType());
-				if(telephonyManager.getNetworkType()!=0)
+				dribTopAr= DribCom.getTopics(results);
+				// If returned topics
+				//
+				if (dribTopAr != null && dribTopAr.size() != 0)
+				{				
+					Log.i(TAG, "Received List of Topics");
+					mHandler.post(mUpdateResults);
+					mHandler.post(mAddOverlays);
+				}
+				else
 				{
-					try{
-						Log.i(TAG,"Retrieving Topics");
-						//To prevent calling data again
-						if(dribTopAr == null){
-						
-							dribTopAr = dribCom.getTopics(GpsListener.currentLocation);
-						
-						}
-
-						if (dribTopAr != null && dribTopAr.size() != 0)
-						{				
-							Log.i(TAG, "Received List of Topics");
-							mHandler.post(mUpdateResults);
-
-							mHandler.post(mAddOverlays);
-						}
-						else
-						{
-							//If no topics, displays default "no topics available" message
-							pd.dismiss();
-							dribTopAr = new ArrayList<DribSubject>();
-							CurrentDribSubject = null;
-							mHandler.post(mUpdateResults);
-						}
-
-					}catch(NullPointerException npe)
-					{
-						Log.e(TAG, "The message is: "+npe.getMessage());
-						//If no topics, displays default "no topics available" message
-						pd.dismiss();
-					}
+					//If no topics, displays default "no topics available" message
+					pd.dismiss();
+					CurrentDribSubject = null;
+					mHandler.post(mUpdateResults);
 				}
 			}
 		};
@@ -183,7 +98,7 @@ public class SubjectActivity extends ListActivity {
 		// start Thread
 		getDribSubjects.start();
 	}
-
+	
 	// Create thread for adding all topics to map
 	final Runnable mAddOverlays = new Runnable() {
 		public void run()
@@ -195,13 +110,13 @@ public class SubjectActivity extends ListActivity {
 				for(DribSubject subject : dribTopAr)
 				{			
 					GeoPoint point = new GeoPoint((int)(subject.getLatitude() * 1E6),(int)(subject.getLongitude() * 1E6));
-					overlayitem = new OverlayItem(point, "Drib Topic", subject.getName());
-					MapsActivity.Itemizedoverlay.addOverlay(overlayitem);
+				    overlayitem = new OverlayItem(point, "Drib Topic", subject.getName());
+				    MapsActivity.Itemizedoverlay.addOverlay(overlayitem);
 				}
 			}
 		}
 	};
-
+	
 	// Create runnable for posting
 	final Runnable mUpdateResults = new Runnable() 
 	{
@@ -210,84 +125,83 @@ public class SubjectActivity extends ListActivity {
 			updateResultsInUi();
 		}
 	};
-
+	
 	private void updateResultsInUi()
 	{
 		// Set list view
-		setListAdapter(new SubjectAdapter(getApplicationContext(), R.layout.subject_row, dribTopAr));
-
-		// dismiss dialog
-		pd.dismiss();
-
-		Log.i(TAG, "List Adapter Set");
-		ListView lv = getListView();
-		lv.setTextFilterEnabled(true);
-
-		lv.setOnItemClickListener(new OnItemClickListener() 
-		{
-			public void onItemClick(AdapterView<?> parent, View view, int position, long id) 
-			{		    	
-				Log.i(TAG, "List Item Clicked");
-				DribSubject selectedTopic = ((DribSubject)(dribTopAr.toArray())[position]);
-
-				CurrentDribSubject = selectedTopic;
-				
-				dribsListIntent = new Intent(SubjectActivity.this, DribActivity.class);
-				startActivity(dribsListIntent);
+	  setListAdapter(new SubjectAdapter(getApplicationContext(), R.layout.subject_row, dribTopAr));
+	  
+	  // dismiss dialog
+	  pd.dismiss();
+	  
+	  Log.i(TAG, "List Adapter Set");
+	  ListView lv = getListView();
+	  lv.setTextFilterEnabled(true);
+	  
+	  lv.setOnItemClickListener(new OnItemClickListener() 
+	  {
+	    public void onItemClick(AdapterView<?> parent, View view, int position, long id) 
+	    {		    	
+	    	Log.i(TAG, "List Item Clicked");
+	    	DribSubject selectedTopic = ((DribSubject)(dribTopAr.toArray())[position]);
+	    	
+	    	CurrentDribSubject = selectedTopic;
+	    	
+//	    	Intent mainIntent = new Intent(SubjectActivity.this,DribActivity.class);
+//            SubjectActivity.this.startActivity(mainIntent);   
+	    	
+	    	TabActivity tabActivity = (TabActivity) getParent();
+			if (tabActivity != null)
+			{
+				TabHost tabHost = tabActivity.getTabHost();
+				tabHost.setCurrentTab(1);
 			}
-		});
-	}
+	    }
+	   });
+}
 	@Override
 	public void onResume() 
 	{
-		super.onResume();
-		//Register broadcast receiver
-				geographicMeasurementsReceiver = new GeographicMeasurementsReceiver(myLoc);
-				this.registerReceiver(geographicMeasurementsReceiver, 
-						new IntentFilter(DashboardActivity.BROADCAST_GEOGRAPHIC_MEASUREMENTS));
-		Log.i(TAG,"Resume was called");
-		
-		//Register broadcast receiver
-		geographicMeasurementsReceiver = new GeographicMeasurementsReceiver(myLoc);
-		this.registerReceiver(geographicMeasurementsReceiver, 
-				new IntentFilter(Splash.BROADCAST_GEOGRAPHIC_MEASUREMENTS));
-		
+	    super.onResume();
 		refreshContent();
 	}
-
+	
 	// Class to hold custom list view information
 	//
 	private static class ViewHolder 
 	{
 		TextView message;
 		TextView info;
+		TextView distance;
 	}
-
+	
 	// Show elapsed time since post
-	private String getElapsed(long millis) 
+	private String getElapsed(long millis)
 	{
 		long time = millis / 1000;
-		//String seconds = Integer.toString((int) (time % 60));
+		// String seconds = Integer.toString((int) (time % 60));
 		String minutes = Integer.toString((int) ((time % 3600) / 60));
 		int tempHours = (int) (time / 3600);
 		String days = Integer.toString(tempHours / 24);
-		String hours = Integer.toString(tempHours%24);
+		String hours = Integer.toString(tempHours % 24);
+		String sent ="";
 
-		minutes += "min ";
-		if (hours.equals("0")) {
-			hours = "";
-		} else {
-			hours += "hrs ";
+		if (!days.equals("0"))
+		{
+			sent = days + " day(s)";
 		}
-		if (days.equals("0")) {
-			days = "";
-		} else {
-			days += "days ";
+		else if (!hours.equals("0"))
+		{
+			sent = hours + " hour(s)";
+		}
+		else
+		{
+			sent = minutes + " min";
 		}
 
-		return days + hours + minutes;
+		return sent + " ago";
 	}
-
+	
 	// Custom list view implementation
 	//
 	private class SubjectAdapter extends ArrayAdapter<DribSubject> {
@@ -314,6 +228,7 @@ public class SubjectActivity extends ListActivity {
 				holder = new ViewHolder();
 				holder.message = (TextView) convertView.findViewById(R.id.subjectText);
 				holder.info = (TextView) convertView.findViewById(R.id.subjectInfo);
+				holder.distance = (TextView) convertView.findViewById(R.id.subjectDistance);
 				convertView.setTag(holder);
 			} 
 			else 
@@ -326,36 +241,20 @@ public class SubjectActivity extends ListActivity {
 			if (subject != null)
 			{
 				holder.message.setText(subject.getName());
-
+				
 				Location subjectLoc = new Location("Subject Location");
-				subjectLoc.setLatitude(subject.getLatitude()/1E6);
-				subjectLoc.setLongitude(subject.getLongitude()/1E6);
-
+				subjectLoc.setLatitude(subject.getLatitude());
+				subjectLoc.setLongitude(subject.getLongitude());
+				
 				// Get distance in km
 				double distance = myLoc.distanceTo(subjectLoc)/1000;
 				DecimalFormat df = new DecimalFormat("#.##"); 
-
+				
 				// Set info text
-				holder.info.setText(df.format(distance) + " km " + "("+ getElapsed(System.currentTimeMillis() - subject.getTime()) + "ago)" ); // + "\nDRank: " + drib.getPopularity());
+				holder.info.setText("last viewed: " + getElapsed(System.currentTimeMillis() - subject.getTime()));
+				holder.distance.setText(df.format(distance) + "km");
 			}
 			return convertView; // return custom view
 		}
 	}
-
-	@Override
-	public void onPause(){
-		super.onPause();
-		if(pd!=null)
-		pd.dismiss();
-		unregisterReceiver(geographicMeasurementsReceiver);
-	}
-
-	@Override
-	public void onDestroy(){
-		super.onDestroy();
-
-		if(pd!=null)
-		pd.dismiss();
-	}
-
 }

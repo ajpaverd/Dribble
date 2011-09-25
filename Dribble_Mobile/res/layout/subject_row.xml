@@ -14,6 +14,17 @@
      android:layout_margin="5dp"
     
      android:src="@drawable/drib_icon_2_small" />
+     <TextView
+		android:id="@+id/subjectDistance"
+		
+		android:layout_width="wrap_content"
+		android:layout_height="fill_parent"
+		android:paddingRight="5dp"
+		android:paddingLeft="5dp"
+		android:layout_alignParentRight="true"
+		android:layout_centerVertical="true"
+		
+		android:textSize="16sp" />
 	<TextView
     android:id="@+id/subjectText"
 	android:layout_width="fill_parent"
@@ -21,14 +32,19 @@
 	
     android:paddingTop="6dp"
 	android:textSize="16sp"
-	android:layout_toRightOf="@id/icon" />
+	android:layout_toRightOf="@id/icon" 
+	android:layout_toLeftOf="@id/subjectDistance"/>
 	<TextView
 	android:id="@+id/subjectInfo"
 	android:layout_width="wrap_content"
 	android:layout_height="wrap_content"
+	
+	android:paddingBottom="5dp"
 	android:layout_below="@id/subjectText"
 	android:layout_toRightOf="@id/icon"
 	android:layout_alignParentLeft="@id/subjectText"
 	android:layout_alignParentBottom="true"
+	
+	android:textColor="@android:color/tertiary_text_light"
 	android:textSize="12sp" />
 </RelativeLayout>

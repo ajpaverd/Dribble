@@ -42,14 +42,14 @@ public class MapsActivity extends MapActivity
 	{
 		super.onResume();
 
-		// Navigate to current location - not used anymore since navigating to
-		// topic location now
+		// Navigate to current location
 		// if (GpsListener.getLocation() != null)
 		// {
 		// GeoPoint geopoint = new GeoPoint(GpsListener.getLatitude(),
 		// GpsListener.getLongitude());
 		// mapController.animateTo(geopoint);
 		// }
+		
 		// Get overlay items
 		List<Overlay> mapOverlays = mapView.getOverlays();
 		

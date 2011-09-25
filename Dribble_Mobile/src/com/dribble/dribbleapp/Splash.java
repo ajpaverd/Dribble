@@ -5,10 +5,6 @@
 
 package com.dribble.dribbleapp;
 
-import java.util.Timer;
-
-import com.dribble.dribbleapp.R;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -23,41 +19,37 @@ import android.provider.Settings;
 import android.util.Log;
 import android.widget.Toast;
 
-
-public class Splash extends Activity {
-
-	private static final String TAG = "Splash";
-	// Splash screen display length (milliseconds)
-	private static int SPLASH_DISPLAY_LENGTH = 1500;
-
-
-	@Override
-	public void onCreate(Bundle icicle) 
-	{
-		super.onCreate(icicle);
-		Log.i(TAG, "Splash displayed");
-		setContentView(R.layout.splash);
-
+	public class Splash extends Activity {
 		
-		
-		/* New Handler to start the Menu-Activity
-		 * and close this Splash-Screen after some seconds.*/
-		new Handler().postDelayed(new Runnable()
-		{
-			public void run() 
-			{
-				/* Create an Intent that will start the Menu-Activity. */
-				Intent mainIntent = new Intent(Splash.this,DashboardActivity.class);
-				Log.i(TAG, "Start Dribble Activity");
-				Splash.this.startActivity(mainIntent);
+		private static final String TAG = "Splash";
+		// Splash screen display length (milliseconds)
+	    private static final int SPLASH_DISPLAY_LENGTH = 1000;
 
-				Splash.this.finish();
-				Log.i(TAG, "Splash Activity Finished");
-			}
-		}, SPLASH_DISPLAY_LENGTH);
-		
-	}	
-
-	
-}
+	     @Override
+	     public void onCreate(Bundle icicle) 
+	     {
+	          super.onCreate(icicle);
+	  		
+	          Log.i(TAG, "Splash displayed");
+	          setContentView(R.layout.splash);
+	          
+	          /* New Handler to start the Menu-Activity
+	           * and close this Splash-Screen after some seconds.*/
+	          new Handler().postDelayed(new Runnable()
+	          {
+	               public void run() 
+	               {
+	                    /* Create an Intent that will start the Menu-Activity. */
+	                    Intent mainIntent = new Intent(Splash.this,DribbleTabs.class);
+	                    Log.i(TAG, "Start Dribble Activity");
+	                    Splash.this.startActivity(mainIntent);
+	                   
+	                    Splash.this.finish();
+	                    Log.i(TAG, "Splash Activity Finished");
+	               }
+	          }, SPLASH_DISPLAY_LENGTH);
+	     }
+	     
+	    
+	}
 

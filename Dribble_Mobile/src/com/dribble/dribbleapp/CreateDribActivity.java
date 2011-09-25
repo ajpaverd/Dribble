@@ -15,9 +15,7 @@ import android.app.AlertDialog;
 import android.app.TabActivity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.location.Location;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -36,15 +34,7 @@ public class CreateDribActivity extends Activity
 	// private static ProgressDialog pd;
 	private static Handler mHandler = new Handler();
 	private Context context;
-	//Preventing static call
-	private GpsListener gpsListener;
-
-	//For receiving geographic measurements
-	public GeographicMeasurementsReceiver geographicMeasurementsReceiver;
-	public Bundle geographicMeasurementsBundle;
 	
-	public Location myLoc;
-
 	public CreateDribActivity()
 	{
 	}
@@ -53,29 +43,13 @@ public class CreateDribActivity extends Activity
 	{
 		this.context = context;
 	}
-
+	
 	public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
 		Log.i(TAG, "Tab Loaded");
 
 		setContentView(R.layout.input_drib);
-
-		//Create Location Object
-
-		LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-		if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER))
-		{
-			myLoc = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-		}
-		else if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER))
-		{
-			myLoc = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-		}
-		//Register broadcast receiver
-
-
-		//Registered Receiver
 	}
 
 	// Refresh content for creating new dribs
@@ -100,22 +74,21 @@ public class CreateDribActivity extends Activity
 				{
 					// Show error message
 					new AlertDialog.Builder(CreateDribActivity.this)
-					.setTitle("Error")
-					.setMessage("Topic cannot be empty")
-					.setPositiveButton("OK", null).show();
+							.setTitle("Error")
+							.setMessage("Topic cannot be empty")
+							.setPositiveButton("OK", null).show();
 				}
 				else
 				{
-					double latitude = myLoc.getLatitude();
-					double longitude = myLoc.getLongitude();
 					// Create Topic for new Drib
-					dribSubject = new DribSubject(dribTopicName, (int)(latitude*1E6), (int)(longitude*1E6));
+					Location loc = GpsListener.getLocation();
+					dribSubject = new DribSubject(dribTopicName, loc.getLatitude(), loc.getLongitude());
 
 					EditText dribMessage = (EditText) findViewById(R.id.dribInput);
 					String dribText = dribMessage.getText().toString();
-
+					
 					// Send drib for a subject
-					sendDrib(dribSubject, dribText, latitude, longitude);
+					sendDrib(dribSubject, dribText);
 					
 					// Hide soft keyboard
 					InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -124,26 +97,33 @@ public class CreateDribActivity extends Activity
 			}
 		});
 	}
-
-	public void sendDrib(DribSubject subject, String message, double latitude, double longitude  )
+	
+	public void sendDrib(DribSubject subject, String message)
 	{		
 		if (message.equals(""))
 		{
 			// Show error message
 			new AlertDialog.Builder(CreateDribActivity.this)
-			.setTitle("Error")
-			.setMessage("Drib cannot be empty")
-			.setPositiveButton("OK", null).show();
+					.setTitle("Error")
+					.setMessage("Drib cannot be empty")
+					.setPositiveButton("OK", null).show();
 		}
 		else
 		{
 			// Data is ok
 
 			// Create new drib
-			Log.i(TAG,"New Drib Latitude " + latitude);
-			Log.i(TAG,"New Drib Longitude " + longitude);
-			final Drib newDrib = new Drib(subject, message, (int)(latitude *1E6), (int)(longitude * 1E6));
+			Location loc = GpsListener.getLocation();
+			final Drib newDrib = new Drib(subject, message, loc.getLatitude(), loc.getLongitude());
 			Log.i(TAG, "Submit new message");
+
+			// Ignoring progress dialog for now, might look better
+			// without it - Chad
+			// pd = new ProgressDialog(v.getContext());
+			// pd.setMessage("Sending Drib...");
+			// pd.setIndeterminate(true);
+			// pd.setCancelable(true);
+			// pd.show();
 
 			// Create a new Thread and send Drib
 			Thread sendDrib = new Thread()
@@ -172,33 +152,31 @@ public class CreateDribActivity extends Activity
 
 	private void updateResultsInUi()
 	{
-		EditText dribMessage = (EditText) findViewById(R.id.dribInput);
-		// Hide soft keyboard
-		InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-		inputManager.hideSoftInputFromWindow(dribMessage.getWindowToken(), 0);
+		// dismiss progress dialog
+		// pd.dismiss();
 
 		Log.i(TAG, "Message Successfully Submitted");
-
+		
 		// Create toast (popup) to show send complete
 		Toast success = Toast.makeText(context, "Message sent successfully", Toast.LENGTH_SHORT);
 		success.show();
-
+		
 		context.sendBroadcast(new Intent("com.dribble.dribbleapp.SENT_DRIB"));
 
-		//TODO Return to dashboard screen
-		Intent dashboard = new Intent(this, DashboardActivity.class);
-		dashboard.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-		startActivity(dashboard);
+		// Set tab to first tab (subjects)
+		TabActivity tabActivity = (TabActivity) getParent();
+		if (tabActivity != null)
+		{
+			
+			TabHost tabHost = tabActivity.getTabHost();
+			tabHost.setCurrentTab(0);
+		}
 	}
 
 	@Override
 	public void onResume()
 	{
 		super.onResume();
-		//Register broadcast receiver
-				geographicMeasurementsReceiver = new GeographicMeasurementsReceiver(myLoc);
-				this.registerReceiver(geographicMeasurementsReceiver, 
-						new IntentFilter(DashboardActivity.BROADCAST_GEOGRAPHIC_MEASUREMENTS));
 		context = this;
 		refreshContent();
 	}
@@ -207,13 +185,11 @@ public class CreateDribActivity extends Activity
 	public void onPause()
 	{
 		super.onPause();
-		unregisterReceiver(geographicMeasurementsReceiver);
+
 		// Show hidden items and clear text
 		EditText et = (EditText) findViewById(R.id.topicInput);
 		et.setText("");
 		EditText drib = (EditText) findViewById(R.id.dribInput);
 		drib.setText("");
-		
-		unregisterReceiver(geographicMeasurementsReceiver);
 	}
 }

@@ -11,19 +11,27 @@
 		android:textStyle="bold"
 		android:gravity="center"
 		android:textSize="18sp"
-		android:text="No Messages" />
+		android:text="No Messages"/>
+	<TextView
+		android:id="@+id/android:empty"
+		android:layout_width="fill_parent"
+		android:layout_height="fill_parent"
+		android:padding="10dp"
+		android:layout_below="@id/topicNameForMessages"
+		android:text="Please select a topic near you to see its messages" />
 	<EditText
 		android:id="@+id/replyDrib"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
-		android:inputType="textShortMessage|textMultiLine"
-		android:imeOptions="actionSend|flagNoEnterAction"
+		android:inputType="textMultiLine"
 		android:gravity="top"
 		android:maxLines="4"
 		android:maxLength="144"
 		android:width = "230dp"
+		android:maxWidth="230dp"
 		android:layout_alignParentBottom="true"
 		android:layout_alignParentLeft="true"
+		android:scrollHorizontally="false"
 		android:hint="Type to reply..."/>
 	<Button
 		android:id="@+id/buttonReply"

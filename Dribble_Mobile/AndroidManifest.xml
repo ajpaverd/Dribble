@@ -1,54 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-	android:versionCode="1" android:versionName="1.0" package="com.dribble.dribbleapp">
-
-	<application android:icon="@drawable/drib_icon_2"
-		android:label="@string/app_name" android:debuggable="true"
-		android:description="@string/app_description">
-		<activity android:name=".Splash" android:label="@string/app_name"
-			android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
-			android:screenOrientation="portrait">
-			<intent-filter>
-				<action android:name="android.intent.action.MAIN" />
-				<category android:name="android.intent.category.LAUNCHER" />
-			</intent-filter>
-		</activity>
-
-		<receiver android:name=".DribbleWidget" android:label="@string/app_name"
+      android:versionCode="1"
+      android:versionName="1.0" package="com.dribble.dribbleapp"
+      >
+      
+    <application android:icon="@drawable/drib_icon_2" android:label="@string/app_name" android:description="@string/app_description" android:debuggable="true">
+        <activity android:name=".Splash" android:label="@string/app_name"
+          android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+          android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />        
+            </intent-filter>
+        </activity>
+        
+        <receiver android:name=".DribbleWidget"
+			android:label="@string/app_name"
 			android:icon="@drawable/drib_icon_2_small">
 			<intent-filter>
-				<action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+				<action
+				android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
 			</intent-filter>
-			<meta-data android:name="android.appwidget.provider"
-				android:resource="@xml/widget_provider" />
+			<meta-data
+				android:name="android.appwidget.provider"
+				android:resource="@xml/widget_provider"/>
 		</receiver>
-		<service android:name=".DribbleWidget$DribbleService" />
-
-		<activity android:name=".DashboardActivity"
-			android:label="@string/app_name" android:launchMode="singleTop"
-			android:theme="@@android:style/Theme.NoTitleBar"></activity>
-		<activity android:name=".DribbleTabs" android:configChanges="keyboardHidden|orientation"
-			android:label="@string/app_name" android:theme="@@android:style/Theme.NoTitleBar"></activity>
-		<activity android:name=".SubjectActivity" android:label="@string/app_name"
-			android:theme="@@android:style/Theme.NoTitleBar"></activity>
-		<activity android:name=".MapsActivity" android:label="@string/app_name" android:noHistory="true"
-			android:theme="@android:style/Theme.NoTitleBar"></activity>
-		<activity android:name=".DribActivity" android:label="@string/app_name" android:noHistory="true"
-			android:theme="@@android:style/Theme.NoTitleBar"></activity>
-		<activity android:name=".CreateDribActivity" android:label="@string/app_name" android:noHistory="true"
-			android:theme="@android:style/Theme.NoTitleBar"></activity>
-		<activity android:name=".DribblePreferencesActivity"
-			android:theme="@@android:style/Theme.NoTitleBar"></activity>
-
-		<uses-library android:name="com.google.android.maps" />
-
-	</application>
-
-	<uses-permission android:name="android.permission.INTERNET" />
-	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-	<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-	<uses-permission android:name="android.permission.READ_PHONE_STATE" />
-	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-	<uses-sdk android:minSdkVersion="3" android:targetSdkVersion="7" />
+			<service android:name=".DribbleWidget$DribbleService"/>
+        
+         <activity android:name=".DribbleMain"
+        android:label = "@string/app_name"
+        android:theme = "@@android:style/Theme.Translucent"></activity>
+        <activity android:name=".DribbleTabs"
+        android:configChanges = "keyboardHidden|orientation"
+        android:label = "@string/app_name"
+        android:theme = "@@android:style/Theme.NoTitleBar"></activity>
+        <activity android:name=".SubjectActivity"
+        android:label = "@string/app_name"
+        android:theme = "@@android:style/Theme.NoTitleBar"></activity>
+        <activity android:name=".MapsActivity"
+        android:label = "@string/app_name"
+        android:theme = "@android:style/Theme.NoTitleBar"></activity>
+        <activity android:name=".DribActivity"
+        android:label = "@string/app_name"
+        android:theme = "@@android:style/Theme.NoTitleBar"></activity>
+         <activity android:name=".CreateDribActivity"
+        android:label = "@string/app_name"
+        android:theme = "@android:style/Theme.Dialog"></activity>
+        <activity android:name=".DribblePreferencesActivity"
+        android:theme = "@@android:style/Theme.NoTitleBar"></activity> 
+        
+        <uses-library android:name="com.google.android.maps" />
+        
+    </application>
+              
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-sdk android:minSdkVersion="3"
+    android:targetSdkVersion="7"/>
 
 </manifest> 

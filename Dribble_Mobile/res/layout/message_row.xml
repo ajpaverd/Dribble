@@ -14,24 +14,6 @@
 <!--         android:layout_margin="5dp" -->
        
 <!--         android:src="@drawable/drib_icon_2_smallest" /> -->
-	<TextView
-		android:id="@+id/textmsg"
-		
-		android:layout_width="wrap_content"
-		android:layout_height="fill_parent"
-		android:paddingTop="6dp"
-		android:layout_alignParentLeft="true"
-		android:layout_alignParentTop="true"/>
-	<TextView
-		android:id="@+id/time_created"
-		
-		android:layout_width="wrap_content"
-		android:layout_height="fill_parent"
-		
-		android:layout_below="@id/textmsg"
-		android:layout_alignLeft="@id/textmsg"
-		
-		android:textSize="12sp" />
 	<ImageButton
 		android:id="@+id/buttondislike"
 		
@@ -42,7 +24,7 @@
 		android:background="@id/android:empty"
 		
 		android:layout_alignParentRight="true"
-		android:layout_alignParentBottom="true"/>
+		android:layout_centerVertical="true"/>
 	<ImageButton
 		android:id="@+id/buttonlike"
 		
@@ -52,7 +34,8 @@
 		android:src="@drawable/icon_like"
 		android:background="@id/android:empty"
 		
-		android:layout_toLeftOf="@id/buttondislike"/>
+		android:layout_toLeftOf="@id/buttondislike"
+		android:layout_centerVertical="true"/>
 	<TextView
 		android:id="@+id/distance"
 		
@@ -60,8 +43,33 @@
 		android:layout_height="fill_parent"
 		android:paddingRight="10dp"
 		android:layout_toLeftOf="@id/buttonlike"
+		android:layout_centerVertical="true"
 		
-		android:textSize="18sp" />
+		android:textSize="16sp" />
+	<TextView
+		android:id="@+id/textmsg"
+		
+		android:layout_width="wrap_content"
+		android:layout_height="fill_parent"
+		android:paddingTop="6dp"
+		android:paddingBottom="5dp"
+		android:paddingRight="5dp"
+		android:layout_alignParentLeft="true"
+		android:textSize="16sp"
+		android:layout_alignParentTop="true"
+		android:layout_toLeftOf="@id/distance"/>
+	<TextView
+		android:id="@+id/time_created"
+		
+		android:layout_width="wrap_content"
+		android:layout_height="fill_parent"
+		
+		android:layout_below="@id/textmsg"
+		android:layout_alignLeft="@id/textmsg"
+		android:layout_toLeftOf="@id/distance"
+		android:textColor="@android:color/tertiary_text_light"
+		
+		android:textSize="12sp" />
 <!-- 	<TextView -->
 <!-- 		android:id="@+id/like_count" -->
 		
