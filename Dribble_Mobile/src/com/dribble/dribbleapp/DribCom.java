@@ -38,7 +38,7 @@ public class DribCom {
 	private static String urlToSendRequest;
 	// 10.0.2.2 resolves to localhost in emulator
 	// 50.18.104.62 for EC2 server
-	private static final String targetDomain = "50.18.104.62:8080";
+	private static final String targetDomain = "wheres.dyndns.org:8080";
 	private static final String TAG = "DribCom";
 	private static final Serializer serializer = new Persister();
 	
