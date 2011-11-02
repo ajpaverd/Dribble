@@ -1,7 +1,7 @@
 package dribble.processing;
 
-import dribble.common.Drib;
-import dribble.common.DribSubject;
+import com.dribble.common.Drib;
+import com.dribble.common.DribSubject;
 
 import java.util.ArrayList;
 import java.util.Collections;

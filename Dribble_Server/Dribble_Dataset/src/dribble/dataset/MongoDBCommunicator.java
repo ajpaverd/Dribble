@@ -1,7 +1,7 @@
 package dribble.dataset;
 
 import com.mongodb.BasicDBList;
-import dribble.common.*;
+import com.dribble.common.*;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.Mongo;
@@ -37,12 +37,15 @@ public class MongoDBCommunicator implements Dataset
         // If DB or collection doesn't exisit, it will be created
         try
         {
-            Mongo m = new Mongo("localhost", 27017);
-            db = m.getDB("DribbleDB");
-
+            Mongo m = new Mongo("dbh74.mongolab.com", 27747);
+            db = m.getDB("dribbledb");
+            boolean auth = db.authenticate("dribble", "Dr1bbl3@pp".toCharArray());
             // Get collection of topics
-            logger.info("Connected to DribbleDB");
-            dribTopics = db.getCollection("DribTopics");
+            if (auth)
+            {
+                logger.info("Connected to DribbleDB");
+                dribTopics = db.getCollection("DribTopics");
+            }
 
         }
         catch (UnknownHostException e)
@@ -63,7 +66,7 @@ public class MongoDBCommunicator implements Dataset
         double earthRadius = 6378; // km 
         // needed to convert radius in 'near' command from radians to km
         double radRadius = radius / (earthRadius * Math.PI / 180);
-        
+
         QueryBuilder query = new QueryBuilder();
         DBObject criteria = query.start("loc").near(longitude, latitude, radRadius).get();
 
@@ -161,7 +164,7 @@ public class MongoDBCommunicator implements Dataset
         BasicDBObject addDrib = new BasicDBObject().append("$push",
                 new BasicDBObject().append("dribs", drib)).append("$inc",
                 new BasicDBObject().append("posts", 1));
-        
+
         // Does upsert, ie. insert array if new topic, add to array if existing
         try
         {

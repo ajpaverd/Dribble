@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<dribble.common.Drib>
+<com.dribble.common.Drib>
     <text>Hello</text>
     <latitude>0</latitude>
     <longitude>0</longitude>
@@ -18,4 +18,4 @@
     </subject>
     <likeCount>0</likeCount>
     <popularity>0</popularity>
-</dribble.common.Drib>
+</com.dribble.common.Drib>

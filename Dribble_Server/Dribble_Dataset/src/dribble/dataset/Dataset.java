@@ -1,6 +1,6 @@
 package dribble.dataset;
 
-import dribble.common.*;
+import com.dribble.common.*;
 
 import java.util.ArrayList;
 

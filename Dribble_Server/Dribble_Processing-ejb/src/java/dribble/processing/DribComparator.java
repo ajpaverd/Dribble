@@ -1,7 +1,7 @@
 
 package dribble.processing;
 
-import dribble.common.Drib;
+import com.dribble.common.Drib;
 
 import java.util.Comparator;
 

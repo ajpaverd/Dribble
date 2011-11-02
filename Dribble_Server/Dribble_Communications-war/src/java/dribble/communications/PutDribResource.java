@@ -1,6 +1,6 @@
 package dribble.communications;
 
-import dribble.common.*;
+import com.dribble.common.*;
 
 import java.util.logging.Logger;
 

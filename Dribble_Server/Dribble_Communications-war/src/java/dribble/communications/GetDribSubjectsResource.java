@@ -1,6 +1,6 @@
 package dribble.communications;
 
-import dribble.common.*;
+import com.dribble.common.*;
 import java.util.ArrayList;
 
 import java.util.logging.Logger;
@@ -77,7 +77,7 @@ public class GetDribSubjectsResource {
 
     /**
      * Retrieves representation of an instance of dribble.communications.GetDribSubjectsResource
-     * @return an instance of dribble.common.DribSubject
+     * @return an instance of com.dribble.common.DribSubject
      */
     @GET
     @Produces("application/xml")
