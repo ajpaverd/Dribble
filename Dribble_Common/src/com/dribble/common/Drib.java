@@ -1,4 +1,4 @@
-package dribble.common;
+package com.dribble.common;
 
 
 import java.io.Serializable;

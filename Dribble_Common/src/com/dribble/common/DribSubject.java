@@ -1,5 +1,5 @@
 
-package dribble.common;
+package com.dribble.common;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
